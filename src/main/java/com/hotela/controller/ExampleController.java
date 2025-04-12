@@ -1,5 +1,6 @@
 package com.hotela.controller;
 
+import com.hotela.error.HotelaException;
 import com.hotela.model.Example;
 import com.hotela.service.ExampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,13 @@ public class ExampleController {
     }
 
     @GetMapping("/examples/{id}")
-    public Example getExampleById(@PathVariable UUID id) {
-        return exampleService.findExampleById(id);
+    public ResponseEntity<Example> getExampleById(@PathVariable UUID id) {
+        try {
+            Example example = exampleService.findExampleById(id);
+            return ResponseEntity.ok(example);
+        } catch (HotelaException.ExampleNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/examples/create")
