@@ -22,12 +22,8 @@ public class ExampleController {
 
     @GetMapping("/examples/{id}")
     public ResponseEntity<Example> getExampleById(@PathVariable UUID id) {
-        try {
-            Example example = exampleService.findExampleById(id);
-            return ResponseEntity.ok(example);
-        } catch (HotelaException.ExampleNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Example example = exampleService.findExampleById(id);
+        return ResponseEntity.ok(example);
     }
 
     @PostMapping("/examples/create")
