@@ -39,3 +39,15 @@ Este exemplo expõe uma API REST simples com dois endpoints principais para cria
 
 ## Documentação das APIs
 A documentação dos endpoints pode ser encontrada em [docs/api](docs/api/readme.md)
+
+## Padrões de desenvolvimento
+Antes de submeter um PR, verifique se o código segue os padrões de desenvolvimento estabelecidos.
+Execute o comando abaixo para verificar a formatação do código:
+```bash
+./gradlew spotlessCheck 
+```
+
+Caso o código não esteja formatado, você pode corrigi-lo automaticamente com:
+```bash
+./gradlew spotlessApply
+```

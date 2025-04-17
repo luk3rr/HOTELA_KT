@@ -1,8 +1,7 @@
 package com.hotela.error;
 
-import lombok.Getter;
-
 import java.util.UUID;
+import lombok.Getter;
 
 @Getter
 public sealed class HotelaException extends RuntimeException {
