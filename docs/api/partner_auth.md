@@ -23,7 +23,9 @@ Endpoints para registro e login de parceiros.
 **Resposta de sucesso (`201 Created`):**
 
 ```json
-"Partner registered successfully"
+{
+  "message": "Partner registered successfully"
+}
 ```
 
 **Resposta de erro (`400 Bad Request`):**
@@ -84,7 +86,9 @@ Authorization: Bearer <token>
 **Resposta de sucesso (`200 OK`):**
 
 ```json
-"Logout successful"
+{
+  "message": "Logout successful"
+}
 ```
 
 **Resposta de erro (`401 Unauthorized`):**
