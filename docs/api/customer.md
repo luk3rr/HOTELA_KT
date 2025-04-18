@@ -19,12 +19,11 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
-  "id": "f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa",
   "name": "João Silva",
   "email": "joao@email.com",
   "phone": "+55 11 98765-4321",
   "id_document": "123.456.789-00",
-  "birth_Date": "1990-05-15",
+  "birth_date": "1990-05-15",
   "address": "Rua Exemplo, 123, São Paulo, SP"
 }
 ```
@@ -34,7 +33,7 @@ Endpoints para gerenciamento de dados do cliente.
 ```json
 {
   "code": "200",
-  "message": "Customer with id f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa not found"
+  "message": "Customer with id {id} not found"
 }
 ```
 

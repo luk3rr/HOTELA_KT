@@ -19,14 +19,13 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
 
 ```json
 {
-  "id": "a1b2c3d4-e5f6-7890-abcd-1234567890ef",
   "hotel_id": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1",
   "number": "101",
   "floor": 1,
   "type": "Deluxe",
   "price": 350.00,
   "capacity": 2,
-  "status": 1,
+  "status": "AVAILABLE",
   "description": "Quarto com vista para o mar, cama king size e ar-condicionado."
 }
 ```
@@ -36,7 +35,7 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
 ```json
 {
   "code": "500",
-  "message": "Room with id a1b2c3d4-e5f6-7890-abcd-1234567890ef not found"
+  "message": "Room with id {id} not found"
 }
 ```
 
@@ -56,7 +55,7 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
   "type": "Deluxe",
   "price": 350.00,
   "capacity": 2,
-  "status": 1,
+  "status": "AVAILABLE",
   "description": "Quarto com vista para o mar, cama king size e ar-condicionado."
 }
 ```

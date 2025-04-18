@@ -19,7 +19,6 @@ Endpoints para gerenciamento de pagamentos de reservas feitas por clientes.
 
 ```json
 {
-  "id": "b1234567-89ab-cdef-0123-456789abcdef",
   "booking_id": "a7d3b2c1-5c4e-4f5d-91b0-1234e56c7d89",
   "amount": 250.00,
   "method": "CREDIT_CARD",
@@ -33,7 +32,7 @@ Endpoints para gerenciamento de pagamentos de reservas feitas por clientes.
 ```json
 {
   "code": "600",
-  "message": "Payment with id b1234567-89ab-cdef-0123-456789abcdef not found"
+  "message": "Payment with id {id} not found"
 }
 ```
 
@@ -53,14 +52,13 @@ Endpoints para gerenciamento de pagamentos de reservas feitas por clientes.
 }
 ```
 
-> Valores aceitos para `"method"`: `"CREDIT_CARD"`, `"PIX"`, `"BOLETO"`, `"DEBIT_CARD"` etc.
-
 **Resposta de sucesso (`201 Created`):**
 
 ```json
 {
   "id": "{generated_uuid}",
-  "message": "Payment created successfully"
+  "message": "Payment created successfully",
+  "paid_at": "2025-04-17T15:23:48Z"
 }
 ```
 
@@ -92,8 +90,6 @@ Endpoints para gerenciamento de pagamentos de reservas feitas por clientes.
   "status": "REFUNDED"
 }
 ```
-
-> Campos possíveis de atualizar: `"status"`, `"method"`
 
 **Resposta de sucesso (`200 OK`):**
 

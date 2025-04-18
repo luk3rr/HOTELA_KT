@@ -29,9 +29,10 @@ Este documento descreve as mensagens de erro para os diferentes endpoints do sis
 | 500    | Room with id {id} not found   |
 
 ## Erros de booking (6xx)
-| Código | Mensagem                       |
-|--------|--------------------------------|
-| 600    | Booking with id {id} not found |
+| Código | Mensagem                               |
+|--------|----------------------------------------|
+| 600    | Booking with id {id} not found         |
+| 601    | Booking with id {id} already cancelled |
 
 ## Erros de payment (7xx)
 | Código | Mensagem                       |

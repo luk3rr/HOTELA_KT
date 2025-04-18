@@ -19,7 +19,6 @@ Endpoints para gerenciamento de dados do parceiro.
 
 ```json
 {
-  "id": "b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae",
   "name": "Hotel Bela Vista",
   "cnpj": "12.345.678/0001-99",
   "email": "contato@belavista.com",
@@ -29,8 +28,8 @@ Endpoints para gerenciamento de dados do parceiro.
   "contact_email": "maria@belavista.com",
   "contact_phone": "(11) 91234-5678",
   "contract_signed": true,
-  "status": "active",
-  "created_at": "2024-01-10T14:30:00",
+  "status": "ACTIVE",
+  "created_at": "2024-01-10T14:30:00Z",
   "notes": "Parceiro com bom histórico de reservas"
 }
 ```
@@ -40,7 +39,7 @@ Endpoints para gerenciamento de dados do parceiro.
 ```json
 {
   "code": "300",
-  "message": "Partner with id b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae not found"
+  "message": "Partner with id {id} not found"
 }
 ```
 
@@ -63,7 +62,7 @@ Endpoints para gerenciamento de dados do parceiro.
   "contact_email": "maria@belavista.com",
   "contact_phone": "(11) 91234-5678",
   "contract_signed": true,
-  "status": "active",
+  "status": "ACTIVE",
   "notes": "Parceiro com bom histórico de reservas"
 }
 ```
@@ -106,7 +105,7 @@ Endpoints para gerenciamento de dados do parceiro.
   "email": "novocontato@belavista.com",
   "phone": "(11) 1234-9876",
   "contact_name": "João Pereira",
-  "status": "inactive",
+  "status": "INACTIVE",
   "notes": "Contrato em revisão"
 }
 ```
@@ -187,7 +186,7 @@ curl -X POST http://localhost:8080/parceiro/create \
            "contact_email": "maria@belavista.com",
            "contact_phone": "(11) 91234-5678",
            "contract_signed": true,
-           "status": "active",
+           "status": "ACTIVE",
            "notes": "partner com bom histórico de reservas"
          }'
 ```
@@ -197,7 +196,7 @@ curl -X POST http://localhost:8080/parceiro/create \
 ```bash
 curl -X PUT http://localhost:8080/partner/b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae/update \
      -H "Content-Type: application/json" \
-     -d '{"email": "novoemail@belavista.com", "status": "inactive"}'
+     -d '{"email": "novoemail@belavista.com", "status": "INACTIVE"}'
 ```
 
 ### Excluir parceiro

@@ -1,6 +1,33 @@
 Enum partner_status {
-  active
-  inactive
+  ACTIVE
+  INACTIVE
+}
+
+Enum room_status {
+  AVAILABLE
+  BOOKED
+  MAINTENANCE
+}
+
+Enum payment_method {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+  PIX
+  CASH
+}
+
+Enum payment_status {
+  PENDING
+  COMPLETED
+  REFUNDED
+  FAILED
+}
+
+Enum booking_status {
+  CONFIRMED
+  CANCELLED
 }
 
 Table partner {
@@ -14,7 +41,7 @@ Table partner {
   contact_email varchar(255)
   contact_phone varchar(20)
   contract_signed boolean
-  status partner_status
+  status partner_status [default: "ACTIVE"]
   created_at datetime
   notes text
 }
@@ -28,7 +55,7 @@ Table hotel {
   state varchar(50)
   zip_code varchar(20)
   phone varchar(20)
-  rating decimal(1,1)
+  rating decimal(1,1) [default: 0.0]
   description text
   website varchar(255)
   latitude decimal(10,6)
@@ -43,7 +70,7 @@ Table room {
   type varchar(50)
   price decimal(10,2)
   capacity int
-  status int
+  status room_status [default: "AVAILABLE"]
   description text
 }
 
@@ -63,10 +90,10 @@ Table booking {
   customer_id uuid [ref: > customer.id]
   room_id uuid [ref: > room.id]
   booked_at datetime
-  checkin_date date
-  checkout_date date
-  guest_count int
-  status int
+  checkin datetime
+  checkout datetime
+  guests int
+  status booking_status
   notes text
 }
 
@@ -75,8 +102,8 @@ Table payment {
   booking_id uuid [ref: > booking.id]
   transaction_id varchar(100)
   amount decimal(10,2)
-  payment_method int
-  status int
+  payment_method payment_method
+  status payment_status
   paid_at datetime
 }
 

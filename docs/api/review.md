@@ -19,12 +19,11 @@ Endpoints para gerenciamento de avaliações feitas por clientes sobre hotéis.
 
 ```json
 {
-  "id": "e1234567-89ab-cdef-0123-456789abcdef",
   "hotel_id": "9f8e7d6c-5b4a-3210-1234-abcdefabcdef",
-  "user": "Maria Oliveira",
+  "customer_id": "45f8e7d6c-5b4a-3210-1234-abcxefabckef",
   "rating": 4,
   "comment": "Hotel bem localizado e limpo.",
-  "created_at": "2025-04-17T15:30:00Z"
+  "reviewed_at": "2025-04-17T15:30:00Z"
 }
 ```
 
@@ -33,7 +32,7 @@ Endpoints para gerenciamento de avaliações feitas por clientes sobre hotéis.
 ```json
 {
   "code": "600",
-  "message": "Review with id e1234567-89ab-cdef-0123-456789abcdef not found"
+  "message": "Review with id {id} not found"
 }
 ```
 
@@ -48,13 +47,11 @@ Endpoints para gerenciamento de avaliações feitas por clientes sobre hotéis.
 ```json
 {
   "hotel_id": "9f8e7d6c-5b4a-3210-1234-abcdefabcdef",
-  "user": "Maria Oliveira",
+  "customer_id": "45f8e7d6c-5b4a-3210-1234-abcxefabckef",
   "rating": 4,
   "comment": "Hotel bem localizado e limpo."
 }
 ```
-
-> O campo `rating` deve estar entre `1` e `5`.
 
 **Resposta de sucesso (`201 Created`):**
 
@@ -94,8 +91,6 @@ Endpoints para gerenciamento de avaliações feitas por clientes sobre hotéis.
   "comment": "Excelente atendimento!"
 }
 ```
-
-> Campos possíveis de atualizar: `"rating"`, `"comment"`
 
 **Resposta de sucesso (`200 OK`):**
 
