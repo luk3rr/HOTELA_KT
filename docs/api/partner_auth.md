@@ -32,7 +32,7 @@ Endpoints para registro e login de parceiros.
 
 ```json
 {
-  "code": "300",
+  "code": "100",
   "message": "Email already registered"
 }
 ```

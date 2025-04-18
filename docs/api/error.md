@@ -2,24 +2,28 @@
 Este documento descreve as mensagens de erro para os diferentes endpoints do sistema, agrupadas por tipo de erro e com códigos numéricos específicos para cada tipo.
 
 ## Erros de Autenticação (1xx)
-| Código | Descrição |
-|--------|-----------|
-| 100    | Email já registrado |
-| 101    | Credenciais inválidas |
-| 102    | Token inválido ou expirado |
+| Código | Mensagem                    |
+|--------|-----------------------------|
+| 100    | Email already registered    |
+| 101    | Invalid credentials         |
+| 102    | Token is invalid or expired |
 
 ## Erros de cliente (2xx)
-| Código | Descrição |
-|--------|-----------|
-| 200    | Cliente não encontrado |
+| Código | Mensagem                        |
+|--------|---------------------------------|
+| 200    | Customer with id {id} not found |
 
 ## Erros de parceiro (3xx)
-| Código | Descrição |
-|--------|-----------|
-| 300    | Parceiro não encontrado |
+| Código | Mensagem                       |
+|--------|--------------------------------|
+| 300    | Partner with id {id} not found |
+
+## Erros de hotel (4xx)
+| Código | Mensagem                     |
+|--------|------------------------------|
+| 400    | Hotel with id {id} not found |
 
 ## Erros gerais (9xx)
-| Código | Descrição |
-|--------|-----------|
-| 900    | Dados inválidos |
-| 901    | Acesso negado |
+| Código | Descrição             |
+|--------|-----------------------|
+| 900    | Invalid data provided |

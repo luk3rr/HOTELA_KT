@@ -40,7 +40,7 @@ Endpoints para gerenciamento de dados do parceiro.
 ```json
 {
   "code": "300",
-  "message": "Partner not found"
+  "message": "Partner with id b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae not found"
 }
 ```
 
@@ -134,7 +134,7 @@ Endpoints para gerenciamento de dados do parceiro.
 ```json
 {
   "code": "300",
-  "message": "Partner not found"
+  "message": "Partner with id {id} not found"
 }
 ```
 
@@ -163,7 +163,7 @@ Endpoints para gerenciamento de dados do parceiro.
 ```json
 {
   "code": "300",
-  "message": "Partner not found"
+  "message": "Partner with id {id} not found"
 }
 ```
 

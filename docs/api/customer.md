@@ -34,7 +34,7 @@ Endpoints para gerenciamento de dados do cliente.
 ```json
 {
   "code": "200",
-  "message": "Customer not found"
+  "message": "Customer with id f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa not found"
 }
 ```
 
@@ -69,7 +69,7 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
-  "code": "201",
+  "code": "900",
   "message": "Invalid data provided"
 }
 ```
@@ -82,9 +82,9 @@ Endpoints para gerenciamento de dados do cliente.
 
 **Parâmetro de caminho:**
 
-| Parâmetro | Tipo | Descrição                               |
-|-----------|------|-----------------------------------------|
-| `id`      | UUID | O ID único do cliente a ser atualizado |
+| Parâmetro | Tipo | Descrição                                |
+|-----------|------|------------------------------------------|
+| `id`      | UUID | O ID único do cliente a ser atualizado   |
 
 **Body JSON:**
 
@@ -111,7 +111,7 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
-  "code": "201",
+  "code": "900",
   "message": "Invalid data provided"
 }
 ```
@@ -121,7 +121,7 @@ Endpoints para gerenciamento de dados do cliente.
 ```json
 {
   "code": "200",
-  "message": "Customer not found"
+  "message": "Customer with id {id} not found"
 }
 ```
 
@@ -150,7 +150,7 @@ Endpoints para gerenciamento de dados do cliente.
 ```json
 {
   "code": "200",
-  "message": "Customer not found"
+  "message": "Customer with id {id} not found"
 }
 ```
 
