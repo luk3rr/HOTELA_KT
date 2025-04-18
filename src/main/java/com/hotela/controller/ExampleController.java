@@ -1,14 +1,12 @@
 package com.hotela.controller;
 
-import com.hotela.error.HotelaException;
 import com.hotela.model.Example;
 import com.hotela.service.ExampleService;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/example")

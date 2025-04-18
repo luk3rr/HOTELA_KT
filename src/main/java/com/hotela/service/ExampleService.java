@@ -3,10 +3,9 @@ package com.hotela.service;
 import com.hotela.error.HotelaException;
 import com.hotela.model.Example;
 import com.hotela.repository.ExampleRepository;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class ExampleService {
@@ -27,7 +26,8 @@ public class ExampleService {
     }
 
     public Example findExampleById(UUID id) {
-        return exampleRepository.findById(id)
+        return exampleRepository
+                .findById(id)
                 .orElseThrow(() -> new HotelaException.ExampleNotFoundException(id));
     }
 }
