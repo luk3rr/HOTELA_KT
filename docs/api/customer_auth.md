@@ -29,7 +29,7 @@ Endpoints para registro e login de clientes.
 }
 ```
 
-**Resposta de erro (`400 Bad Request`):**
+**Resposta de erro (`409 Conflict`):**
 
 ```json
 {
