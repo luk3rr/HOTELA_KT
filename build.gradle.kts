@@ -28,6 +28,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.postgresql:postgresql")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 	// Replace h2 to postgresql after configuring the database
 	runtimeOnly("com.h2database:h2")
 	compileOnly("org.projectlombok:lombok")
