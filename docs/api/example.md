@@ -59,10 +59,10 @@ Endpoint para criar e buscar objetos do tipo `Example`.
 
 ## Modelo de Dados: `Example`
 
-| Campo | Tipo  | Obrigatório | Descrição            |
+| Campo | Tipo  | Obrigatório | Descrição              |
 |-------|-------|-------------|------------------------|
-| `id`  | UUID  | Não         | Identificador único   |
-| `name`| String| Sim         | Nome do exemplo       |
+| `id`  | UUID  | Não         | Identificador único    |
+| `name`| String| Sim         | Nome do exemplo        |
 
 ---
 

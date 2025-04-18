@@ -73,7 +73,8 @@ Endpoints para gerenciamento de hotéis vinculados a parceiros.
 
 ```json
 {
-  "id": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1"
+  "id": "{generated_uuid}"
+  "message": "Hotel created successfully"
 }
 ```
 

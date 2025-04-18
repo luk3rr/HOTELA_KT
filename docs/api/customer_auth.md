@@ -24,6 +24,7 @@ Endpoints para registro e login de clientes.
 
 ```json
 {
+  "id": "{generated_uuid}",
   "message": "Customer registered successfully"
 }
 ```

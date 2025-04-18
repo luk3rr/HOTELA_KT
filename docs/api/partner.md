@@ -72,7 +72,8 @@ Endpoints para gerenciamento de dados do parceiro.
 
 ```json
 {
-  "id": "b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae"
+  "id": "{generated_uuid}",
+  "message": "Partner created successfully"
 }
 ```
 

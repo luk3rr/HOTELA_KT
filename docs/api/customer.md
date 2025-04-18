@@ -61,7 +61,8 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
-  "id": "f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa"
+  "id": "{generated-uuid}",
+  "message": "Customer created successfully"
 }
 ```
 

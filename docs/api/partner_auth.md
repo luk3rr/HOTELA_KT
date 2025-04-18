@@ -24,6 +24,7 @@ Endpoints para registro e login de parceiros.
 
 ```json
 {
+  "id": "{generated_uuid}",
   "message": "Partner registered successfully"
 }
 ```
