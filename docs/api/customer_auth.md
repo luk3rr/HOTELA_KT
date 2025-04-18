@@ -1,11 +1,11 @@
-# Cliente Autenticação
+# Customer Authentication
 Endpoints para registro e login de clientes.
 
 ---
 
 ## Endpoints
 
-### POST `/auth/client/register`
+### POST `/auth/customer/register`
 
 **Descrição:** Registra um novo cliente para autenticação no sistema.
 
@@ -13,18 +13,18 @@ Endpoints para registro e login de clientes.
 
 ```json
 {
-  "email": "cliente@email.com",
+  "email": "customer@email.com",
   "password": "senha_segura"
 }
 ```
 
-> O cliente correspondente já deve existir previamente na tabela `cliente`. O campo `email` deve ser único.
+> O cliente correspondente já deve existir previamente na tabela `customer`. O campo `email` deve ser único.
 
 **Resposta de sucesso (`201 Created`):**
 
 ```json
 {
-  "message": "Client registered successfully"
+  "message": "Customer registered successfully"
 }
 ```
 
@@ -39,7 +39,7 @@ Endpoints para registro e login de clientes.
 
 ---
 
-### POST `/auth/client/login`
+### POST `/auth/customer/login`
 
 **Descrição:** Realiza o login do cliente e retorna um token JWT.
 
@@ -47,7 +47,7 @@ Endpoints para registro e login de clientes.
 
 ```json
 {
-  "email": "cliente@email.com",
+  "email": "customer@email.com",
   "password": "senha_segura"
 }
 ```
@@ -58,7 +58,7 @@ Endpoints para registro e login de clientes.
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "type": "Bearer",
-  "expireAt": "2025-04-18T14:00:00Z"
+  "expire_at": "2025-04-18T14:00:00Z"
 }
 ```
 
@@ -73,7 +73,7 @@ Endpoints para registro e login de clientes.
 
 ---
 
-### POST `/auth/client/logout`
+### POST `/auth/customer/logout`
 
 **Descrição:** Realiza o logout do cliente e invalida o token atual.
 
@@ -107,7 +107,7 @@ Authorization: Bearer <token>
 ### Registrar cliente
 
 ```bash
-curl -X POST http://localhost:8080/auth/client/register \
+curl -X POST http://localhost:8080/auth/customer/register \
      -H "Content-Type: application/json" \
      -d '{"email": "joao@email.com", "password": "minha_senha"}'
 ```
@@ -115,7 +115,7 @@ curl -X POST http://localhost:8080/auth/client/register \
 ### Login do cliente
 
 ```bash
-curl -X POST http://localhost:8080/auth/client/login \
+curl -X POST http://localhost:8080/auth/customer/login \
      -H "Content-Type: application/json" \
      -d '{"email": "joao@email.com", "password": "minha_senha"}'
 ```
@@ -123,6 +123,6 @@ curl -X POST http://localhost:8080/auth/client/login \
 ### Logout do cliente
 
 ```bash
-curl -X POST http://localhost:8080/auth/client/logout \
+curl -X POST http://localhost:8080/auth/customer/logout \
      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```

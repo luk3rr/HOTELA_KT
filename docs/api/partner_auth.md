@@ -1,4 +1,4 @@
-# Parceiro Autenticação
+# Partner Authentication
 Endpoints para registro e login de parceiros.
 
 ---
@@ -13,12 +13,12 @@ Endpoints para registro e login de parceiros.
 
 ```json
 {
-  "email": "parceiro@email.com",
+  "email": "partner@email.com",
   "password": "senha_segura"
 }
 ```
 
-> O parceiro correspondente já deve existir previamente na tabela `parceiro`. O campo `email` deve ser único.
+> O parceiro correspondente já deve existir previamente na tabela `partner`. O campo `email` deve ser único.
 
 **Resposta de sucesso (`201 Created`):**
 
@@ -47,7 +47,7 @@ Endpoints para registro e login de parceiros.
 
 ```json
 {
-  "email": "parceiro@email.com",
+  "email": "partner@email.com",
   "password": "senha_segura"
 }
 ```

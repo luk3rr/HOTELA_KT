@@ -1,11 +1,11 @@
-# Cliente
+# Customer
 Endpoints para gerenciamento de dados do cliente.
 
 ---
 
 ## Endpoints
 
-### GET `/client/{id}`
+### GET `/customer/{id}`
 
 **Descrição:** Retorna os detalhes de um cliente pelo ID.
 
@@ -20,12 +20,12 @@ Endpoints para gerenciamento de dados do cliente.
 ```json
 {
   "id": "f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa",
-  "nome": "João Silva",
+  "name": "João Silva",
   "email": "joao@email.com",
-  "telefone": "+55 11 98765-4321",
-  "documento_identificacao": "123.456.789-00",
-  "data_nascimento": "1990-05-15",
-  "endereco": "Rua Exemplo, 123, São Paulo, SP"
+  "phone": "+55 11 98765-4321",
+  "id_document": "123.456.789-00",
+  "birth_Date": "1990-05-15",
+  "address": "Rua Exemplo, 123, São Paulo, SP"
 }
 ```
 
@@ -34,13 +34,13 @@ Endpoints para gerenciamento de dados do cliente.
 ```json
 {
   "code": "200",
-  "message": "Client not found"
+  "message": "Customer not found"
 }
 ```
 
 ---
 
-### POST `/client/create`
+### POST `/customer/create`
 
 **Descrição:** Cria um novo cliente no sistema.
 
@@ -48,12 +48,12 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
-  "nome": "João Silva",
+  "name": "João Silva",
   "email": "joao@email.com",
-  "telefone": "+55 11 98765-4321",
-  "documento_identificacao": "123.456.789-00",
-  "data_nascimento": "1990-05-15",
-  "endereco": "Rua Exemplo, 123, São Paulo, SP"
+  "phone": "+55 11 98765-4321",
+  "id_document": "123.456.789-00",
+  "birth_date": "1990-05-15",
+  "address": "Rua Exemplo, 123, São Paulo, SP"
 }
 ```
 
@@ -76,7 +76,7 @@ Endpoints para gerenciamento de dados do cliente.
 
 ---
 
-### PUT `/client/{id}/update`
+### PUT `/customer/{id}/update`
 
 **Descrição:** Atualiza os dados de um cliente existente.
 
@@ -90,12 +90,12 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
-  "nome": "João Silva Filho",
+  "name": "João Silva Filho",
   "email": "joao.silva@email.com",
-  "telefone": "+55 11 98765-4321",
-  "documento_identificacao": "123.456.789-00",
-  "data_nascimento": "1990-05-15",
-  "endereco": "Rua Nova, 456, São Paulo, SP"
+  "phone": "+55 11 98765-4321",
+  "id_document": "123.456.789-00",
+  "birth_date": "1990-05-15",
+  "address": "Rua Nova, 456, São Paulo, SP"
 }
 ```
 
@@ -103,7 +103,7 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
-  "message": "Client updated successfully"
+  "message": "Customer updated successfully"
 }
 ```
 
@@ -121,13 +121,13 @@ Endpoints para gerenciamento de dados do cliente.
 ```json
 {
   "code": "200",
-  "message": "Client not found"
+  "message": "Customer not found"
 }
 ```
 
 ---
 
-### DELETE `/client/{id}/delete`
+### DELETE `/customer/{id}/delete`
 
 **Descrição:** Exclui um cliente do sistema.
 
@@ -141,7 +141,7 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
-  "message": "Client deleted successfully"
+  "message": "Customer deleted successfully"
 }
 ```
 
@@ -150,7 +150,7 @@ Endpoints para gerenciamento de dados do cliente.
 ```json
 {
   "code": "200",
-  "message": "Client not found"
+  "message": "Customer not found"
 }
 ```
 
@@ -161,21 +161,21 @@ Endpoints para gerenciamento de dados do cliente.
 ### Criar cliente
 
 ```bash
-curl -X POST http://localhost:8080/client/create \
+curl -X POST http://localhost:8080/customer/create \
      -H "Content-Type: application/json" \
-     -d '{"nome": "João Silva", "email": "joao@email.com", "telefone": "+55 11 98765-4321", "documento_identificacao": "123.456.789-00", "data_nascimento": "1990-05-15", "endereco": "Rua Exemplo, 123, São Paulo, SP"}'
+     -d '{"name": "João Silva", "email": "joao@email.com", "phone": "+55 11 98765-4321", "id_document": "123.456.789-00", "birth_date": "1990-05-15", "address": "Rua Exemplo, 123, São Paulo, SP"}'
 ```
 
 ### Atualizar cliente
 
 ```bash
-curl -X PUT http://localhost:8080/client/f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa/update \
+curl -X PUT http://localhost:8080/customer/f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa/update \
      -H "Content-Type: application/json" \
-     -d '{"nome": "João Silva Filho", "email": "joao.silva@email.com", "telefone": "+55 11 98765-4321", "documento_identificacao": "123.456.789-00", "data_nascimento": "1990-05-15", "endereco": "Rua Nova, 456, São Paulo, SP"}'
+     -d '{"name": "João Silva Filho", "email": "joao.silva@email.com", "phone": "+55 11 98765-4321", "id_document": "123.456.789-00", "birth_date": "1990-05-15", "address": "Rua Nova, 456, São Paulo, SP"}'
 ```
 
 ### Excluir cliente
 
 ```bash
-curl -X DELETE http://localhost:8080/client/f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa/delete
+curl -X DELETE http://localhost:8080/customer/f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa/delete
 ```
