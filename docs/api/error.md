@@ -23,6 +23,26 @@ Este documento descreve as mensagens de erro para os diferentes endpoints do sis
 |--------|------------------------------|
 | 400    | Hotel with id {id} not found |
 
+## Erros de room (5xx)
+| Código | Mensagem                      |
+|--------|-------------------------------|
+| 500    | Room with id {id} not found   |
+
+## Erros de booking (6xx)
+| Código | Mensagem                       |
+|--------|--------------------------------|
+| 600    | Booking with id {id} not found |
+
+## Erros de payment (7xx)
+| Código | Mensagem                       |
+|--------|--------------------------------|
+| 700    | Payment with id {id} not found |
+
+## Erros de review (8xx)
+| Código | Mensagem                      |
+|--------|-------------------------------|
+| 800    | Review with id {id} not found |
+
 ## Erros gerais (9xx)
 | Código | Descrição             |
 |--------|-----------------------|
