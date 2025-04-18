@@ -13,5 +13,10 @@ http://localhost:8080/
 3. [Partner Auth](partner_auth.md)
 4. [Customer](customer.md)
 5. [Customer Auth](customer_auth.md)
+6. [Hotel](hotel.md)
+7. [Booking](booking.md)
+8. [Payment](payment.md)
+9. [Review](review.md)
+10. [Room](room.md)
 
 A definição dos códigos de erro segue o padrão definido em [error.md](error.md).
