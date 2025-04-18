@@ -9,3 +9,9 @@ http://localhost:8080/
 
 ## Endpoints
 1. [Example](example.md)
+2. [Partner](partner.md)
+3. [Partner Auth](partner_auth.md)
+4. [Client](client.md)
+5. [Client Auth](client_auth.md)
+
+A definição dos códigos de erro segue o padrão definido em [error.md](error.md).
