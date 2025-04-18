@@ -40,6 +40,11 @@ Este exemplo expõe uma API REST simples com dois endpoints principais para cria
 ## Documentação das APIs
 A documentação dos endpoints pode ser encontrada em [docs/api](docs/api/readme.md)
 
+Com a aplicação em execução, você pode acessar a documentação Swagger em:
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
 ## Padrões de desenvolvimento
 Antes de submeter um PR, verifique se o código segue os padrões de desenvolvimento estabelecidos.
 Execute o comando abaixo para verificar a formatação do código:
