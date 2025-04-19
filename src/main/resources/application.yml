@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: hotela
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/hotela
+    username: hotela_user
+    password: pswd
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  liquibase:
+    url: jdbc:postgresql://localhost:5432/hotela
+    user: hotela_user
+    password: pswd
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
+logging:
+  level:
+    liquibase: DEBUG

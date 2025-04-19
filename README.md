@@ -1,8 +1,8 @@
 # Sistema de hotel
-- **Back-end:** Java 21  
-- **Testes unitários:** JUnit e Mockito  
+- **Back-end:** Kotlin
+- **Testes unitários:** Kotest
 - **Framework:** Spring  
-- **Comunicação back-front:** API Rest  
+- **Comunicação back-front:** API Restful
 
 ## Como executar o projeto com Gradle
 

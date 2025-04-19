@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: hotela-postgres
+    environment:
+      POSTGRES_USER: hotela_user
+      POSTGRES_PASSWORD: pswd
+      POSTGRES_DB: hotela
+      TZ: "UTC"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - hotela-network
+
+networks:
+  hotela-network:
+    driver: bridge
+
+volumes:
+  pgdata:

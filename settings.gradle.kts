@@ -1,1 +1,1 @@
-rootProject.name = "hotela"
+rootProject.name = "hotela_kt"
