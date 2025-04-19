@@ -1,4 +1,4 @@
-package com.hotela;
+package com.hotela
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan

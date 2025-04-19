@@ -6,17 +6,12 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class ExampleService(private val exampleRepository: ExampleRepository) {
+class ExampleService(
+    private val exampleRepository: ExampleRepository,
+) {
+    suspend fun createExample(example: Example): UUID = exampleRepository.create(example)
 
-    suspend fun createExample(example: Example): UUID {
-        return exampleRepository.create(example)
-    }
+    suspend fun getExampleById(id: UUID): Example = exampleRepository.getById(id)
 
-    suspend fun getExampleById(id: UUID): Example {
-        return exampleRepository.getById(id)
-    }
-
-    suspend fun findExampleById(id: UUID): Example? {
-        return exampleRepository.findById(id)
-    }
+    suspend fun findExampleById(id: UUID): Example? = exampleRepository.findById(id)
 }

@@ -11,14 +11,13 @@ import kotlin.reflect.full.findAnnotation
 class RestExceptionHandler {
     @ExceptionHandler(HotelaException::class)
     fun handleHotelaException(e: HotelaException): ResponseEntity<ErrorResponse> {
-
         e::class.findAnnotation<ResponseStatus>()?.let {
             return ResponseEntity(ErrorResponse(e.code, e.message), it.value)
         }
 
         return ResponseEntity(
             ErrorResponse(e.code, e.message),
-            HttpStatus.INTERNAL_SERVER_ERROR
+            HttpStatus.INTERNAL_SERVER_ERROR,
         )
     }
 }

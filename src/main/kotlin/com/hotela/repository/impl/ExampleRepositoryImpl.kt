@@ -8,25 +8,21 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 class ExampleRepositoryImpl(
-    private val databaseClient: DatabaseClient
+    private val databaseClient: DatabaseClient,
 ) : ExampleRepository {
-    override suspend fun findById(id: UUID): Example? {
-        return databaseClient
+    override suspend fun findById(id: UUID): Example? =
+        databaseClient
             .sql(FIND_BY_ID)
             .bind("id", id)
             .map { row, _ ->
                 mapper(row)
-            }
-            .awaitSingleOrNull()
-    }
+            }.awaitSingleOrNull()
 
-    override suspend fun getById(id: UUID): Example {
-        return findById(id) ?: throw HotelaException.ExampleNotFoundException(id)
-    }
+    override suspend fun getById(id: UUID): Example = findById(id) ?: throw HotelaException.ExampleNotFoundException(id)
 
     override suspend fun create(example: Example): UUID {
         findById(example.id)?.let {
@@ -39,17 +35,15 @@ class ExampleRepositoryImpl(
             .bind("name", example.name)
             .map { row, _ ->
                 mapper(row)
-            }
-            .awaitSingle()
+            }.awaitSingle()
             .id
     }
 
-    private fun mapper(row: Row): Example {
-        return Example(
+    private fun mapper(row: Row): Example =
+        Example(
             id = row.get("id", UUID::class.java)!!,
-            name = row.get("name", String::class.java)!!
+            name = row.get("name", String::class.java)!!,
         )
-    }
 }
 
 private const val FIND_BY_ID = """

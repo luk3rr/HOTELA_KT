@@ -1,7 +1,6 @@
 import org.gradle.api.JavaVersion
 import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.liquibase.gradle.LiquibaseExtension
 
 plugins {
     id("org.springframework.boot") version "3.4.4"
@@ -56,7 +55,6 @@ tasks.withType<KotlinCompile>().configureEach {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 }
-
 
 spotless {
     kotlin {
