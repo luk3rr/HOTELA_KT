@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset lucas:001
+--changeset lucas.araujo:001-create-example
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
