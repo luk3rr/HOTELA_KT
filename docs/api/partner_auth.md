@@ -13,8 +13,17 @@ Endpoints para registro e login de parceiros.
 
 ```json
 {
-  "email": "partner@email.com",
-  "password": "senha_segura"
+  "email": "contato@pousadadomar.com.br",
+  "password": "senhaSuperSecreta123",
+  "name": "Pousada do Mar",
+  "cnpj": "12.345.678/0001-99",
+  "phone": "+55 31 99999-8888",
+  "address": "Rua das Gaivotas, 123 - Ubatuba, SP",
+  "contactName": "Maria Silva",
+  "contactPhone": "+55 11 98888-7777",
+  "contactEmail": "maria.silva@pousadadomar.com.br",
+  "contractSigned": true,
+  "notes": "Contrato assinado digitalmente no dia 20/03/2025"
 }
 ```
 
@@ -24,8 +33,9 @@ Endpoints para registro e login de parceiros.
 
 ```json
 {
-  "id": "{generated_uuid}",
-  "message": "Partner registered successfully"
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "type": "Bearer",
+  "expire_at": "2025-04-18T14:00:00Z"
 }
 ```
 
@@ -48,8 +58,8 @@ Endpoints para registro e login de parceiros.
 
 ```json
 {
-  "email": "partner@email.com",
-  "password": "senha_segura"
+  "email": "contato@pousadadomar.com.br",
+  "password": "senhaSuperSecreta123",
 }
 ```
 
@@ -74,35 +84,6 @@ Endpoints para registro e login de parceiros.
 
 ---
 
-### POST `/auth/partner/logout`
-
-**Descrição:** Realiza o logout do parceiro e invalida o token atual.
-
-**Header obrigatório:**
-
-```
-Authorization: Bearer <token>
-```
-
-**Resposta de sucesso (`200 OK`):**
-
-```json
-{
-  "message": "Logout successful"
-}
-```
-
-**Resposta de erro (`401 Unauthorized`):**
-
-```json
-{
-  "code": "102",
-  "message": "Token is invalid or expired"
-}
-```
-
----
-
 ## Exemplos com `curl`
 
 ### Registrar parceiro
@@ -110,7 +91,20 @@ Authorization: Bearer <token>
 ```bash
 curl -X POST http://localhost:8080/auth/partner/register \
      -H "Content-Type: application/json" \
-     -d '{"email": "lucas@hotelx.com", "password": "senha_segura"}'
+     -d '{
+              "email": "contato@pousadadomar.com.br",
+              "password": "senhaSuperSecreta123",
+              "name": "Pousada do Mar",
+              "cnpj": "12.345.678/0001-99",
+              "phone": "+55 31 99999-8888",
+              "address": "Rua das Gaivotas, 123 - Ubatuba, SP",
+              "contactName": "Maria Silva",
+              "contactPhone": "+55 11 98888-7777",
+              "contactEmail": "maria.silva@pousadadomar.com.br",
+              "contractSigned": true,
+              "status": "ACTIVE",
+              "notes": "Contrato assinado digitalmente no dia 20/03/2025"
+        }'
 ```
 
 ### Login do parceiro
@@ -118,12 +112,5 @@ curl -X POST http://localhost:8080/auth/partner/register \
 ```bash
 curl -X POST http://localhost:8080/auth/partner/login \
      -H "Content-Type: application/json" \
-     -d '{"email": "lucas@hotelx.com", "password": "senha_segura"}'
-```
-
-### Logout do parceiro
-
-```bash
-curl -X POST http://localhost:8080/auth/partner/logout \
-     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+     -d '{"email": "contato@pousadadomar.com.br", "password": "senhaSuperSecreta123"}'
 ```
