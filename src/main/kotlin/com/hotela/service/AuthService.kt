@@ -2,6 +2,7 @@ package com.hotela.service
 
 import com.hotela.model.database.Customer
 import com.hotela.model.database.CustomerAuth
+import com.hotela.model.database.PartnerAuth
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
@@ -18,26 +19,54 @@ class AuthService(
     private val jwtDecoder: JwtDecoder,
     private val jwtEncoder: JwtEncoder,
     private val customerService: CustomerService,
+    private val partnerAuthService: PartnerAuthService,
 ) {
-    fun createCustomerToken(customer: CustomerAuth): String {
-        val jwsHeader = JwsHeader.with { "HS256" }.build()
+    companion object {
+        private val JWS_HEADER = JwsHeader.with { "HS256" }.build()
+        private const val ISSUER = "hotela_backend"
+        private const val EXPIRATION_DURATION_MINUTES = 60L
+        private val EXPIRATION_DURATION_UNIT = ChronoUnit.MINUTES
+    }
+
+    fun createCustomerToken(customer: CustomerAuth): String =
+        createToken(subject = customer.email, claimKey = "customerAuthId", claimValue = customer.id)
+
+    fun createPartnerToken(partner: PartnerAuth): String =
+        createToken(subject = partner.email, claimKey = "partnerAuthId", claimValue = partner.id)
+
+    private fun createToken(
+        subject: String,
+        claimKey: String,
+        claimValue: Any,
+    ): String {
+        val now = Instant.now()
         val claims =
             JwtClaimsSet
                 .builder()
-                .issuer("hotela_backend")
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plus(1L, ChronoUnit.HOURS))
-                .subject(customer.email)
-                .claim("customerId", customer.id)
+                .issuer(ISSUER)
+                .issuedAt(now)
+                .expiresAt(now.plus(EXPIRATION_DURATION_MINUTES, EXPIRATION_DURATION_UNIT))
+                .subject(subject)
+                .claim(claimKey, claimValue)
                 .build()
-        return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).tokenValue
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(JWS_HEADER, claims)).tokenValue
     }
 
-    suspend fun parseToken(token: String): Customer? =
+    suspend fun parseCustomerToken(token: String): Customer? =
         try {
             val jwt = jwtDecoder.decode(token)
-            val userId = jwt.claims["customerId"] as UUID
+            val userId = jwt.claims["customerAuthId"] as UUID
             customerService.findById(userId)
+        } catch (e: Exception) {
+            null
+        }
+
+    suspend fun parsePartnerToken(token: String): PartnerAuth? =
+        try {
+            val jwt = jwtDecoder.decode(token)
+            val partnerId = jwt.claims["partnerAuthId"] as UUID
+            partnerAuthService.findById(partnerId)
         } catch (e: Exception) {
             null
         }

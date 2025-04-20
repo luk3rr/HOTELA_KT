@@ -1,8 +1,8 @@
 package com.hotela.repository.impl
 
 import com.hotela.error.HotelaException
-import com.hotela.model.database.CustomerAuth
-import com.hotela.repository.CustomerAuthRepository
+import com.hotela.model.database.PartnerAuth
+import com.hotela.repository.PartnerAuthRepository
 import io.r2dbc.spi.Row
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingle
@@ -12,10 +12,18 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Component
-class CustomerAuthRepositoryImpl(
+class PartnerAuthRepositoryImpl(
     private val databaseClient: DatabaseClient,
-) : CustomerAuthRepository {
-    override suspend fun findByEmail(email: String): CustomerAuth? =
+) : PartnerAuthRepository {
+    override suspend fun findById(id: UUID): PartnerAuth? =
+        databaseClient
+            .sql(FIND_BY_ID)
+            .bind("id", id)
+            .map { row, _ ->
+                mapper(row)
+            }.awaitSingleOrNull()
+
+    override suspend fun findByEmail(email: String): PartnerAuth? =
         databaseClient
             .sql(FIND_BY_EMAIL)
             .bind("email", email)
@@ -31,25 +39,25 @@ class CustomerAuthRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
-    override suspend fun save(customerAuth: CustomerAuth): CustomerAuth {
-        if (existsByEmail(customerAuth.email)) {
+    override suspend fun save(partnerAuth: PartnerAuth): PartnerAuth {
+        if (existsByEmail(partnerAuth.email)) {
             throw HotelaException.EmailAlreadyRegisteredException()
         }
 
         return databaseClient
             .sql(SAVE)
-            .bind("id", customerAuth.id)
-            .bind("customerId", customerAuth.customerId)
-            .bind("email", customerAuth.email)
-            .bind("passwordHash", customerAuth.passwordHash)
+            .bind("id", partnerAuth.id)
+            .bind("partnerId", partnerAuth.partnerId)
+            .bind("email", partnerAuth.email)
+            .bind("passwordHash", partnerAuth.passwordHash)
             .map { row, _ -> mapper(row) }
             .awaitSingle()
     }
 
-    private fun mapper(row: Row): CustomerAuth =
-        CustomerAuth(
+    private fun mapper(row: Row): PartnerAuth =
+        PartnerAuth(
             id = row.get("id", UUID::class.java)!!,
-            customerId = row.get("customer_id", UUID::class.java)!!,
+            partnerId = row.get("partner_id", UUID::class.java)!!,
             email = row.get("email", String::class.java)!!,
             passwordHash = row.get("password_hash", String::class.java)!!,
             createdAt = row.get("created_at", LocalDateTime::class.java)!!,
@@ -58,18 +66,22 @@ class CustomerAuthRepositoryImpl(
         )
 
     companion object {
+        private const val FIND_BY_ID = """
+            SELECT * FROM partner_auth WHERE id = :id
+        """
+
         private const val FIND_BY_EMAIL = """
-        SELECT * FROM customer_auth WHERE email = :email
+            SELECT * FROM partner_auth WHERE email = :email
         """
 
         private const val EXISTS_BY_EMAIL = """
-        SELECT EXISTS(SELECT 1 FROM customer_auth WHERE email = :email) AS exists
+            SELECT EXISTS(SELECT 1 FROM partner_auth WHERE email = :email) AS exists
         """
 
         private const val SAVE = """
-        INSERT INTO customer_auth (id, customer_id, email, password_hash)
-        VALUES (:id, :customerId, :email, :passwordHash)
-        RETURNING *
+            INSERT INTO partner_auth (id, partner_id, email, password_hash)
+            VALUES (:id, :partnerId, :email, :passwordHash)
+            RETURNING *
         """
     }
 }

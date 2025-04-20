@@ -85,7 +85,7 @@ class CustomerRepositoryImpl(
         private const val SAVE = """
         INSERT INTO customer (id, name, email, phone, id_document, birth_date, address)
         VALUES (:id, :name, :email, :phone, :idDocument, :birthDate, :address)
-        RETURNING id, name, email, phone, id_document, birth_date, address
+        RETURNING *
         """
     }
 }

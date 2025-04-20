@@ -1,21 +1,18 @@
-package com.hotela.model.database
+package com.hotela.model.auth
 
 import com.hotela.model.enum.PartnerStatus
-import java.time.LocalDateTime
-import java.util.UUID
 
-data class Partner(
-    val id: UUID,
+data class PartnerRegisterRequest(
+    val email: String,
+    val password: String,
     val name: String,
     val cnpj: String,
-    val email: String,
     val phone: String,
     val address: String,
     val contactName: String?,
-    val contactEmail: String?,
     val contactPhone: String?,
+    val contactEmail: String?,
     val contractSigned: Boolean = false,
     val status: PartnerStatus = PartnerStatus.ACTIVE,
-    val createdAt: LocalDateTime? = LocalDateTime.now(),
     val notes: String? = null,
 )

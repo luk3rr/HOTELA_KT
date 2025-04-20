@@ -129,7 +129,6 @@ CREATE TABLE partner_auth
     partner_id    uuid UNIQUE NOT NULL,
     email         varchar(255) UNIQUE NOT NULL,
     password_hash varchar(255)        NOT NULL,
-    password_salt varchar(255)        NOT NULL,
     created_at    timestamp NOT NULL DEFAULT now(),
     last_login    timestamp NOT NULL DEFAULT now(),
     active        boolean NOT NULL DEFAULT true

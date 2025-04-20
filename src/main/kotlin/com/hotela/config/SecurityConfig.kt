@@ -28,8 +28,8 @@ class SecurityConfig {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
             authorizeHttpRequests {
-                authorize(HttpMethod.POST, "/auth/customer/login", permitAll)
-                authorize(HttpMethod.POST, "/auth/customer/register", permitAll)
+                authorize(HttpMethod.POST, "/auth/*/login", permitAll)
+                authorize(HttpMethod.POST, "/auth/*/register", permitAll)
                 authorize(anyRequest, authenticated)
             }
             oauth2ResourceServer {
