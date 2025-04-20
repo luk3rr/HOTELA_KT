@@ -9,10 +9,12 @@ import com.hotela.model.database.CustomerAuth
 import com.hotela.service.AuthService
 import com.hotela.service.CustomerAuthService
 import com.hotela.service.CustomerService
+import org.springframework.http.HttpStatus
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.util.UUID
@@ -25,6 +27,7 @@ class AuthController(
     private val customerService: CustomerService,
 ) {
     @PostMapping("/customer/login")
+    @ResponseStatus(HttpStatus.OK)
     suspend fun customerLogin(
         @RequestBody payload: AuthRequest,
     ): AuthResponse {
@@ -41,6 +44,7 @@ class AuthController(
 
     @PostMapping("/customer/register")
     @Transactional
+    @ResponseStatus(HttpStatus.CREATED)
     suspend fun customerRegister(
         @RequestBody payload: CustomerRegisterRequest,
     ): AuthResponse {
