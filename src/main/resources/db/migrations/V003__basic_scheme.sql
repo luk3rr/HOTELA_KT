@@ -32,7 +32,7 @@ CREATE TABLE hotel
     state       varchar(50) NOT NULL,
     zip_code    varchar(20) NOT NULL,
     phone       varchar(20) NOT NULL,
-    rating      decimal(1, 1) NOT NULL DEFAULT 0,
+    rating      decimal(2, 1) NOT NULL DEFAULT 0,
     description text,
     website     varchar(255),
     latitude    decimal(10, 6) NOT NULL,
