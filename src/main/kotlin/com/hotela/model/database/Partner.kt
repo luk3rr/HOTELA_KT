@@ -1,10 +1,10 @@
-package com.hotela.model
+package com.hotela.model.database
 
 import com.hotela.model.enum.PartnerStatus
 import java.time.LocalDateTime
 import java.util.UUID
 
-class Partner(
+data class Partner(
     val id: UUID,
     val name: String,
     val cnpj: String,

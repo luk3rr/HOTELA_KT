@@ -1,10 +1,10 @@
-package com.hotela.model
+package com.hotela.model.database
 
 import com.hotela.model.enum.BookingStatus
 import java.time.LocalDateTime
 import java.util.UUID
 
-class Booking(
+data class Booking(
     val id: UUID,
     val customerId: UUID,
     val hotelId: UUID,

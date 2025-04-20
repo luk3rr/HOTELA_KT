@@ -21,3 +21,6 @@ spring:
 logging:
   level:
     liquibase: DEBUG
+
+security:
+  key: ${JWT_SECRET}

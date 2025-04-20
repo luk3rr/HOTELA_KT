@@ -14,7 +14,17 @@ git clone https://github.com/seu-usuario/seu-repositorio.git
 cd seu-repositorio
 ```
 
-### 2. Executar o projeto
+### 2. Gere uma chave compatível com JWT
+```bash
+export JWT_SECRET=$(openssl rand -base64 64)
+```
+
+Essa chave será usada para assinar os tokens JWT. Você pode verificar se a variável foi criada corretamente com o comando:
+```bash
+echo $JWT_SECRET
+```
+
+### 3. Executar o projeto
 Você pode iniciar a aplicação com o comando:
 
 ```bash
@@ -26,7 +36,7 @@ gradlew.bat bootRun
 ```
 A aplicação será iniciada na porta padrão 8080.
 
-### 3. Rodar os testes
+### 4. Rodar os testes
 Para executar os testes automatizados:
 
 bash
@@ -34,7 +44,7 @@ Copiar
 Editar
 ./gradlew test
 
-### 4. Testando endpoint de exemplo
+### 5. Testando endpoint de exemplo
 Este exemplo expõe uma API REST simples com dois endpoints principais para criação e consulta de objetos `Example`.
 
 ## Documentação das APIs

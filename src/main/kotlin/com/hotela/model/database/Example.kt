@@ -1,4 +1,4 @@
-package com.hotela.model
+package com.hotela.model.database
 
 import java.util.UUID
 

@@ -1,6 +1,6 @@
 package com.hotela.controller
 
-import com.hotela.model.Example
+import com.hotela.model.database.Example
 import com.hotela.service.ExampleService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

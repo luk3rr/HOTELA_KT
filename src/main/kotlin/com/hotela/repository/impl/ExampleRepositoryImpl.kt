@@ -1,7 +1,7 @@
 package com.hotela.repository.impl
 
 import com.hotela.error.HotelaException
-import com.hotela.model.Example
+import com.hotela.model.database.Example
 import com.hotela.repository.ExampleRepository
 import io.r2dbc.spi.Row
 import org.springframework.r2dbc.core.DatabaseClient

@@ -1,6 +1,6 @@
 package com.hotela.service
 
-import com.hotela.model.Example
+import com.hotela.model.database.Example
 import com.hotela.repository.ExampleRepository
 import org.springframework.stereotype.Service
 import java.util.UUID

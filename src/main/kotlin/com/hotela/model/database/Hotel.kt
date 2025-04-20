@@ -1,9 +1,9 @@
-package com.hotela.model
+package com.hotela.model.database
 
 import java.math.BigDecimal
 import java.util.UUID
 
-class Hotel(
+data class Hotel(
     val id: UUID,
     val partnerId: UUID,
     val name: String,

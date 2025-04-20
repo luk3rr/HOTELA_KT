@@ -1,10 +1,10 @@
-package com.hotela.model
+package com.hotela.model.database
 
 import com.hotela.model.enum.RoomStatus
 import java.math.BigDecimal
 import java.util.UUID
 
-class Room(
+data class Room(
     val id: UUID,
     val hotelId: UUID,
     val number: String,

@@ -1,9 +1,9 @@
-package com.hotela.model
+package com.hotela.model.database
 
 import java.time.LocalDateTime
 import java.util.UUID
 
-class Review(
+data class Review(
     val id: UUID,
     val customerId: UUID,
     val hotelId: UUID,

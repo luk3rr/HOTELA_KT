@@ -1,4 +1,4 @@
-package com.hotela.model
+package com.hotela.model.database
 
 import com.hotela.model.enum.PaymentMethod
 import com.hotela.model.enum.PaymentStatus
@@ -6,7 +6,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
 
-class Payment(
+data class Payment(
     val id: UUID,
     val bookingId: UUID,
     val transactionId: String,

@@ -1,12 +1,11 @@
-package com.hotela.model
+package com.hotela.model.auth
 
 import java.time.LocalDate
-import java.util.UUID
 
-class Customer(
-    val id: UUID,
-    val name: String,
+data class CustomerRegisterRequest(
     val email: String,
+    val password: String,
+    val name: String,
     val phone: String,
     val idDocument: String,
     val birthDate: LocalDate,
