@@ -13,8 +13,13 @@ Endpoints para registro e login de clientes.
 
 ```json
 {
-  "email": "customer@email.com",
-  "password": "senha_segura"
+  "email": "example@example.com",
+  "password": "password123",
+  "name": "John Doe",
+  "phone": "1234567890",
+  "idDocument": "12345678901",
+  "birthDate": "1990-01-01",
+  "address": "123 Example Street, City, Country"
 }
 ```
 
@@ -24,8 +29,9 @@ Endpoints para registro e login de clientes.
 
 ```json
 {
-  "id": "{generated_uuid}",
-  "message": "Customer registered successfully"
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "type": "Bearer",
+  "expire_at": "2025-04-18T14:00:00Z"
 }
 ```
 
@@ -48,8 +54,8 @@ Endpoints para registro e login de clientes.
 
 ```json
 {
-  "email": "customer@email.com",
-  "password": "senha_segura"
+  "email": "example@example.com",
+  "password": "password123"
 }
 ```
 
@@ -74,35 +80,6 @@ Endpoints para registro e login de clientes.
 
 ---
 
-### POST `/auth/customer/logout`
-
-**Descrição:** Realiza o logout do cliente e invalida o token atual.
-
-**Header obrigatório:**
-
-```
-Authorization: Bearer <token>
-```
-
-**Resposta de sucesso (`200 OK`):**
-
-```json
-{
-  "message": "Logout successful"
-}
-```
-
-**Resposta de erro (`401 Unauthorized`):**
-
-```json
-{
-  "code": "102",
-  "message": "Token is invalid or expired"
-}
-```
-
----
-
 ## Exemplos com `curl`
 
 ### Registrar cliente
@@ -110,7 +87,15 @@ Authorization: Bearer <token>
 ```bash
 curl -X POST http://localhost:8080/auth/customer/register \
      -H "Content-Type: application/json" \
-     -d '{"email": "joao@email.com", "password": "minha_senha"}'
+     -d '{
+              "email": "example@example.com",
+              "password": "password123",
+              "name": "John Doe",
+              "phone": "1234567890",
+              "idDocument": "12345678901",
+              "birthDate": "1990-01-01",
+              "address": "123 Example Street, City, Country"
+         }'
 ```
 
 ### Login do cliente
@@ -118,12 +103,5 @@ curl -X POST http://localhost:8080/auth/customer/register \
 ```bash
 curl -X POST http://localhost:8080/auth/customer/login \
      -H "Content-Type: application/json" \
-     -d '{"email": "joao@email.com", "password": "minha_senha"}'
-```
-
-### Logout do cliente
-
-```bash
-curl -X POST http://localhost:8080/auth/customer/logout \
-     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+     -d '{"email": "example@example.com", "password": "password123"}'
 ```
