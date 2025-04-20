@@ -1,14 +1,14 @@
 package com.hotela.controller
 
 import com.hotela.error.HotelaException
-import com.hotela.model.auth.AuthRequest
-import com.hotela.model.auth.AuthResponse
-import com.hotela.model.auth.CustomerRegisterRequest
-import com.hotela.model.auth.PartnerRegisterRequest
 import com.hotela.model.database.Customer
 import com.hotela.model.database.CustomerAuth
 import com.hotela.model.database.Partner
 import com.hotela.model.database.PartnerAuth
+import com.hotela.model.dto.AuthRequest
+import com.hotela.model.dto.AuthResponse
+import com.hotela.model.dto.CustomerRegisterRequest
+import com.hotela.model.dto.PartnerRegisterRequest
 import com.hotela.service.AuthService
 import com.hotela.service.CustomerAuthService
 import com.hotela.service.CustomerService
@@ -38,14 +38,15 @@ class AuthController(
     suspend fun partnerLogin(
         @RequestBody payload: AuthRequest,
     ): AuthResponse {
-        val partner = partnerAuthService.findByEmail(payload.email) ?: throw HotelaException.InvalidCredentialsException()
+        val partnerAuth = partnerAuthService.findByEmail(payload.email) ?: throw HotelaException.InvalidCredentialsException()
 
-        if (!authService.checkBCryptPassword(payload.password, partner.passwordHash)) {
+        if (!authService.checkBCryptPassword(payload.password, partnerAuth.passwordHash)) {
             throw HotelaException.InvalidCredentialsException()
         }
 
         return AuthResponse(
-            token = authService.createPartnerToken(partner),
+            authId = partnerAuth.id,
+            token = authService.createPartnerToken(partnerAuth),
         )
     }
 
@@ -91,6 +92,7 @@ class AuthController(
         val savedPartnerAuth = partnerAuthService.save(partnerAuth)
 
         return AuthResponse(
+            authId = savedPartnerAuth.id,
             token = authService.createPartnerToken(savedPartnerAuth),
         )
     }
@@ -100,14 +102,15 @@ class AuthController(
     suspend fun customerLogin(
         @RequestBody payload: AuthRequest,
     ): AuthResponse {
-        val customer = customerAuthService.findByEmail(payload.email) ?: throw HotelaException.InvalidCredentialsException()
+        val customerAuth = customerAuthService.findByEmail(payload.email) ?: throw HotelaException.InvalidCredentialsException()
 
-        if (!authService.checkBCryptPassword(payload.password, customer.passwordHash)) {
+        if (!authService.checkBCryptPassword(payload.password, customerAuth.passwordHash)) {
             throw HotelaException.InvalidCredentialsException()
         }
 
         return AuthResponse(
-            token = authService.createCustomerToken(customer),
+            authId = customerAuth.id,
+            token = authService.createCustomerToken(customerAuth),
         )
     }
 
@@ -147,6 +150,7 @@ class AuthController(
         val savedCustomerAuth = customerAuthService.save(customerAuth)
 
         return AuthResponse(
+            authId = savedCustomerAuth.id,
             token = authService.createCustomerToken(savedCustomerAuth),
         )
     }

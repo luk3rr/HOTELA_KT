@@ -1,8 +1,8 @@
-package com.hotela.model.auth
+package com.hotela.model.dto
 
 import java.util.UUID
 
-data class RegisterResponse(
+data class ResourceCreatedResponse(
     val id: UUID,
     val message: String,
 )

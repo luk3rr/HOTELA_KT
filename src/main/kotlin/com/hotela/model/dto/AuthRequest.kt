@@ -1,4 +1,4 @@
-package com.hotela.model.auth
+package com.hotela.model.dto
 
 data class AuthRequest(
     val email: String,

@@ -11,9 +11,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
 import javax.crypto.spec.SecretKeySpec
 
-/**
- * This class just sets the encoding settings for JWT.
- */
 @Configuration
 class JWTConfig(
     @Value("\${security.key}")

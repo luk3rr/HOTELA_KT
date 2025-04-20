@@ -29,6 +29,9 @@ sealed class HotelaException(
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     class InvalidOrExpiredTokenException : HotelaException("102", "Token is invalid or expired")
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    class AccessDeniedException : HotelaException("103", "Access denied")
+
     // 2xx - Customer
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class CustomerNotFoundException(
