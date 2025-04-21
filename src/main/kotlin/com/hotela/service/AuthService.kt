@@ -173,24 +173,6 @@ class AuthService(
         return jwtEncoder.encode(JwtEncoderParameters.from(JWS_HEADER, claims)).tokenValue
     }
 
-    private suspend fun parseCustomerToken(token: String): Customer? =
-        try {
-            val jwt = jwtDecoder.decode(token)
-            val userId = jwt.claims[AuthClaimKey.CUSTOMER.key] as UUID
-            customerService.findById(userId)
-        } catch (e: Exception) {
-            null
-        }
-
-    private suspend fun parsePartnerToken(token: String): PartnerAuth? =
-        try {
-            val jwt = jwtDecoder.decode(token)
-            val partnerId = jwt.claims[AuthClaimKey.PARTNER.key] as UUID
-            partnerAuthService.findById(partnerId)
-        } catch (e: Exception) {
-            null
-        }
-
     private fun checkBCryptPassword(
         password: String,
         hashedPassword: String,

@@ -57,10 +57,7 @@ Em seguida, execute o seguinte comando para compilar e iniciar a aplicação:
 ```bash
 ./gradlew bootRun
 ```
-Ou, no Windows:
-```bash
-gradlew.bat bootRun
-```
+
 A aplicação será iniciada na porta padrão 8080.
 
 ### 6. Rodar os testes

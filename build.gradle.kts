@@ -1,5 +1,17 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val springSecurityVersion: String by project
+val springBootVersion: String by project
+val springDocVersion: String by project
+val jsonWebTokenVersion: String by project
+val jacksonVersion: String by project
+val kotlinCoroutinesVersion: String by project
+val liquibaseVersion: String by project
+val kotestVersion: String by project
+val kotestExtensionsSpringVersion: String by project
+val mockkVersion: String by project
+val pactVersion: String by project
+
 plugins {
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
@@ -25,28 +37,28 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("org.springframework.security:spring-security-config:6.4.4")
-    implementation("org.springframework.security:spring-security-crypto:6.4.4")
-    implementation("org.springframework.boot:spring-boot-starter-security:3.4.4")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
-    implementation("io.jsonwebtoken:jjwt:0.12.6")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.4")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.0-rc2")
+    implementation("org.springframework.security:spring-security-config:$springSecurityVersion")
+    implementation("org.springframework.security:spring-security-crypto:$springSecurityVersion")
+    implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
+    implementation("io.jsonwebtoken:jjwt:$jsonWebTokenVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.2")
-    implementation("org.liquibase:liquibase-core:4.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinCoroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinCoroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$kotlinCoroutinesVersion")
+    implementation("org.liquibase:liquibase-core:$liquibaseVersion")
     implementation("org.postgresql:r2dbc-postgresql")
     implementation("org.postgresql:postgresql")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
-    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
-    testImplementation("io.mockk:mockk:1.13.17")
-    testImplementation("au.com.dius.pact:consumer:4.6.17")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:$kotestExtensionsSpringVersion")
+    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("au.com.dius.pact:consumer:$pactVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
