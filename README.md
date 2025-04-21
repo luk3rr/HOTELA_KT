@@ -66,3 +66,9 @@ Caso o código não esteja formatado, você pode corrigi-lo automaticamente com:
 ```bash
 ./gradlew spotlessApply
 ```
+
+## Sonarqube
+Para verificar a qualidade do código, você pode acessar o sonarcloud do projeto:
+```
+https://sonarcloud.io/project/overview?id=luk3rr_HOTELA_KT
+```

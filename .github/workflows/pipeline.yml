@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test-and-format:
+  pipeline:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +27,8 @@ jobs:
 
     - name: Run tests with gradle
       run: ./gradlew test
+
+    - name: Run sonarcloud analysis
+      uses: SonarSource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

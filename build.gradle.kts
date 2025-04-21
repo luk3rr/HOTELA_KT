@@ -1,5 +1,3 @@
-import org.gradle.api.JavaVersion
-import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
