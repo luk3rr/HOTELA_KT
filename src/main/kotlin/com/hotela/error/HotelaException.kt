@@ -8,17 +8,6 @@ sealed class HotelaException(
     val code: String,
     override val message: String,
 ) : RuntimeException(message) {
-    // 0xx - Example
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    class ExampleNotFoundException(
-        id: UUID,
-    ) : HotelaException("000", "Example with id $id not found")
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    class ExampleAlreadyExistsException(
-        id: UUID,
-    ) : HotelaException("001", "Example with id $id already exists")
-
     // 1xx - Authentication
     @ResponseStatus(HttpStatus.CONFLICT)
     class EmailAlreadyRegisteredException : HotelaException("100", "Email already registered")
