@@ -1,8 +1,15 @@
 package com.hotela.service
 
+import com.hotela.error.HotelaException
 import com.hotela.model.database.Customer
 import com.hotela.model.database.CustomerAuth
+import com.hotela.model.database.Partner
 import com.hotela.model.database.PartnerAuth
+import com.hotela.model.dto.request.AuthRequest
+import com.hotela.model.dto.request.CustomerRegisterRequest
+import com.hotela.model.dto.request.PartnerRegisterRequest
+import com.hotela.model.dto.response.AuthResponse
+import com.hotela.model.enum.AuthClaimKey
 import com.hotela.model.enum.Role
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.oauth2.jwt.JwsHeader
@@ -12,6 +19,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
@@ -21,19 +29,128 @@ class AuthService(
     private val jwtEncoder: JwtEncoder,
     private val customerService: CustomerService,
     private val partnerAuthService: PartnerAuthService,
+    private val partnerService: PartnerService,
+    private val customerAuthService: CustomerAuthService,
 ) {
     companion object {
         private val JWS_HEADER = JwsHeader.with { "HS256" }.build()
         private const val ISSUER = "hotela_backend"
-        private const val EXPIRATION_DURATION_MINUTES = 60L
+        private const val EXPIRATION_DURATION = 60L
         private val EXPIRATION_DURATION_UNIT = ChronoUnit.MINUTES
+        private const val SALT_ROUNDS = 10
     }
 
-    fun createCustomerToken(customer: CustomerAuth): String =
-        createToken(subject = customer.email, claimKey = "customerAuthId", claimValue = customer.id, role = Role.CUSTOMER)
+    suspend fun partnerLogin(payload: AuthRequest): AuthResponse {
+        val partnerAuth =
+            partnerAuthService.findByEmail(payload.email)
+                ?: throw HotelaException.InvalidCredentialsException()
 
-    fun createPartnerToken(partner: PartnerAuth): String =
-        createToken(subject = partner.email, claimKey = "partnerAuthId", claimValue = partner.id, role = Role.PARTNER)
+        if (!checkBCryptPassword(payload.password, partnerAuth.passwordHash)) {
+            throw HotelaException.InvalidCredentialsException()
+        }
+
+        return AuthResponse(
+            authId = partnerAuth.id,
+            token = createPartnerToken(partnerAuth),
+        )
+    }
+
+    suspend fun partnerRegister(payload: PartnerRegisterRequest): AuthResponse {
+        if (partnerAuthService.existsByEmail(payload.email)) {
+            throw HotelaException.EmailAlreadyRegisteredException()
+        }
+
+        val partner =
+            Partner(
+                id = UUID.randomUUID(),
+                name = payload.name,
+                cnpj = payload.cnpj,
+                email = payload.email,
+                phone = payload.phone,
+                address = payload.address,
+                contactName = payload.contactName,
+                contactEmail = payload.contactEmail,
+                contactPhone = payload.contactPhone,
+                contractSigned = payload.contractSigned,
+                status = payload.status,
+                createdAt = LocalDateTime.now(),
+                notes = payload.notes,
+            )
+
+        val partnerAuth =
+            PartnerAuth(
+                id = UUID.randomUUID(),
+                partnerId = partner.id,
+                email = payload.email,
+                passwordHash = hashPassword(payload.password),
+                createdAt = LocalDateTime.now(),
+                lastLogin = LocalDateTime.now(),
+                active = true,
+            )
+
+        partnerService.save(partner)
+        val savedPartnerAuth = partnerAuthService.save(partnerAuth)
+
+        return AuthResponse(
+            authId = savedPartnerAuth.id,
+            token = createPartnerToken(savedPartnerAuth),
+        )
+    }
+
+    suspend fun customerLogin(payload: AuthRequest): AuthResponse {
+        val customerAuth = customerAuthService.findByEmail(payload.email) ?: throw HotelaException.InvalidCredentialsException()
+
+        if (!checkBCryptPassword(payload.password, customerAuth.passwordHash)) {
+            throw HotelaException.InvalidCredentialsException()
+        }
+
+        return AuthResponse(
+            authId = customerAuth.id,
+            token = createCustomerToken(customerAuth),
+        )
+    }
+
+    suspend fun customerRegister(payload: CustomerRegisterRequest): AuthResponse {
+        if (customerAuthService.existsByEmail(payload.email)) {
+            throw HotelaException.EmailAlreadyRegisteredException()
+        }
+
+        val customer =
+            Customer(
+                id = UUID.randomUUID(),
+                name = payload.name,
+                email = payload.email,
+                phone = payload.phone,
+                idDocument = payload.idDocument,
+                birthDate = payload.birthDate,
+                address = payload.address,
+            )
+
+        val customerAuth =
+            CustomerAuth(
+                id = UUID.randomUUID(),
+                customerId = customer.id,
+                email = payload.email,
+                passwordHash = hashPassword(payload.password),
+                createdAt = LocalDateTime.now(),
+                lastLogin = LocalDateTime.now(),
+                active = true,
+            )
+
+        customerService.save(customer)
+        val savedCustomerAuth = customerAuthService.save(customerAuth)
+
+        return AuthResponse(
+            authId = savedCustomerAuth.id,
+            token = createCustomerToken(savedCustomerAuth),
+        )
+    }
+
+    private fun createCustomerToken(customer: CustomerAuth): String =
+        createToken(subject = customer.email, claimKey = AuthClaimKey.CUSTOMER.key, claimValue = customer.id, role = Role.CUSTOMER)
+
+    private fun createPartnerToken(partner: PartnerAuth): String =
+        createToken(subject = partner.email, claimKey = AuthClaimKey.PARTNER.key, claimValue = partner.id, role = Role.PARTNER)
 
     private fun createToken(
         subject: String,
@@ -47,34 +164,34 @@ class AuthService(
                 .builder()
                 .issuer(ISSUER)
                 .issuedAt(now)
-                .expiresAt(now.plus(EXPIRATION_DURATION_MINUTES, EXPIRATION_DURATION_UNIT))
+                .expiresAt(now.plus(EXPIRATION_DURATION, EXPIRATION_DURATION_UNIT))
                 .subject(subject)
                 .claim(claimKey, claimValue)
-                .claim("role", role)
+                .claim(AuthClaimKey.ROLE.key, role)
                 .build()
 
         return jwtEncoder.encode(JwtEncoderParameters.from(JWS_HEADER, claims)).tokenValue
     }
 
-    suspend fun parseCustomerToken(token: String): Customer? =
+    private suspend fun parseCustomerToken(token: String): Customer? =
         try {
             val jwt = jwtDecoder.decode(token)
-            val userId = jwt.claims["customerAuthId"] as UUID
+            val userId = jwt.claims[AuthClaimKey.CUSTOMER.key] as UUID
             customerService.findById(userId)
         } catch (e: Exception) {
             null
         }
 
-    suspend fun parsePartnerToken(token: String): PartnerAuth? =
+    private suspend fun parsePartnerToken(token: String): PartnerAuth? =
         try {
             val jwt = jwtDecoder.decode(token)
-            val partnerId = jwt.claims["partnerAuthId"] as UUID
+            val partnerId = jwt.claims[AuthClaimKey.PARTNER.key] as UUID
             partnerAuthService.findById(partnerId)
         } catch (e: Exception) {
             null
         }
 
-    fun checkBCryptPassword(
+    private fun checkBCryptPassword(
         password: String,
         hashedPassword: String,
     ): Boolean =
@@ -84,5 +201,5 @@ class AuthService(
             false
         }
 
-    fun hashPassword(password: String): String = BCrypt.hashpw(password, BCrypt.gensalt(10))
+    private fun hashPassword(password: String): String = BCrypt.hashpw(password, BCrypt.gensalt(SALT_ROUNDS))
 }

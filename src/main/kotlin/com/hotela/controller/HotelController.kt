@@ -7,6 +7,7 @@ import com.hotela.model.dto.request.UpdateHotelRequest
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.HotelService
+import com.hotela.util.getPartnerAuthId
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -46,7 +47,7 @@ class HotelController(
         @RequestBody payload: CreateHotelRequest,
         principal: JwtAuthenticationToken,
     ): ResourceCreatedResponse {
-        val partnerAuthId = extractPartnerAuthId(principal)
+        val partnerAuthId = principal.getPartnerAuthId()
         val createdHotel = hotelService.createHotel(payload, partnerAuthId)
 
         return ResourceCreatedResponse(
@@ -67,12 +68,5 @@ class HotelController(
         return ResourceUpdatedResponse(
             message = "Hotel updated successfully",
         )
-    }
-
-    private fun extractPartnerAuthId(principal: JwtAuthenticationToken): UUID {
-        val claims = principal.token.claims
-        return claims["partnerAuthId"]?.let {
-            UUID.fromString(it.toString())
-        } ?: throw HotelaException.InvalidCredentialsException()
     }
 }

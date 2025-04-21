@@ -19,10 +19,10 @@ class HotelService(
 
     suspend fun createHotel(
         payload: CreateHotelRequest,
-        partnerAuthIdFromToken: UUID,
+        partnerAuthId: UUID,
     ): Hotel {
         val partnerAuth =
-            partnerAuthService.findById(partnerAuthIdFromToken)
+            partnerAuthService.findById(partnerAuthId)
                 ?: throw HotelaException.InvalidCredentialsException()
 
         if (partnerAuth.id != payload.partnerAuthId) {
