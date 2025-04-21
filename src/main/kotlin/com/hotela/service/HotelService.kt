@@ -2,6 +2,7 @@ package com.hotela.service
 
 import com.hotela.error.HotelaException
 import com.hotela.model.database.Hotel
+import com.hotela.model.dto.request.CreateHotelRequest
 import com.hotela.model.dto.request.UpdateHotelRequest
 import com.hotela.repository.HotelRepository
 import org.springframework.stereotype.Service
@@ -9,13 +10,44 @@ import java.util.UUID
 
 @Service
 class HotelService(
+    private val partnerAuthService: PartnerAuthService,
     private val hotelRepository: HotelRepository,
 ) {
     suspend fun findById(id: UUID) = hotelRepository.findById(id)
 
     suspend fun findByPartnerId(partnerId: UUID) = hotelRepository.findByPartnerId(partnerId)
 
-    suspend fun save(hotel: Hotel) = hotelRepository.save(hotel)
+    suspend fun createHotel(
+        payload: CreateHotelRequest,
+        partnerAuthIdFromToken: UUID,
+    ): Hotel {
+        val partnerAuth =
+            partnerAuthService.findById(partnerAuthIdFromToken)
+                ?: throw HotelaException.InvalidCredentialsException()
+
+        if (partnerAuth.id != payload.partnerAuthId) {
+            throw HotelaException.AccessDeniedException()
+        }
+
+        val hotel =
+            Hotel(
+                id = UUID.randomUUID(),
+                partnerId = partnerAuth.partnerId,
+                name = payload.name,
+                address = payload.address,
+                city = payload.city,
+                state = payload.state,
+                zipCode = payload.zipCode,
+                phone = payload.phone,
+                rating = payload.rating,
+                description = payload.description,
+                website = payload.website,
+                latitude = payload.latitude,
+                longitude = payload.longitude,
+            )
+
+        return hotelRepository.save(hotel)
+    }
 
     suspend fun update(
         id: UUID,

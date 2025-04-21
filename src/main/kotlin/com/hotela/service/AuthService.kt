@@ -3,6 +3,7 @@ package com.hotela.service
 import com.hotela.model.database.Customer
 import com.hotela.model.database.CustomerAuth
 import com.hotela.model.database.PartnerAuth
+import com.hotela.model.enum.Role
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
@@ -29,15 +30,16 @@ class AuthService(
     }
 
     fun createCustomerToken(customer: CustomerAuth): String =
-        createToken(subject = customer.email, claimKey = "customerAuthId", claimValue = customer.id)
+        createToken(subject = customer.email, claimKey = "customerAuthId", claimValue = customer.id, role = Role.CUSTOMER)
 
     fun createPartnerToken(partner: PartnerAuth): String =
-        createToken(subject = partner.email, claimKey = "partnerAuthId", claimValue = partner.id)
+        createToken(subject = partner.email, claimKey = "partnerAuthId", claimValue = partner.id, role = Role.PARTNER)
 
     private fun createToken(
         subject: String,
         claimKey: String,
         claimValue: Any,
+        role: Role,
     ): String {
         val now = Instant.now()
         val claims =
@@ -48,6 +50,7 @@ class AuthService(
                 .expiresAt(now.plus(EXPIRATION_DURATION_MINUTES, EXPIRATION_DURATION_UNIT))
                 .subject(subject)
                 .claim(claimKey, claimValue)
+                .claim("role", role)
                 .build()
 
         return jwtEncoder.encode(JwtEncoderParameters.from(JWS_HEADER, claims)).tokenValue

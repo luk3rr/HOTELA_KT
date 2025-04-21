@@ -7,8 +7,9 @@ import com.hotela.model.dto.request.UpdateHotelRequest
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.HotelService
-import com.hotela.service.PartnerAuthService
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,9 +23,9 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/hotel")
+@EnableMethodSecurity
 class HotelController(
     private val hotelService: HotelService,
-    private val partnerAuthService: PartnerAuthService,
 ) {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -40,43 +41,13 @@ class HotelController(
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).PARTNER)")
     suspend fun createHotel(
         @RequestBody payload: CreateHotelRequest,
         principal: JwtAuthenticationToken,
     ): ResourceCreatedResponse {
-        val claims = principal.token.claims
-
-        val partnerAuthIdFromToken =
-            claims["partnerAuthId"]?.let {
-                UUID.fromString(it.toString())
-            } ?: throw HotelaException.InvalidCredentialsException()
-
-        val partnerAuth =
-            partnerAuthService.findById(partnerAuthIdFromToken)
-                ?: throw HotelaException.InvalidCredentialsException()
-
-        if (partnerAuth.id != payload.partnerAuthId) {
-            throw HotelaException.AccessDeniedException()
-        }
-
-        val hotel =
-            Hotel(
-                id = UUID.randomUUID(),
-                partnerId = partnerAuth.partnerId,
-                name = payload.name,
-                address = payload.address,
-                city = payload.city,
-                state = payload.state,
-                zipCode = payload.zipCode,
-                phone = payload.phone,
-                rating = payload.rating,
-                description = payload.description,
-                website = payload.website,
-                latitude = payload.latitude,
-                longitude = payload.longitude,
-            )
-
-        val createdHotel = hotelService.save(hotel)
+        val partnerAuthId = extractPartnerAuthId(principal)
+        val createdHotel = hotelService.createHotel(payload, partnerAuthId)
 
         return ResourceCreatedResponse(
             id = createdHotel.id,
@@ -86,14 +57,22 @@ class HotelController(
 
     @PutMapping("/update/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).PARTNER)")
     suspend fun updateHotel(
         @PathVariable id: UUID,
         @RequestBody payload: UpdateHotelRequest,
     ): ResourceUpdatedResponse {
-        val hotel = hotelService.update(id, payload)
+        hotelService.update(id, payload)
 
         return ResourceUpdatedResponse(
             message = "Hotel updated successfully",
         )
+    }
+
+    private fun extractPartnerAuthId(principal: JwtAuthenticationToken): UUID {
+        val claims = principal.token.claims
+        return claims["partnerAuthId"]?.let {
+            UUID.fromString(it.toString())
+        } ?: throw HotelaException.InvalidCredentialsException()
     }
 }

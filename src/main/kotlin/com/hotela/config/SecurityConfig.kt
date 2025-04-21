@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
@@ -33,7 +35,9 @@ class SecurityConfig {
                 authorize(anyRequest, authenticated)
             }
             oauth2ResourceServer {
-                jwt { }
+                jwt {
+                    jwtAuthenticationConverter = jwtAuthenticationConverter()
+                }
             }
         }
 
@@ -50,5 +54,16 @@ class SecurityConfig {
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source
+    }
+
+    @Bean
+    fun jwtAuthenticationConverter(): JwtAuthenticationConverter {
+        val converter = JwtGrantedAuthoritiesConverter()
+        converter.setAuthorityPrefix("ROLE_")
+        converter.setAuthoritiesClaimName("role")
+
+        val jwtConverter = JwtAuthenticationConverter()
+        jwtConverter.setJwtGrantedAuthoritiesConverter(converter)
+        return jwtConverter
     }
 }
