@@ -16,17 +16,44 @@ cd seu-repositorio
 
 ### 2. Gere uma chave compatível com JWT
 ```bash
-export JWT_SECRET=$(openssl rand -base64 64)
+echo "JWT_SECRET=$(openssl rand -base64 32)" >> .env
 ```
 
-Essa chave será usada para assinar os tokens JWT. Você pode verificar se a variável foi criada corretamente com o comando:
+Essa chave será usada para assinar os tokens JWT. Você pode verificar se ela foi criada corretamente com o comando:
 ```bash
-echo $JWT_SECRET
+cat .env
 ```
 
-### 3. Executar o projeto
-Você pode iniciar a aplicação com o comando:
+### 3. Gere uma senha para o banco de dados
+```bash
+echo "POSTGRES_PASSWORD=$(openssl rand -base64 12)" >> .env
+```
 
+Essa senha será usada para acessar o banco de dados PostgreSQL. Você pode verificar se ela foi criada corretamente com o comando:
+```bash
+cat .env
+```
+
+### 4. Iniciar o container com o banco de dados
+Certifique-se de ter o **Docker** instalado e em execução.
+
+Para iniciar o banco de dados PostgreSQL, execute o seguinte comando na raiz do projeto:
+```bash
+docker compose up -d
+```
+
+Isso iniciará um container com o banco de dados PostgreSQL. Você pode verificar se o container está em execução com o comando:
+```bash
+docker compose ps
+```
+
+### 5. Executar o projeto
+Primeiro, leia o arquivo `.env` para carregar as variáveis de ambiente:
+```bash
+export $(cat .env | xargs)
+```
+
+Em seguida, execute o seguinte comando para compilar e iniciar a aplicação:
 ```bash
 ./gradlew bootRun
 ```
@@ -36,16 +63,16 @@ gradlew.bat bootRun
 ```
 A aplicação será iniciada na porta padrão 8080.
 
-### 4. Rodar os testes
+### 6. Rodar os testes
 Para executar os testes automatizados:
 
-bash
-Copiar
-Editar
+```bash
 ./gradlew test
+```
 
-### 5. Testando endpoint de exemplo
-Este exemplo expõe uma API REST simples com dois endpoints principais para criação e consulta de objetos `Example`.
+### 6. Testando endpoint de exemplo
+Você pode utilizar a [collection](docs/postman) do [Postman](https://www.postman.com/) criada para facilitar os testes dos endpoints da API.
+Para isso, basta importar a collection e o environment no Postman.
 
 ## Documentação das APIs
 A documentação dos endpoints pode ser encontrada em [docs/api](docs/api/readme.md)

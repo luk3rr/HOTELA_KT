@@ -4,7 +4,7 @@ services:
     container_name: hotela-postgres
     environment:
       POSTGRES_USER: hotela_user
-      POSTGRES_PASSWORD: pswd
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: hotela
       TZ: "UTC"
     volumes:

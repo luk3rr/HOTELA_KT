@@ -5,7 +5,7 @@ spring:
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/hotela
     username: hotela_user
-    password: pswd
+    password: ${POSTGRES_PASSWORD}
 
   jpa:
     hibernate:
@@ -14,7 +14,7 @@ spring:
   liquibase:
     url: jdbc:postgresql://localhost:5432/hotela
     user: hotela_user
-    password: pswd
+    password: ${POSTGRES_PASSWORD}
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-master.yaml
 
