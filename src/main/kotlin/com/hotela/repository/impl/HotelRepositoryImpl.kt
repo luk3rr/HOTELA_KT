@@ -53,6 +53,25 @@ class HotelRepositoryImpl(
                 mapper(row)
             }.awaitSingleOrNull()!!
 
+    override suspend fun update(hotel: Hotel): Hotel =
+        databaseClient
+            .sql(UPDATE)
+            .bind("id", hotel.id)
+            .bind("name", hotel.name)
+            .bind("address", hotel.address)
+            .bind("city", hotel.city)
+            .bind("state", hotel.state)
+            .bind("zipCode", hotel.zipCode)
+            .bind("phone", hotel.phone)
+            .bind("rating", hotel.rating)
+            .bind("description", hotel.description)
+            .bind("website", hotel.website)
+            .bind("latitude", hotel.latitude)
+            .bind("longitude", hotel.longitude)
+            .map { row, _ ->
+                mapper(row)
+            }.awaitSingleOrNull()!!
+
     private fun mapper(row: Row): Hotel =
         Hotel(
             id = row.get("id", UUID::class.java)!!,
@@ -85,6 +104,23 @@ class HotelRepositoryImpl(
             ) VALUES (
                 :id, :partnerId, :name, :address, :city, :state, :zipCode, :phone, :rating, :description, :website, :latitude, :longitude
             )
+            RETURNING *
+        """
+
+        private const val UPDATE = """
+            UPDATE hotel SET
+                name = :name,
+                address = :address,
+                city = :city,
+                state = :state,
+                zip_code = :zipCode,
+                phone = :phone,
+                rating = :rating,
+                description = :description,
+                website = :website,
+                latitude = :latitude,
+                longitude = :longitude
+            WHERE id = :id
             RETURNING *
         """
     }

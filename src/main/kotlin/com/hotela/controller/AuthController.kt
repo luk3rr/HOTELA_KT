@@ -5,10 +5,10 @@ import com.hotela.model.database.Customer
 import com.hotela.model.database.CustomerAuth
 import com.hotela.model.database.Partner
 import com.hotela.model.database.PartnerAuth
-import com.hotela.model.dto.AuthRequest
-import com.hotela.model.dto.AuthResponse
-import com.hotela.model.dto.CustomerRegisterRequest
-import com.hotela.model.dto.PartnerRegisterRequest
+import com.hotela.model.dto.request.AuthRequest
+import com.hotela.model.dto.request.CustomerRegisterRequest
+import com.hotela.model.dto.request.PartnerRegisterRequest
+import com.hotela.model.dto.response.AuthResponse
 import com.hotela.service.AuthService
 import com.hotela.service.CustomerAuthService
 import com.hotela.service.CustomerService

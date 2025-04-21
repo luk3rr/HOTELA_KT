@@ -1,4 +1,4 @@
-package com.hotela.model.dto
+package com.hotela.model.dto.request
 
 import java.time.LocalDate
 

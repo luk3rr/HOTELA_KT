@@ -9,4 +9,6 @@ interface HotelRepository {
     suspend fun findByPartnerId(partnerId: UUID): List<Hotel>
 
     suspend fun save(hotel: Hotel): Hotel
+
+    suspend fun update(hotel: Hotel): Hotel
 }

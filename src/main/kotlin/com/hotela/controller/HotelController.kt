@@ -2,8 +2,10 @@ package com.hotela.controller
 
 import com.hotela.error.HotelaException
 import com.hotela.model.database.Hotel
-import com.hotela.model.dto.CreateHotelRequest
-import com.hotela.model.dto.ResourceCreatedResponse
+import com.hotela.model.dto.request.CreateHotelRequest
+import com.hotela.model.dto.request.UpdateHotelRequest
+import com.hotela.model.dto.response.ResourceCreatedResponse
+import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.HotelService
 import com.hotela.service.PartnerAuthService
 import org.springframework.http.HttpStatus
@@ -11,6 +13,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -78,6 +81,19 @@ class HotelController(
         return ResourceCreatedResponse(
             id = createdHotel.id,
             message = "Hotel created successfully",
+        )
+    }
+
+    @PutMapping("/update/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    suspend fun updateHotel(
+        @PathVariable id: UUID,
+        @RequestBody payload: UpdateHotelRequest,
+    ): ResourceUpdatedResponse {
+        val hotel = hotelService.update(id, payload)
+
+        return ResourceUpdatedResponse(
+            message = "Hotel updated successfully",
         )
     }
 }

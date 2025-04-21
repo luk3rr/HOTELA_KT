@@ -1,4 +1,4 @@
-package com.hotela.model.dto
+package com.hotela.model.dto.response
 
 import java.time.LocalDateTime
 import java.util.UUID
