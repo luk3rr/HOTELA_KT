@@ -5,10 +5,8 @@ import com.nimbusds.jose.proc.SecurityContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.oauth2.jwt.JwtDecoder
-import org.springframework.security.oauth2.jwt.JwtEncoder
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
 import javax.crypto.spec.SecretKeySpec
 
 @Configuration
@@ -23,10 +21,10 @@ class JWTConfig(
     private val secretKey = SecretKeySpec(jwtKey.toByteArray(), "HmacSHA256")
 
     @Bean
-    fun jwtDecoder(): JwtDecoder = NimbusJwtDecoder.withSecretKey(secretKey).build()
+    fun jwtDecoder(): NimbusReactiveJwtDecoder = NimbusReactiveJwtDecoder.withSecretKey(secretKey).build()
 
     @Bean
-    fun jwtEncoder(): JwtEncoder {
+    fun jwtEncoder(): NimbusJwtEncoder {
         val secret = ImmutableSecret<SecurityContext>(secretKey)
         return NimbusJwtEncoder(secret)
     }

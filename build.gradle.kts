@@ -3,12 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val springSecurityVersion: String by project
 val springBootVersion: String by project
 val springDocVersion: String by project
+val springWebVersion: String by project
 val jsonWebTokenVersion: String by project
 val jacksonVersion: String by project
 val kotlinCoroutinesVersion: String by project
 val liquibaseVersion: String by project
 val kotestVersion: String by project
-val kotestExtensionsSpringVersion: String by project
+val kotestSpringVersion: String by project
 val mockkVersion: String by project
 val pactVersion: String by project
 
@@ -34,13 +35,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("org.springframework.security:spring-security-config:$springSecurityVersion")
-    implementation("org.springframework.security:spring-security-crypto:$springSecurityVersion")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:$springBootVersion")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springBootVersion")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc:$springBootVersion")
     implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion")
+    implementation("org.springframework.security:spring-security-config:$springSecurityVersion")
+    implementation("org.springframework.security:spring-security-crypto:$springSecurityVersion")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
     implementation("io.jsonwebtoken:jjwt:$jsonWebTokenVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
@@ -52,11 +53,11 @@ dependencies {
     implementation("org.liquibase:liquibase-core:$liquibaseVersion")
     implementation("org.postgresql:r2dbc-postgresql")
     implementation("org.postgresql:postgresql")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:$springBootVersion")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:$kotestExtensionsSpringVersion")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:$kotestSpringVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("au.com.dius.pact:consumer:$pactVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

@@ -10,7 +10,7 @@ import com.hotela.service.HotelService
 import com.hotela.util.getPartnerAuthId
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -24,7 +24,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/hotel")
-@EnableMethodSecurity
+@EnableReactiveMethodSecurity
 class HotelController(
     private val hotelService: HotelService,
 ) {

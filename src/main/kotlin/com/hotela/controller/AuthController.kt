@@ -6,7 +6,6 @@ import com.hotela.model.dto.request.PartnerRegisterRequest
 import com.hotela.model.dto.response.AuthResponse
 import com.hotela.service.AuthService
 import org.springframework.http.HttpStatus
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,7 +24,6 @@ class AuthController(
     ): AuthResponse = authService.partnerLogin(payload)
 
     @PostMapping("/partner/register")
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun partnerRegister(
         @RequestBody payload: PartnerRegisterRequest,
@@ -38,7 +36,6 @@ class AuthController(
     ): AuthResponse = authService.customerLogin(payload)
 
     @PostMapping("/customer/register")
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun customerRegister(
         @RequestBody payload: CustomerRegisterRequest,

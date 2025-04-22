@@ -14,10 +14,11 @@ import com.hotela.model.enum.Role
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
-import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -25,8 +26,8 @@ import java.util.UUID
 
 @Service
 class AuthService(
-    private val jwtDecoder: JwtDecoder,
     private val jwtEncoder: JwtEncoder,
+    private val jwtDecoder: NimbusReactiveJwtDecoder,
     private val customerService: CustomerService,
     private val partnerAuthService: PartnerAuthService,
     private val partnerService: PartnerService,
@@ -55,6 +56,7 @@ class AuthService(
         )
     }
 
+    @Transactional
     suspend fun partnerRegister(payload: PartnerRegisterRequest): AuthResponse {
         if (partnerAuthService.existsByEmail(payload.email)) {
             throw HotelaException.EmailAlreadyRegisteredException()
