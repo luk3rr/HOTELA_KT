@@ -49,7 +49,7 @@ class HotelService(
         return hotelRepository.save(hotel)
     }
 
-    suspend fun update(
+    suspend fun updateHotel(
         id: UUID,
         payload: UpdateHotelRequest,
     ): Hotel {

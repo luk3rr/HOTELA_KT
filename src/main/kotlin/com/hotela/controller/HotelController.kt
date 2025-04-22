@@ -63,7 +63,7 @@ class HotelController(
         @PathVariable id: UUID,
         @RequestBody payload: UpdateHotelRequest,
     ): ResourceUpdatedResponse {
-        hotelService.update(id, payload)
+        hotelService.updateHotel(id, payload)
 
         return ResourceUpdatedResponse(
             message = "Hotel updated successfully",
