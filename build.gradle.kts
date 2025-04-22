@@ -18,8 +18,10 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.0.3"
     id("org.liquibase.gradle") version "2.2.0"
+    id("org.sonarqube") version "6.1.0.5360"
     kotlin("jvm") version "2.1.10"
     kotlin("plugin.spring") version "2.1.10"
+    jacoco
 }
 
 group = "com.hotela"
@@ -74,6 +76,12 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+}
+
+tasks.withType<JacocoReport> {
+    reports {
+        xml.required.set(true)
+    }
 }
 
 spotless {

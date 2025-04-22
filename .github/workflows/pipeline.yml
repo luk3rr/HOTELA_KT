@@ -26,7 +26,7 @@ jobs:
       run: ./gradlew spotlessCheck
 
     - name: Run tests with gradle
-      run: ./gradlew test
+      run: ./gradlew test jacocoTestReport
 
     - name: Run sonarcloud analysis
       uses: SonarSource/sonarqube-scan-action@master
