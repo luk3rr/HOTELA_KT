@@ -42,10 +42,6 @@ class PartnerRepositoryImpl(
             }.awaitSingle()
 
     override suspend fun save(partner: Partner): Partner {
-        if (existsByEmail(partner.email)) {
-            throw HotelaException.EmailAlreadyRegisteredException()
-        }
-
         return databaseClient
             .sql(SAVE)
             .bind("id", partner.id)

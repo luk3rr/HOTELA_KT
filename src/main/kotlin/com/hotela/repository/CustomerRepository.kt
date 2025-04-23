@@ -10,5 +10,5 @@ interface CustomerRepository {
 
     suspend fun existsByEmail(email: String): Boolean
 
-    suspend fun save(customer: Customer): Customer
+    suspend fun create(customer: Customer): Customer
 }

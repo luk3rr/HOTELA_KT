@@ -11,5 +11,5 @@ class CustomerService(
 ) {
     suspend fun findById(id: UUID): Customer? = customerRepository.findById(id)
 
-    suspend fun save(customer: Customer): Customer = customerRepository.save(customer)
+    suspend fun save(customer: Customer): Customer = customerRepository.create(customer)
 }

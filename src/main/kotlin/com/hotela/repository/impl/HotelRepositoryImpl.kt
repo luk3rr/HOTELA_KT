@@ -33,7 +33,7 @@ class HotelRepositoryImpl(
             .collectList()
             .awaitSingleOrNull() ?: emptyList()
 
-    override suspend fun save(hotel: Hotel): Hotel =
+    override suspend fun create(hotel: Hotel): Hotel =
         databaseClient
             .sql(SAVE)
             .bind("id", hotel.id)

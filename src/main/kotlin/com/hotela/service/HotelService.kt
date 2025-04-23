@@ -46,7 +46,7 @@ class HotelService(
                 longitude = payload.longitude,
             )
 
-        return hotelRepository.save(hotel)
+        return hotelRepository.create(hotel)
     }
 
     suspend fun updateHotel(

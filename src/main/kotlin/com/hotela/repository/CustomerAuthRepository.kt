@@ -7,5 +7,5 @@ interface CustomerAuthRepository {
 
     suspend fun existsByEmail(email: String): Boolean
 
-    suspend fun save(customerAuth: CustomerAuth): CustomerAuth
+    suspend fun create(customerAuth: CustomerAuth): CustomerAuth
 }

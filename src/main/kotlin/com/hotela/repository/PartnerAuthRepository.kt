@@ -10,5 +10,5 @@ interface PartnerAuthRepository {
 
     suspend fun existsByEmail(email: String): Boolean
 
-    suspend fun save(partner: PartnerAuth): PartnerAuth
+    suspend fun create(partner: PartnerAuth): PartnerAuth
 }

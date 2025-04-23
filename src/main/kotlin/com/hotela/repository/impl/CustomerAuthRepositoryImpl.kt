@@ -31,11 +31,7 @@ class CustomerAuthRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
-    override suspend fun save(customerAuth: CustomerAuth): CustomerAuth {
-        if (existsByEmail(customerAuth.email)) {
-            throw HotelaException.EmailAlreadyRegisteredException()
-        }
-
+    override suspend fun create(customerAuth: CustomerAuth): CustomerAuth {
         return databaseClient
             .sql(SAVE)
             .bind("id", customerAuth.id)

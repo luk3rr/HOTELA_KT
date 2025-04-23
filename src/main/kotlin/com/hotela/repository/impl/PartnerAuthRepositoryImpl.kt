@@ -1,6 +1,5 @@
 package com.hotela.repository.impl
 
-import com.hotela.error.HotelaException
 import com.hotela.model.database.PartnerAuth
 import com.hotela.repository.PartnerAuthRepository
 import io.r2dbc.spi.Row
@@ -39,11 +38,7 @@ class PartnerAuthRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
-    override suspend fun save(partnerAuth: PartnerAuth): PartnerAuth {
-        if (existsByEmail(partnerAuth.email)) {
-            throw HotelaException.EmailAlreadyRegisteredException()
-        }
-
+    override suspend fun create(partnerAuth: PartnerAuth): PartnerAuth {
         return databaseClient
             .sql(SAVE)
             .bind("id", partnerAuth.id)

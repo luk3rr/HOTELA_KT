@@ -1,6 +1,5 @@
 package com.hotela.repository.impl
 
-import com.hotela.error.HotelaException
 import com.hotela.model.database.Customer
 import com.hotela.repository.CustomerRepository
 import io.r2dbc.spi.Row
@@ -39,11 +38,7 @@ class CustomerRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
-    override suspend fun save(customer: Customer): Customer {
-        if (existsByEmail(customer.email)) {
-            throw HotelaException.EmailAlreadyRegisteredException()
-        }
-
+    override suspend fun create(customer: Customer): Customer {
         return databaseClient
             .sql(SAVE)
             .bind("id", customer.id)

@@ -12,5 +12,5 @@ class CustomerAuthService(
 
     suspend fun existsByEmail(email: String): Boolean = customerAuthRepository.existsByEmail(email)
 
-    suspend fun save(customerAuth: CustomerAuth): CustomerAuth = customerAuthRepository.save(customerAuth)
+    suspend fun save(customerAuth: CustomerAuth): CustomerAuth = customerAuthRepository.create(customerAuth)
 }
