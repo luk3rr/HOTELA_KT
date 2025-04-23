@@ -38,8 +38,8 @@ class CustomerRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
-    override suspend fun create(customer: Customer): Customer {
-        return databaseClient
+    override suspend fun create(customer: Customer): Customer =
+        databaseClient
             .sql(SAVE)
             .bind("id", customer.id)
             .bind("name", customer.name)
@@ -51,7 +51,6 @@ class CustomerRepositoryImpl(
             .map { row, _ ->
                 mapper(row)
             }.awaitSingle()
-    }
 
     private fun mapper(row: Row): Customer =
         Customer(

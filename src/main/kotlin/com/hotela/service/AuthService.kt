@@ -90,8 +90,8 @@ class AuthService(
                 active = true,
             )
 
-        partnerService.save(partner)
-        val savedPartnerAuth = partnerAuthService.save(partnerAuth)
+        partnerService.createPartner(partner)
+        val savedPartnerAuth = partnerAuthService.createPartnerAuth(partnerAuth)
 
         return AuthResponse(
             authId = savedPartnerAuth.id,
@@ -139,8 +139,8 @@ class AuthService(
                 active = true,
             )
 
-        customerService.save(customer)
-        val savedCustomerAuth = customerAuthService.save(customerAuth)
+        customerService.createCustomer(customer)
+        val savedCustomerAuth = customerAuthService.createCustomerAuth(customerAuth)
 
         return AuthResponse(
             authId = savedCustomerAuth.id,

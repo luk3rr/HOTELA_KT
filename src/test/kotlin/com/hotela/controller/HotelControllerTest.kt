@@ -168,7 +168,7 @@ class HotelControllerTest(
             context("when the request is valid") {
                 test("should return 200 OK") {
                     coEvery {
-                        hotelService.updateHotel(any(), any())
+                        hotelService.updateHotel(any(), any(), any())
                     } returns hotel
 
                     val requestBody = UpdateHotelRequestStubs.create()
@@ -196,7 +196,7 @@ class HotelControllerTest(
             context("when the hotel does not exist") {
                 test("should return 404 NOT FOUND") {
                     coEvery {
-                        hotelService.updateHotel(any(), any())
+                        hotelService.updateHotel(any(), any(), any())
                     } throws HotelaException.HotelNotFoundException(hotel.id)
 
                     val requestBody = UpdateHotelRequestStubs.create()

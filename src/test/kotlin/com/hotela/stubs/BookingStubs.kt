@@ -6,8 +6,8 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 object BookingStubs {
-    fun create(): Booking {
-        return Booking(
+    fun create(): Booking =
+        Booking(
             id = UUID.fromString("080e6191-65d1-4f87-a1e6-509a2f73c4eb"),
             customerId = UUID.fromString("d167ab17-e593-46f5-b8ca-73a9c9726d3c"),
             hotelId = UUID.fromString("f8f0424b-76ff-4351-b7d0-37e66e79db17"),
@@ -18,5 +18,4 @@ object BookingStubs {
             status = BookingStatus.CONFIRMED,
             notes = "Test booking",
         )
-    }
 }

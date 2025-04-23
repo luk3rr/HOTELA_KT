@@ -38,8 +38,8 @@ class PartnerAuthRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
-    override suspend fun create(partnerAuth: PartnerAuth): PartnerAuth {
-        return databaseClient
+    override suspend fun create(partnerAuth: PartnerAuth): PartnerAuth =
+        databaseClient
             .sql(SAVE)
             .bind("id", partnerAuth.id)
             .bind("partnerId", partnerAuth.partnerId)
@@ -47,7 +47,6 @@ class PartnerAuthRepositoryImpl(
             .bind("passwordHash", partnerAuth.passwordHash)
             .map { row, _ -> mapper(row) }
             .awaitSingle()
-    }
 
     private fun mapper(row: Row): PartnerAuth =
         PartnerAuth(

@@ -1,6 +1,5 @@
 package com.hotela.repository.impl
 
-import com.hotela.error.HotelaException
 import com.hotela.model.database.Partner
 import com.hotela.model.enum.PartnerStatus
 import com.hotela.repository.PartnerRepository
@@ -41,8 +40,8 @@ class PartnerRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
-    override suspend fun save(partner: Partner): Partner {
-        return databaseClient
+    override suspend fun create(partner: Partner): Partner =
+        databaseClient
             .sql(SAVE)
             .bind("id", partner.id)
             .bind("name", partner.name)
@@ -59,7 +58,6 @@ class PartnerRepositoryImpl(
             .bind("notes", partner.notes)
             .map { row, _ -> mapper(row) }
             .awaitSingle()
-    }
 
     private fun mapper(row: Row): Partner =
         Partner(

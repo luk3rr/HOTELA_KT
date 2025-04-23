@@ -5,10 +5,10 @@ import java.math.BigDecimal
 import java.util.UUID
 
 object HotelStubs {
-    fun create() =
+    fun create(partnerId: UUID = UUID.fromString("99f9f48d-7956-4638-9b1a-891f19d28b58")) =
         Hotel(
             id = UUID.fromString("edab2302-c9d0-480c-a229-46e2b63f625b"),
-            partnerId = UUID.fromString("1f69f883-db90-4296-91b1-e99260084808"),
+            partnerId = partnerId,
             name = "Hotel Test",
             address = "123 Test St",
             city = "Test City",

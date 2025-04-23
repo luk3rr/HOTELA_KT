@@ -10,5 +10,5 @@ interface PartnerRepository {
 
     suspend fun existsByEmail(email: String): Boolean
 
-    suspend fun save(partner: Partner): Partner
+    suspend fun create(partner: Partner): Partner
 }

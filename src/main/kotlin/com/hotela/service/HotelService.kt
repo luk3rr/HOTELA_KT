@@ -51,9 +51,18 @@ class HotelService(
 
     suspend fun updateHotel(
         id: UUID,
+        partnerAuthId: UUID,
         payload: UpdateHotelRequest,
     ): Hotel {
         val hotel = hotelRepository.findById(id) ?: throw HotelaException.HotelNotFoundException(id)
+
+        val partnerAuth =
+            partnerAuthService.findById(partnerAuthId)
+                ?: throw HotelaException.InvalidCredentialsException()
+
+        if (partnerAuth.partnerId != hotel.partnerId) {
+            throw HotelaException.AccessDeniedException()
+        }
 
         val updatedHotel =
             hotel.copy(

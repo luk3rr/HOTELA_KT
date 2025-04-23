@@ -62,8 +62,10 @@ class HotelController(
     suspend fun updateHotel(
         @PathVariable id: UUID,
         @RequestBody payload: UpdateHotelRequest,
+        principal: JwtAuthenticationToken,
     ): ResourceUpdatedResponse {
-        hotelService.updateHotel(id, payload)
+        val partnerAuthId = principal.getPartnerAuthId()
+        hotelService.updateHotel(id, partnerAuthId, payload)
 
         return ResourceUpdatedResponse(
             message = "Hotel updated successfully",

@@ -15,5 +15,5 @@ class PartnerService(
 
     suspend fun existsByEmail(email: String) = partnerRepository.existsByEmail(email)
 
-    suspend fun save(partner: Partner) = partnerRepository.save(partner)
+    suspend fun createPartner(partner: Partner) = partnerRepository.create(partner)
 }

@@ -15,5 +15,5 @@ class PartnerAuthService(
 
     suspend fun existsByEmail(email: String): Boolean = partnerAuthRepository.existsByEmail(email)
 
-    suspend fun save(partnerAuth: PartnerAuth): PartnerAuth = partnerAuthRepository.create(partnerAuth)
+    suspend fun createPartnerAuth(partnerAuth: PartnerAuth): PartnerAuth = partnerAuthRepository.create(partnerAuth)
 }

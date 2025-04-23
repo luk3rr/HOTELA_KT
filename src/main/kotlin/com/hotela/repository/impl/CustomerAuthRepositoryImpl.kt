@@ -1,6 +1,5 @@
 package com.hotela.repository.impl
 
-import com.hotela.error.HotelaException
 import com.hotela.model.database.CustomerAuth
 import com.hotela.repository.CustomerAuthRepository
 import io.r2dbc.spi.Row
@@ -31,8 +30,8 @@ class CustomerAuthRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
-    override suspend fun create(customerAuth: CustomerAuth): CustomerAuth {
-        return databaseClient
+    override suspend fun create(customerAuth: CustomerAuth): CustomerAuth =
+        databaseClient
             .sql(SAVE)
             .bind("id", customerAuth.id)
             .bind("customerId", customerAuth.customerId)
@@ -40,7 +39,6 @@ class CustomerAuthRepositoryImpl(
             .bind("passwordHash", customerAuth.passwordHash)
             .map { row, _ -> mapper(row) }
             .awaitSingle()
-    }
 
     private fun mapper(row: Row): CustomerAuth =
         CustomerAuth(
