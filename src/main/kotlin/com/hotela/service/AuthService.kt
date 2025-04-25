@@ -100,7 +100,9 @@ class AuthService(
     }
 
     suspend fun customerLogin(payload: AuthRequest): AuthResponse {
-        val customerAuth = customerAuthService.findByEmail(payload.email) ?: throw HotelaException.InvalidCredentialsException()
+        val customerAuth =
+            customerAuthService.findByEmail(payload.email)
+                ?: throw HotelaException.InvalidCredentialsException()
 
         if (!checkBCryptPassword(payload.password, customerAuth.passwordHash)) {
             throw HotelaException.InvalidCredentialsException()
