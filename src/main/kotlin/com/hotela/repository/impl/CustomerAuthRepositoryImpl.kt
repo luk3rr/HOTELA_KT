@@ -30,6 +30,14 @@ class CustomerAuthRepositoryImpl(
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
 
+    override suspend fun existsById(id: UUID): Boolean =
+        databaseClient
+            .sql(EXISTS_BY_ID)
+            .bind("id", id)
+            .map { row, _ ->
+                row.get("exists", Boolean::class.java)!!
+            }.awaitSingle()
+
     override suspend fun create(customerAuth: CustomerAuth): CustomerAuth =
         databaseClient
             .sql(SAVE)
@@ -58,6 +66,10 @@ class CustomerAuthRepositoryImpl(
 
         private const val EXISTS_BY_EMAIL = """
         SELECT EXISTS(SELECT 1 FROM customer_auth WHERE email = :email) AS exists
+        """
+
+        private const val EXISTS_BY_ID = """
+        SELECT EXISTS(SELECT 1 FROM customer_auth WHERE id = :id) AS exists
         """
 
         private const val SAVE = """

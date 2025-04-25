@@ -11,4 +11,9 @@ data class CustomerAuth(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val lastLogin: LocalDateTime = LocalDateTime.now(),
     val active: Boolean = true,
-)
+) {
+    init {
+        require(email.isNotBlank()) { "Customer email cannot be blank" }
+        require(passwordHash.isNotBlank()) { "Customer password hash cannot be blank" }
+    }
+}

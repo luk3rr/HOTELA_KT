@@ -14,4 +14,9 @@ data class Payment(
     val paymentMethod: PaymentMethod,
     val status: PaymentStatus,
     val paidAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    init {
+        require(transactionId.isNotBlank()) { "Transaction ID cannot be blank" }
+        require(amount > BigDecimal.ZERO) { "Amount must be greater than zero" }
+    }
+}
