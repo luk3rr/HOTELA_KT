@@ -108,4 +108,21 @@ class CustomerRepositoryImplTest :
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Boolean>>())
             }
         }
+
+        should("successfully update a customer") {
+            customerRepositoryImpl.update(customer) shouldBe customer
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("id", customer.id)
+                genericDatabaseSpec.bind("name", customer.name)
+                genericDatabaseSpec.bind("email", customer.email)
+                genericDatabaseSpec.bind("phone", customer.phone)
+                genericDatabaseSpec.bind("idDocument", customer.idDocument)
+                genericDatabaseSpec.bind("birthDate", customer.birthDate)
+                genericDatabaseSpec.bind("address", customer.address)
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Customer>>())
+                rowsFetchSpec.first()
+            }
+        }
     })

@@ -22,6 +22,22 @@ class CustomerAuthRepositoryImpl(
                 mapper(row)
             }.awaitSingleOrNull()
 
+    override suspend fun findById(id: UUID): CustomerAuth? =
+        databaseClient
+            .sql(FIND_BY_ID)
+            .bind("id", id)
+            .map { row, _ ->
+                mapper(row)
+            }.awaitSingleOrNull()
+
+    override suspend fun findByCustomerId(customerId: UUID): CustomerAuth? =
+        databaseClient
+            .sql(FIND_BY_CUSTOMER_ID)
+            .bind("customerId", customerId)
+            .map { row, _ ->
+                mapper(row)
+            }.awaitSingleOrNull()
+
     override suspend fun existsByEmail(email: String): Boolean =
         databaseClient
             .sql(EXISTS_BY_EMAIL)
@@ -62,6 +78,14 @@ class CustomerAuthRepositoryImpl(
     companion object {
         private const val FIND_BY_EMAIL = """
         SELECT * FROM customer_auth WHERE email = :email
+        """
+
+        private const val FIND_BY_ID = """
+        SELECT * FROM customer_auth WHERE id = :id
+        """
+
+        private const val FIND_BY_CUSTOMER_ID = """
+        SELECT * FROM customer_auth WHERE customer_id = :customerId
         """
 
         private const val EXISTS_BY_EMAIL = """

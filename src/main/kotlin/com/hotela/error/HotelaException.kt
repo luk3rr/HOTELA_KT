@@ -16,6 +16,8 @@ sealed class HotelaException(
         const val ACCESS_DENIED = "103"
         const val CUSTOMER_AUTH_ALREADY_EXISTS = "104"
         const val PARTNER_AUTH_ALREADY_EXISTS = "105"
+        const val CUSTOMER_AUTH_NOT_FOUND = "106"
+        const val PARTNER_AUTH_NOT_FOUND = "107"
 
         // 2xx - Customer
         const val CUSTOMER_NOT_FOUND = "200"
@@ -70,6 +72,16 @@ sealed class HotelaException(
     class PartnerAuthAlreadyExistsException(
         id: UUID,
     ) : HotelaException(PARTNER_AUTH_ALREADY_EXISTS, "Partner auth with id $id already exists")
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    class CustomerAuthNotFoundException(
+        id: UUID,
+    ) : HotelaException(CUSTOMER_AUTH_NOT_FOUND, "Customer auth with id $id not found")
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    class PartnerAuthNotFoundException(
+        id: UUID,
+    ) : HotelaException(PARTNER_AUTH_NOT_FOUND, "Partner auth with id $id not found")
 
     // 2xx - Customer
     @ResponseStatus(HttpStatus.NOT_FOUND)

@@ -83,6 +83,28 @@ class CustomerAuthRepositoryImplTest :
             }
         }
 
+        should("successfully find a customer auth by id") {
+            customerAuthRepositoryImpl.findById(customerAuth.id) shouldBe customerAuth
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("id", customerAuth.id)
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, CustomerAuth>>())
+                rowsFetchSpec.first()
+            }
+        }
+
+        should("successfully find a customer auth by customer id") {
+            customerAuthRepositoryImpl.findByCustomerId(customerAuth.customerId) shouldBe customerAuth
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("customerId", customerAuth.customerId)
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, CustomerAuth>>())
+                rowsFetchSpec.first()
+            }
+        }
+
         should("successfully check if a customer auth exists by email") {
             every { mockRow.get("exists", Boolean::class.java) } returns true
 
@@ -91,6 +113,18 @@ class CustomerAuthRepositoryImplTest :
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("email", customerAuth.email)
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Boolean>>())
+            }
+        }
+
+        should("successfully check if a customer auth exists by id") {
+            every { mockRow.get("exists", Boolean::class.java) } returns true
+
+            customerAuthRepositoryImpl.existsById(customerAuth.id) shouldBe true
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("id", customerAuth.id)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Boolean>>())
             }
         }

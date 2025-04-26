@@ -52,6 +52,20 @@ class CustomerRepositoryImpl(
                 mapper(row)
             }.awaitSingle()
 
+    override suspend fun update(customer: Customer): Customer =
+        databaseClient
+            .sql(UPDATE)
+            .bind("id", customer.id)
+            .bind("name", customer.name)
+            .bind("email", customer.email)
+            .bind("phone", customer.phone)
+            .bind("idDocument", customer.idDocument)
+            .bind("birthDate", customer.birthDate)
+            .bind("address", customer.address)
+            .map { row, _ ->
+                mapper(row)
+            }.awaitSingle()
+
     private fun mapper(row: Row): Customer =
         Customer(
             id = row.get("id", UUID::class.java)!!,
@@ -79,6 +93,13 @@ class CustomerRepositoryImpl(
         private const val SAVE = """
         INSERT INTO customer (id, name, email, phone, id_document, birth_date, address)
         VALUES (:id, :name, :email, :phone, :idDocument, :birthDate, :address)
+        RETURNING *
+        """
+
+        private const val UPDATE = """
+        UPDATE customer
+        SET name = :name, email = :email, phone = :phone, id_document = :idDocument, birth_date = :birthDate, address = :address
+        WHERE id = :id
         RETURNING *
         """
     }
