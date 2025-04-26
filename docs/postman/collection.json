@@ -24,10 +24,17 @@
 									"",
 									"// Guarda o token, seu tipo e o id de login do cliente",
 									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"customer_auth_id\", jsonData.authId);",
 									"pm.collectionVariables.set(\"customer_token\", jsonData.token);",
 									"pm.collectionVariables.set(\"customer_token_type\", jsonData.type);",
-									""
+									"",
+									"// Extrai os IDs do token e armazena em variáveis",
+									"let token = pm.collectionVariables.get(\"customer_token\");",
+									"let payloadBase64 = token.split('.')[1];",
+									"let payloadJson = JSON.parse(atob(payloadBase64));",
+									"let customerAuthId = payloadJson.authId;",
+									"let customerUserId = payloadJson.userId;",
+									"pm.collectionVariables.set(\"customer_auth_id\", customerAuthId);",
+									"pm.collectionVariables.set(\"customer_user_id\", customerUserId);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -75,10 +82,17 @@
 								"exec": [
 									"// Guarda o token, seu tipo e o id de login do cliente",
 									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"customer_auth_id\", jsonData.authId);",
 									"pm.collectionVariables.set(\"customer_token\", jsonData.token);",
 									"pm.collectionVariables.set(\"customer_token_type\", jsonData.type);",
-									""
+									"",
+									"// Extrai os IDs do token e armazena em variáveis",
+									"let token = pm.collectionVariables.get(\"customer_token\");",
+									"let payloadBase64 = token.split('.')[1];",
+									"let payloadJson = JSON.parse(atob(payloadBase64));",
+									"let customerAuthId = payloadJson.authId;",
+									"let customerUserId = payloadJson.userId;",
+									"pm.collectionVariables.set(\"customer_auth_id\", customerAuthId);",
+									"pm.collectionVariables.set(\"customer_user_id\", customerUserId);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -131,9 +145,17 @@
 									"",
 									"// Guarda o token, seu tipo e o id de login do parceiro",
 									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"partner_auth_id\", jsonData.authId);",
 									"pm.collectionVariables.set(\"partner_token\", jsonData.token);",
-									"pm.collectionVariables.set(\"partner_token_type\", jsonData.type);"
+									"pm.collectionVariables.set(\"partner_token_type\", jsonData.type);",
+									"",
+									"// Extrai os IDs do token e armazena em variáveis",
+									"let token = pm.collectionVariables.get(\"partner_token\");",
+									"let payloadBase64 = token.split('.')[1];",
+									"let payloadJson = JSON.parse(atob(payloadBase64));",
+									"let partnerAuthId = payloadJson.authId;",
+									"let partnerUserId = payloadJson.userId;",
+									"pm.collectionVariables.set(\"partner_auth_id\", partnerAuthId);",
+									"pm.collectionVariables.set(\"partner_user_id\", partnerUserId);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -151,7 +173,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"contato@pousadadomar.com.br\",\n  \"password\": \"senhaSuperSecreta123\",\n  \"name\": \"Pousada do Mar\",\n  \"cnpj\": \"12.345.678/0001-99\",\n  \"phone\": \"+55 31 99999-8888\",\n  \"address\": \"Rua das Gaivotas, 123 - Ubatuba, SP\",\n  \"contactName\": \"Maria Silva\",\n  \"contactPhone\": \"+55 11 98888-7777\",\n  \"contactEmail\": \"maria.silva@pousadadomar.com.br\",\n  \"contractSigned\": true,\n  \"notes\": \"Contrato assinado digitalmente no dia 20/03/2025\"\n}",
+							"raw": "{\n  \"email\": \"contat11o@pousadadomar.com.br\",\n  \"password\": \"senhaSuperSecreta123\",\n  \"name\": \"Pousada do Mar\",\n  \"cnpj\": \"12.345.678/0001-99\",\n  \"phone\": \"+55 31 99999-8888\",\n  \"address\": \"Rua das Gaivotas, 123 - Ubatuba, SP\",\n  \"contactName\": \"Maria Silva\",\n  \"contactPhone\": \"+55 11 98888-7777\",\n  \"contactEmail\": \"maria.silva@pousadadomar.com.br\",\n  \"contractSigned\": true,\n  \"notes\": \"Contrato assinado digitalmente no dia 20/03/2025\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -181,9 +203,17 @@
 								"exec": [
 									"// Guarda o token, seu tipo e o id de login do parceiro",
 									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"partner_auth_id\", jsonData.authId);",
 									"pm.collectionVariables.set(\"partner_token\", jsonData.token);",
-									"pm.collectionVariables.set(\"partner_token_type\", jsonData.type);"
+									"pm.collectionVariables.set(\"partner_token_type\", jsonData.type);",
+									"",
+									"// Extrai os IDs do token e armazena em variáveis",
+									"let token = pm.collectionVariables.get(\"partner_token\");",
+									"let payloadBase64 = token.split('.')[1];",
+									"let payloadJson = JSON.parse(atob(payloadBase64));",
+									"let partnerAuthId = payloadJson.authId;",
+									"let partnerUserId = payloadJson.userId;",
+									"pm.collectionVariables.set(\"partner_auth_id\", partnerAuthId);",
+									"pm.collectionVariables.set(\"partner_user_id\", partnerUserId);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -217,70 +247,6 @@
 								"auth",
 								"partner",
 								"login"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Example",
-			"item": [
-				{
-					"name": "Create Example",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Lucas\",\n  \"id\": \"019e2eb1-5bed-497d-be1e-df74bcc9fca2\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/example/examples/create",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"example",
-								"examples",
-								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Find Example by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{server_addr}}/example/examples/:id",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"example",
-								"examples",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "019e2eb1-5bed-497d-be1e-df74bcc9fca1"
-								}
 							]
 						}
 					},
@@ -333,7 +299,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"partnerAuthId\": \"{{partner_auth_id}}\", \n  \"name\": \"Hotel das Palmeiras\",\n  \"address\": \"Rua Exemplo, 123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"12345-678\",\n  \"phone\": \"11999999999\",\n  \"rating\": 4.5,\n  \"description\": \"Hotel charmoso com café incluso\",\n  \"website\": \"http://hotelpalmeiras.com\",\n  \"latitude\": -23.55052,\n  \"longitude\": -46.633308\n}",
+							"raw": "{\n  \"name\": \"Hotel das Palmeiras\",\n  \"address\": \"Rua Exemplo, 123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"12345-678\",\n  \"phone\": \"11999999999\",\n  \"rating\": 4.5,\n  \"description\": \"Hotel charmoso com café incluso\",\n  \"website\": \"http://hotelpalmeiras.com\",\n  \"latitude\": -23.55052,\n  \"longitude\": -46.633308\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -354,6 +320,73 @@
 					"response": []
 				},
 				{
+					"name": "Update hotel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{partner_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Hotel charmoso com café da manhã, almoço e jantar incluso\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/hotel/update/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"hotel",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{hotel_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Find hotel by id",
 					"event": [
 						{
@@ -362,7 +395,6 @@
 								"exec": [
 									"// guarda o id do hotel e do parceiro dono",
 									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"hotel_id\", jsonData.id);",
 									"pm.collectionVariables.set(\"partner_id\", jsonData.partnerId);"
 								],
 								"type": "text/javascript",
@@ -496,6 +528,130 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Customer",
+			"item": [
+				{
+					"name": "Find customer by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// guarda o id do hotel e do parceiro dono",
+									"let jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"partner_id\", jsonData.partnerId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/customer/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"customer",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{customer_user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update customer",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John F Doe\",\n    \"phone\": \"1234567890\",\n    \"idDocument\": \"12345678901\",\n    \"birthDate\": \"2001-01-01\",\n    \"address\": \"321 Example Street, City, Country\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/customer/update",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"customer",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [
@@ -561,6 +717,14 @@
 		},
 		{
 			"key": "partner_id",
+			"value": ""
+		},
+		{
+			"key": "customer_user_id",
+			"value": ""
+		},
+		{
+			"key": "partner_user_id",
 			"value": ""
 		}
 	]
