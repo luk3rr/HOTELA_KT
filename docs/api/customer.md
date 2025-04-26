@@ -19,11 +19,12 @@ Endpoints para gerenciamento de dados do cliente.
 
 ```json
 {
+  "id": "a8787188-53e4-4a51-88d2-48c04f7afdfc",
   "name": "João Silva",
   "email": "joao@email.com",
   "phone": "+55 11 98765-4321",
-  "id_document": "123.456.789-00",
-  "birth_date": "1990-05-15",
+  "idDocument": "123.456.789-00",
+  "birthDate": "1990-05-15",
   "address": "Rua Exemplo, 123, São Paulo, SP"
 }
 ```
@@ -39,62 +40,18 @@ Endpoints para gerenciamento de dados do cliente.
 
 ---
 
-### POST `/customer/create`
+### PUT `/customer/update`
 
-**Descrição:** Cria um novo cliente no sistema.
-
-**Body JSON:**
-
-```json
-{
-  "name": "João Silva",
-  "email": "joao@email.com",
-  "phone": "+55 11 98765-4321",
-  "id_document": "123.456.789-00",
-  "birth_date": "1990-05-15",
-  "address": "Rua Exemplo, 123, São Paulo, SP"
-}
-```
-
-**Resposta de sucesso (`201 Created`):**
-
-```json
-{
-  "id": "{generated-uuid}",
-  "message": "Customer created successfully"
-}
-```
-
-**Resposta de erro (`400 Bad Request`):**
-
-```json
-{
-  "code": "900",
-  "message": "Invalid data provided"
-}
-```
-
----
-
-### PUT `/customer/{id}/update`
-
-**Descrição:** Atualiza os dados de um cliente existente.
-
-**Parâmetro de caminho:**
-
-| Parâmetro | Tipo | Descrição                                |
-|-----------|------|------------------------------------------|
-| `id`      | UUID | O ID único do cliente a ser atualizado   |
+**Descrição:** Atualiza os dados de um cliente existente. Usa os dados no JWT para localizar o cliente.
 
 **Body JSON:**
 
 ```json
 {
   "name": "João Silva Filho",
-  "email": "joao.silva@email.com",
-  "phone": "+55 11 98765-4321",
-  "id_document": "123.456.789-00",
-  "birth_date": "1990-05-15",
+  "phone": "+55 21 98765-4325",
+  "idDocument": "123.456.789-10",
+  "birthDate": "1990-05-16",
   "address": "Rua Nova, 456, São Paulo, SP"
 }
 ```
@@ -109,6 +66,8 @@ Endpoints para gerenciamento de dados do cliente.
 
 **Resposta de erro (`400 Bad Request`):**
 
+Caso os dados estejam inválidos ou incompletos.
+
 ```json
 {
   "code": "900",
@@ -116,45 +75,16 @@ Endpoints para gerenciamento de dados do cliente.
 }
 ```
 
-**Resposta de erro (`404 Not Found`):**
-
-```json
-{
-  "code": "200",
-  "message": "Customer with id {id} not found"
-}
-```
-
----
-
-### DELETE `/customer/{id}/delete`
-
-**Descrição:** Exclui um cliente do sistema.
-
-**Parâmetro de caminho:**
-
-| Parâmetro | Tipo | Descrição                            |
-|-----------|------|--------------------------------------|
-| `id`      | UUID | O ID único do cliente a ser excluído |
-
-**Resposta de sucesso (`200 OK`):**
-
-```json
-{
-  "message": "Customer deleted successfully"
-}
-```
+Pode ocorrer também se a data de nascimento não for válida. Nesse caso, o próprio protocolo HTTP retornará um erro `400 Bad Request` ao tentar fazer o cast para `LocalDate`.
 
 **Resposta de erro (`404 Not Found`):**
 
 ```json
 {
-  "code": "200",
-  "message": "Customer with id {id} not found"
+  "code": "106",
+  "message": "Customer auth with id {id} not found"
 }
 ```
-
----
 
 ## Exemplos com `curl`
 
@@ -163,7 +93,7 @@ Endpoints para gerenciamento de dados do cliente.
 ```bash
 curl -X POST http://localhost:8080/customer/create \
      -H "Content-Type: application/json" \
-     -d '{"name": "João Silva", "email": "joao@email.com", "phone": "+55 11 98765-4321", "id_document": "123.456.789-00", "birth_date": "1990-05-15", "address": "Rua Exemplo, 123, São Paulo, SP"}'
+     -d '{"name": "João Silva", "email": "joao@email.com", "phone": "+55 11 98765-4321", "idDocument": "123.456.789-00", "birthDate": "1990-05-15", "address": "Rua Exemplo, 123, São Paulo, SP"}'
 ```
 
 ### Atualizar cliente
@@ -171,11 +101,5 @@ curl -X POST http://localhost:8080/customer/create \
 ```bash
 curl -X PUT http://localhost:8080/customer/f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa/update \
      -H "Content-Type: application/json" \
-     -d '{"name": "João Silva Filho", "email": "joao.silva@email.com", "phone": "+55 11 98765-4321", "id_document": "123.456.789-00", "birth_date": "1990-05-15", "address": "Rua Nova, 456, São Paulo, SP"}'
-```
-
-### Excluir cliente
-
-```bash
-curl -X DELETE http://localhost:8080/customer/f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa/delete
+     -d '{"name": "João Silva Filho", "email": "joao.silva@email.com", "phone": "+55 21 98765-4321", "idDocument": "123.456.789-10", "birthDate": "1990-05-16", "address": "Rua Nova, 456, São Paulo, SP"}'
 ```

@@ -1,4 +1,4 @@
-package com.hotela.stubs
+package com.hotela.stubs.database
 
 import com.hotela.model.database.Review
 import java.time.LocalDateTime

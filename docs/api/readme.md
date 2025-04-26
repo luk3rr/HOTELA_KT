@@ -18,4 +18,8 @@ http://localhost:8080/
 8. [Review](review.md)
 9. [Room](room.md)
 
+## Erros
 A definição dos códigos de erro segue o padrão definido em [error.md](error.md).
+
+## JWT
+Os endpoints que requerem autenticação usam JWT (JSON Web Token) para validação. O token deve ser enviado no cabeçalho `Authorization`. Uma documentação detalhada sobre o padrão JWT utilizado pode ser encontrada em [jwt.md](jwt.md).

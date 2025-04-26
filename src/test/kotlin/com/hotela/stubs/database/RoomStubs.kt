@@ -1,4 +1,4 @@
-package com.hotela.stubs
+package com.hotela.stubs.database
 
 import com.hotela.model.database.Room
 import com.hotela.model.enum.RoomStatus

@@ -35,7 +35,6 @@ Endpoints para registro e login de parceiros.
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "type": "Bearer",
-  "expire_at": "2025-04-18T14:00:00Z"
 }
 ```
 
@@ -69,7 +68,6 @@ Endpoints para registro e login de parceiros.
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "type": "Bearer",
-  "expireAt": "2025-04-18T14:00:00Z"
 }
 ```
 

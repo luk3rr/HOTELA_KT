@@ -8,9 +8,13 @@ import com.hotela.model.database.Hotel
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.HotelService
-import com.hotela.stubs.CreateHotelRequestStubs
-import com.hotela.stubs.HotelStubs
-import com.hotela.stubs.UpdateHotelRequestStubs
+import com.hotela.stubs.database.CustomerAuthStubs
+import com.hotela.stubs.database.CustomerStubs
+import com.hotela.stubs.database.HotelStubs
+import com.hotela.stubs.database.PartnerAuthStubs
+import com.hotela.stubs.database.PartnerStubs
+import com.hotela.stubs.request.CreateHotelRequestStubs
+import com.hotela.stubs.request.UpdateHotelRequestStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
@@ -21,7 +25,6 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
-import java.util.UUID
 
 @WebFluxTest(controllers = [HotelController::class])
 class HotelControllerTest(
@@ -37,9 +40,11 @@ class HotelControllerTest(
     }
 
     init {
-        val hotel = HotelStubs.create()
-        val customerId = UUID.fromString("a31d1133-4423-4d10-a1ba-1557a0fca1f5")
-        val partnerId = UUID.fromString("7ad48a95-8355-4160-9c21-0c28a0bfdd10")
+        val partner = PartnerStubs.create()
+        val customer = CustomerStubs.create()
+        val hotel = HotelStubs.create(partnerId = partner.id)
+        val customerAuth = CustomerAuthStubs.create(customerId = customer.id)
+        val partnerAuth = PartnerAuthStubs.create(partnerId = partner.id)
 
         context("POST /hotel/create") {
             context("when the request is valid") {
@@ -52,7 +57,7 @@ class HotelControllerTest(
 
                     val response =
                         webTestClient
-                            .asPartner(hotel.partnerId)
+                            .asPartner(partner.id, partnerAuth.id)
                             .post()
                             .uri("/hotel/create")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -76,7 +81,7 @@ class HotelControllerTest(
                     val requestBody = CreateHotelRequestStubs.create()
 
                     webTestClient
-                        .asCustomer(customerId)
+                        .asCustomer(customer.id, customerAuth.id)
                         .post()
                         .uri("/hotel/create")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +102,7 @@ class HotelControllerTest(
 
                     val response =
                         webTestClient
-                            .asPartner(hotel.partnerId)
+                            .asPartner(partner.id, partnerAuth.id)
                             .get()
                             .uri("/hotel/${hotel.id}")
                             .exchange()
@@ -121,7 +126,7 @@ class HotelControllerTest(
 
                     val response =
                         webTestClient
-                            .asPartner(hotel.id)
+                            .asPartner(partner.id, partnerAuth.id)
                             .get()
                             .uri("/hotel/${hotel.id}")
                             .exchange()
@@ -146,9 +151,9 @@ class HotelControllerTest(
 
                     val response =
                         webTestClient
-                            .asPartner(partnerId)
+                            .asPartner(partner.id, partnerAuth.id)
                             .get()
-                            .uri("/hotel/partner/$partnerId")
+                            .uri("/hotel/partner/${partner.id}")
                             .exchange()
                             .expectStatus()
                             .isOk
@@ -175,7 +180,7 @@ class HotelControllerTest(
 
                     val response =
                         webTestClient
-                            .asPartner(hotel.partnerId)
+                            .asPartner(partner.id, partnerAuth.id)
                             .put()
                             .uri("/hotel/update/${hotel.id}")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -203,7 +208,7 @@ class HotelControllerTest(
 
                     val response =
                         webTestClient
-                            .asPartner(hotel.partnerId)
+                            .asPartner(partner.id, partnerAuth.id)
                             .put()
                             .uri("/hotel/update/${hotel.id}")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -225,7 +230,7 @@ class HotelControllerTest(
                     val requestBody = UpdateHotelRequestStubs.create()
 
                     webTestClient
-                        .asCustomer(customerId)
+                        .asCustomer(customer.id, customerAuth.id)
                         .put()
                         .uri("/hotel/update/${hotel.id}")
                         .contentType(MediaType.APPLICATION_JSON)

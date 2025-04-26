@@ -3,10 +3,10 @@ package com.hotela.controller
 import com.hotela.asGuest
 import com.hotela.model.dto.response.AuthResponse
 import com.hotela.service.AuthService
-import com.hotela.stubs.AuthRequestStubs
-import com.hotela.stubs.AuthResponseStubs
-import com.hotela.stubs.CustomerRegisterRequestStubs
-import com.hotela.stubs.PartnerRegisterRequestStubs
+import com.hotela.stubs.request.AuthRequestStubs
+import com.hotela.stubs.request.CustomerRegisterRequestStubs
+import com.hotela.stubs.request.PartnerRegisterRequestStubs
+import com.hotela.stubs.response.AuthResponseStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
@@ -59,10 +59,8 @@ class AuthControllerTest(
                             .returnResult()
                             .responseBody!!
 
-                    response.authId shouldBe response.authId
                     response.token shouldBe response.token
                     response.type shouldBe response.type
-                    response.expireAt shouldBe response.expireAt
                 }
             }
         }
@@ -92,10 +90,8 @@ class AuthControllerTest(
                             .returnResult()
                             .responseBody!!
 
-                    response.authId shouldBe response.authId
                     response.token shouldBe response.token
                     response.type shouldBe response.type
-                    response.expireAt shouldBe response.expireAt
                 }
             }
         }
@@ -125,10 +121,8 @@ class AuthControllerTest(
                             .returnResult()
                             .responseBody!!
 
-                    response.authId shouldBe response.authId
                     response.token shouldBe response.token
                     response.type shouldBe response.type
-                    response.expireAt shouldBe response.expireAt
                 }
             }
         }
@@ -158,10 +152,8 @@ class AuthControllerTest(
                             .returnResult()
                             .responseBody!!
 
-                    response.authId shouldBe response.authId
                     response.token shouldBe response.token
                     response.type shouldBe response.type
-                    response.expireAt shouldBe response.expireAt
                 }
             }
         }

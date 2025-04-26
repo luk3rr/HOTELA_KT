@@ -6,9 +6,11 @@ import com.hotela.asPartner
 import com.hotela.error.ErrorResponse
 import com.hotela.error.HotelaException
 import com.hotela.model.database.Customer
+import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.CustomerService
-import com.hotela.stubs.CustomerStubs
-import com.hotela.stubs.UpdateCustomerRequestStubs
+import com.hotela.stubs.database.CustomerAuthStubs
+import com.hotela.stubs.database.CustomerStubs
+import com.hotela.stubs.request.UpdateCustomerRequestStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
@@ -35,6 +37,7 @@ class CustomerControllerTest(
 
     init {
         val customer = CustomerStubs.create()
+        val customerAuth = CustomerAuthStubs.create(customer.id)
         val updateCustomerRequest = UpdateCustomerRequestStubs.create()
 
         require(
@@ -56,7 +59,7 @@ class CustomerControllerTest(
 
                     val response =
                         webTestClient
-                            .asCustomer(customer.id)
+                            .asCustomer(customer.id, customerAuth.id)
                             .get()
                             .uri("/customer/${customer.id}")
                             .exchange()
@@ -80,7 +83,7 @@ class CustomerControllerTest(
 
                     val response =
                         webTestClient
-                            .asCustomer(customer.id)
+                            .asCustomer(customer.id, customerAuth.id)
                             .get()
                             .uri("/customer/${customer.id}")
                             .exchange()
@@ -114,7 +117,7 @@ class CustomerControllerTest(
 
                     val response =
                         webTestClient
-                            .asCustomer(customer.id)
+                            .asCustomer(customer.id, customerAuth.id)
                             .put()
                             .uri("/customer/update")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -124,16 +127,11 @@ class CustomerControllerTest(
                             .isOk
                             .expectHeader()
                             .contentType(MediaType.APPLICATION_JSON)
-                            .expectBody(Customer::class.java)
+                            .expectBody(ResourceUpdatedResponse::class.java)
                             .returnResult()
                             .responseBody!!
 
-                    response.id shouldBe customerUpdated.id
-                    response.name shouldBe customerUpdated.name
-                    response.phone shouldBe customerUpdated.phone
-                    response.idDocument shouldBe customerUpdated.idDocument
-                    response.birthDate shouldBe customerUpdated.birthDate
-                    response.address shouldBe customerUpdated.address
+                    response.message shouldBe "Customer updated successfully"
                 }
             }
 
@@ -145,7 +143,7 @@ class CustomerControllerTest(
 
                     val response =
                         webTestClient
-                            .asCustomer(customer.id)
+                            .asCustomer(customer.id, customerAuth.id)
                             .put()
                             .uri("/customer/update")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -165,7 +163,7 @@ class CustomerControllerTest(
             context("when the requester is not a customer") {
                 test("should return 403 FORBIDDEN when the requester is a partner") {
                     webTestClient
-                        .asPartner(customer.id)
+                        .asPartner(customer.id, customerAuth.id)
                         .put()
                         .uri("/customer/update")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -195,7 +193,7 @@ class CustomerControllerTest(
 
                     val response =
                         webTestClient
-                            .asCustomer(customer.id)
+                            .asCustomer(customer.id, customerAuth.id)
                             .put()
                             .uri("/customer/update")
                             .contentType(MediaType.APPLICATION_JSON)

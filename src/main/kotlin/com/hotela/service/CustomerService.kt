@@ -5,7 +5,7 @@ import com.hotela.model.database.Customer
 import com.hotela.model.dto.request.UpdateCustomerRequest
 import com.hotela.repository.CustomerAuthRepository
 import com.hotela.repository.CustomerRepository
-import com.hotela.util.getCustomerAuthId
+import com.hotela.util.getAuthId
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -29,7 +29,7 @@ class CustomerService(
         payload: UpdateCustomerRequest,
         token: JwtAuthenticationToken,
     ): Customer {
-        val customerAuthId = token.getCustomerAuthId()
+        val customerAuthId = token.getAuthId()
 
         val customerAuth =
             customerAuthRepository.findById(customerAuthId)

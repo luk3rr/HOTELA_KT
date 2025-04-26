@@ -1,16 +1,15 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
-import com.hotela.stubs.AuthRequestStubs
-import com.hotela.stubs.CustomerAuthStubs
-import com.hotela.stubs.CustomerRegisterRequestStubs
-import com.hotela.stubs.CustomerStubs
-import com.hotela.stubs.PartnerAuthStubs
-import com.hotela.stubs.PartnerRegisterRequestStubs
-import com.hotela.stubs.PartnerStubs
+import com.hotela.stubs.database.CustomerAuthStubs
+import com.hotela.stubs.database.CustomerStubs
+import com.hotela.stubs.database.PartnerAuthStubs
+import com.hotela.stubs.database.PartnerStubs
+import com.hotela.stubs.request.AuthRequestStubs
+import com.hotela.stubs.request.CustomerRegisterRequestStubs
+import com.hotela.stubs.request.PartnerRegisterRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -58,7 +57,6 @@ class AuthServiceTest :
 
                     val result = authService.partnerLogin(authRequest)
 
-                    result.authId shouldBe partnerAuth.id
                     result.token shouldNotBe null
                 }
             }
@@ -95,7 +93,6 @@ class AuthServiceTest :
 
                     val result = authService.partnerRegister(partnerRegisterRequest)
 
-                    result.authId shouldBe partnerAuth.id
                     result.token shouldNotBe null
                 }
             }
@@ -119,7 +116,6 @@ class AuthServiceTest :
 
                     val result = authService.customerLogin(authRequest)
 
-                    result.authId shouldBe customerAuth.id
                     result.token shouldNotBe null
                 }
             }
@@ -156,7 +152,6 @@ class AuthServiceTest :
 
                     val result = authService.customerRegister(customerRegisterRequest)
 
-                    result.authId shouldBe customerAuth.id
                     result.token shouldNotBe null
                 }
             }

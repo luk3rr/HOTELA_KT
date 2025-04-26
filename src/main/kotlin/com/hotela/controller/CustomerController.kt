@@ -3,6 +3,7 @@ package com.hotela.controller
 import com.hotela.error.HotelaException
 import com.hotela.model.database.Customer
 import com.hotela.model.dto.request.UpdateCustomerRequest
+import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.CustomerService
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -35,5 +36,11 @@ class CustomerController(
     suspend fun updateCustomer(
         @RequestBody payload: UpdateCustomerRequest,
         principal: JwtAuthenticationToken,
-    ): Customer = customerService.updateCustomer(payload, principal)
+    ): ResourceUpdatedResponse {
+        customerService.updateCustomer(payload, principal)
+
+        return ResourceUpdatedResponse(
+            message = "Customer updated successfully",
+        )
+    }
 }

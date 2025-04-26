@@ -108,7 +108,6 @@ Se não houver hotéis associados ao parceiro, a resposta será uma lista vazia.
 
 ```json
 {
-  "partnerAuthId": "b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae",
   "name": "Hotel das Palmeiras",
   "address": "Rua Exemplo, 123",
   "city": "São Paulo",
@@ -153,7 +152,7 @@ Caso o parceiro não esteja autenticado ou autorizado.
 
 ---
 
-### PUT `/hotel/{id}/update`
+### PUT `/hotel/update/{id}`
 
 **Descrição:** Atualiza os dados de um hotel.
 
@@ -202,12 +201,11 @@ Caso o parceiro não esteja autenticado ou autorizado.
 curl -X POST http://localhost:8080/hotel/create \
      -H "Content-Type: application/json" \
      -d '{
-           "partner_id": "b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae",
            "name": "Hotel Bela Vista",
            "address": "Av. das Flores, 1000",
            "city": "São Paulo",
            "state": "SP",
-           "zip_code": "01234-567",
+           "zipCode": "01234-567",
            "phone": "(11) 1234-5678",
            "description": "Hotel com vista panorâmica e piscina aquecida.",
            "website": "https://www.belavista.com",

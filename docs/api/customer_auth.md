@@ -30,8 +30,7 @@ Endpoints para registro e login de clientes.
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "type": "Bearer",
-  "expireAt": "2025-04-18T14:00:00Z"
+  "type": "Bearer"
 }
 ```
 
@@ -64,8 +63,7 @@ Endpoints para registro e login de clientes.
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "type": "Bearer",
-  "expire_at": "2025-04-18T14:00:00Z"
+  "type": "Bearer"
 }
 ```
 

@@ -1,4 +1,4 @@
-package com.hotela.stubs
+package com.hotela.stubs.request
 
 import com.hotela.model.dto.request.CustomerRegisterRequest
 import java.time.LocalDate

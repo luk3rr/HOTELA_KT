@@ -1,7 +1,7 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.database.Customer
-import com.hotela.stubs.CustomerStubs
+import com.hotela.stubs.database.CustomerStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks

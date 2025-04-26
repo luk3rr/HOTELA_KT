@@ -1,7 +1,7 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.database.PartnerAuth
-import com.hotela.stubs.PartnerAuthStubs
+import com.hotela.stubs.database.PartnerAuthStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks

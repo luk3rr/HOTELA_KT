@@ -1,14 +1,12 @@
-package com.hotela.stubs
+package com.hotela.stubs.request
 
 import com.hotela.model.database.Hotel
 import com.hotela.model.dto.request.CreateHotelRequest
 import java.math.BigDecimal
-import java.util.UUID
 
 object CreateHotelRequestStubs {
     fun create(): CreateHotelRequest =
         CreateHotelRequest(
-            partnerAuthId = UUID.fromString("d9dca113-9113-4130-a1f7-47eea1df22cb"),
             name = "Hotel California",
             address = "123 Sunset Boulevard",
             city = "Los Angeles",
@@ -24,7 +22,6 @@ object CreateHotelRequestStubs {
 
     fun create(hotel: Hotel): CreateHotelRequest =
         CreateHotelRequest(
-            partnerAuthId = hotel.partnerId,
             name = hotel.name,
             address = hotel.address,
             city = hotel.city,

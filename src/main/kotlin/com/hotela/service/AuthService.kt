@@ -51,7 +51,6 @@ class AuthService(
         }
 
         return AuthResponse(
-            authId = partnerAuth.id,
             token = createPartnerToken(partnerAuth),
         )
     }
@@ -94,7 +93,6 @@ class AuthService(
         val savedPartnerAuth = partnerAuthService.createPartnerAuth(partnerAuth)
 
         return AuthResponse(
-            authId = savedPartnerAuth.id,
             token = createPartnerToken(savedPartnerAuth),
         )
     }
@@ -109,7 +107,6 @@ class AuthService(
         }
 
         return AuthResponse(
-            authId = customerAuth.id,
             token = createCustomerToken(customerAuth),
         )
     }
@@ -145,21 +142,30 @@ class AuthService(
         val savedCustomerAuth = customerAuthService.createCustomerAuth(customerAuth)
 
         return AuthResponse(
-            authId = savedCustomerAuth.id,
             token = createCustomerToken(savedCustomerAuth),
         )
     }
 
-    private fun createCustomerToken(customer: CustomerAuth): String =
-        createToken(subject = customer.email, claimKey = AuthClaimKey.CUSTOMER.key, claimValue = customer.id, role = Role.CUSTOMER)
+    private fun createCustomerToken(customerAuth: CustomerAuth): String =
+        createToken(
+            subject = customerAuth.email,
+            userClaimValue = customerAuth.customerId,
+            authClaimValue = customerAuth.id,
+            role = Role.CUSTOMER,
+        )
 
-    private fun createPartnerToken(partner: PartnerAuth): String =
-        createToken(subject = partner.email, claimKey = AuthClaimKey.PARTNER.key, claimValue = partner.id, role = Role.PARTNER)
+    private fun createPartnerToken(partnerAuth: PartnerAuth): String =
+        createToken(
+            subject = partnerAuth.email,
+            userClaimValue = partnerAuth.partnerId,
+            authClaimValue = partnerAuth.id,
+            role = Role.PARTNER,
+        )
 
     private fun createToken(
         subject: String,
-        claimKey: String,
-        claimValue: Any,
+        userClaimValue: Any,
+        authClaimValue: Any,
         role: Role,
     ): String {
         val now = Instant.now()
@@ -170,7 +176,8 @@ class AuthService(
                 .issuedAt(now)
                 .expiresAt(now.plus(EXPIRATION_DURATION, EXPIRATION_DURATION_UNIT))
                 .subject(subject)
-                .claim(claimKey, claimValue)
+                .claim(AuthClaimKey.USERID.key, userClaimValue)
+                .claim(AuthClaimKey.AUTHID.key, authClaimValue)
                 .claim(AuthClaimKey.ROLE.key, role)
                 .build()
 

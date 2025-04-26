@@ -4,9 +4,9 @@ import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.repository.CustomerAuthRepository
 import com.hotela.repository.CustomerRepository
-import com.hotela.stubs.CustomerAuthStubs
-import com.hotela.stubs.CustomerStubs
-import com.hotela.stubs.UpdateCustomerRequestStubs
+import com.hotela.stubs.database.CustomerAuthStubs
+import com.hotela.stubs.database.CustomerStubs
+import com.hotela.stubs.request.UpdateCustomerRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -29,32 +29,32 @@ class CustomerServiceTest :
         val jwtToken = mockk<JwtAuthenticationToken>()
         val jwt = mockk<Jwt>()
 
-        val customer = CustomerStubs.create()
-        val customerAuth = CustomerAuthStubs.create(customer.id)
-        val updateCustomerRequest = UpdateCustomerRequestStubs.create()
+        Given("a customer service") {
+            val customer = CustomerStubs.create()
+            val customerAuth = CustomerAuthStubs.create(customer.id)
+            val updateCustomerRequest = UpdateCustomerRequestStubs.create()
 
-        require(
-            customer.name != updateCustomerRequest.name &&
-                customer.phone != updateCustomerRequest.phone &&
-                customer.idDocument != updateCustomerRequest.idDocument &&
-                customer.birthDate != updateCustomerRequest.birthDate &&
-                customer.address != updateCustomerRequest.address,
-        ) {
-            "Customer and UpdateCustomerRequest should have different values"
-        }
+            require(
+                customer.name != updateCustomerRequest.name &&
+                    customer.phone != updateCustomerRequest.phone &&
+                    customer.idDocument != updateCustomerRequest.idDocument &&
+                    customer.birthDate != updateCustomerRequest.birthDate &&
+                    customer.address != updateCustomerRequest.address,
+            ) {
+                "Customer and UpdateCustomerRequest should have different values"
+            }
 
-        val customerUpdated =
-            customer.copy(
-                name = updateCustomerRequest.name ?: customer.name,
-                phone = updateCustomerRequest.phone ?: customer.phone,
-                idDocument = updateCustomerRequest.idDocument ?: customer.idDocument,
-                birthDate = updateCustomerRequest.birthDate ?: customer.birthDate,
-                address = updateCustomerRequest.address ?: customer.address,
-            )
+            val customerUpdated =
+                customer.copy(
+                    name = updateCustomerRequest.name ?: customer.name,
+                    phone = updateCustomerRequest.phone ?: customer.phone,
+                    idDocument = updateCustomerRequest.idDocument ?: customer.idDocument,
+                    birthDate = updateCustomerRequest.birthDate ?: customer.birthDate,
+                    address = updateCustomerRequest.address ?: customer.address,
+                )
 
-        Given("a customer") {
-            When("calling findById") {
-                And("the customer exists") {
+            And("calling findById") {
+                When("the customer exists") {
                     Then("it should return the customer") {
                         coEvery { customerRepository.findById(customer.id) } returns customer
 
@@ -64,7 +64,7 @@ class CustomerServiceTest :
                     }
                 }
 
-                And("the customer does not exist") {
+                When("the customer does not exist") {
                     Then("it should return null") {
                         coEvery { customerRepository.findById(customer.id) } returns null
 
@@ -75,8 +75,8 @@ class CustomerServiceTest :
                 }
             }
 
-            When("calling createCustomer") {
-                And("the customer does not exist") {
+            And("calling createCustomer") {
+                When("the customer does not exist") {
                     coEvery { customerRepository.findById(customer.id) } returns null
 
                     Then("it should create the customer") {
@@ -88,7 +88,7 @@ class CustomerServiceTest :
                     }
                 }
 
-                And("the customer already exists") {
+                When("the customer already exists") {
                     coEvery { customerRepository.findById(customer.id) } returns customer
 
                     Then("it should throw an exception") {
@@ -103,13 +103,13 @@ class CustomerServiceTest :
                 }
             }
 
-            When("calling updateCustomer") {
-                And("the customer exists") {
+            And("calling updateCustomer") {
+                When("the customer exists") {
                     coEvery { customerRepository.findById(customer.id) } returns customer
 
                     And("requester is the same as customer") {
                         every { jwtToken.token } returns jwt
-                        every { jwt.claims } returns mapOf(AuthClaimKey.CUSTOMER.key to customerAuth.id.toString())
+                        every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to customerAuth.id.toString())
 
                         Then("it should update the customer") {
                             coEvery { customerAuthRepository.findById(customerAuth.id) } returns customerAuth
@@ -130,7 +130,7 @@ class CustomerServiceTest :
 
                         Then("it should throw an exception") {
                             every { jwtToken.token } returns jwt
-                            every { jwt.claims } returns mapOf(AuthClaimKey.CUSTOMER.key to customerAuth.id.toString())
+                            every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to customerAuth.id.toString())
 
                             val exception =
                                 shouldThrow<HotelaException.CustomerAuthNotFoundException> {
