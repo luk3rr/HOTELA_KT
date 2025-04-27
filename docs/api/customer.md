@@ -1,5 +1,5 @@
 # Customer
-Endpoints para gerenciamento de dados do cliente.
+Endpoints para gerenciamento de dados do cliente. Requer autenticação via JWT.
 
 ---
 

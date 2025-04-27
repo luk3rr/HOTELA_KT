@@ -1,5 +1,5 @@
 # Hotel
-Endpoints para gerenciamento de hotéis vinculados a parceiros.
+Endpoints para gerenciamento de hotéis vinculados a parceiros. Requer autenticação via JWT.
 
 ---
 

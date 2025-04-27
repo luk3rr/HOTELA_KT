@@ -1,5 +1,5 @@
 # Partner 
-Endpoints para gerenciamento de dados do parceiro.
+Endpoints para gerenciamento de dados do parceiro. Requer autenticação via JWT.
 
 ---
 
@@ -19,17 +19,18 @@ Endpoints para gerenciamento de dados do parceiro.
 
 ```json
 {
+  "id": "285fbda5-3d28-47c4-91ee-d31268332696",
   "name": "Hotel Bela Vista",
   "cnpj": "12.345.678/0001-99",
   "email": "contato@belavista.com",
   "phone": "(11) 1234-5678",
   "address": "Av. das Flores, 1000, São Paulo, SP",
-  "contact_name": "Maria Oliveira",
-  "contact_email": "maria@belavista.com",
-  "contact_phone": "(11) 91234-5678",
-  "contract_signed": true,
+  "contactName": "Maria Oliveira",
+  "contactEmail": "maria@belavista.com",
+  "contactPhone": "(11) 91234-5678",
+  "contractSigned": true,
   "status": "ACTIVE",
-  "created_at": "2024-01-10T14:30:00Z",
+  "createdAt": "2024-01-10T14:30:00Z",
   "notes": "Parceiro com bom histórico de reservas"
 }
 ```
@@ -45,15 +46,9 @@ Endpoints para gerenciamento de dados do parceiro.
 
 ---
 
-### PUT `/partner/{id}/update`
+### PUT `/partner/update`
 
-**Descrição:** Atualiza os dados de um parceiro existente.
-
-**Parâmetro de caminho:**
-
-| Parâmetro | Tipo | Descrição                               |
-|-----------|------|-----------------------------------------|
-| `id`      | UUID | O ID único do parceiro a ser atualizado |
+**Descrição:** Atualiza os dados de um parceiro existente. Usa os dados no JWT para localizar o parceiro.
 
 **Body JSON:**
 
@@ -62,7 +57,7 @@ Endpoints para gerenciamento de dados do parceiro.
   "name": "Hotel Bela Vista Ltda",
   "email": "novocontato@belavista.com",
   "phone": "(11) 1234-9876",
-  "contact_name": "João Pereira",
+  "contactName": "João Pereira",
   "status": "INACTIVE",
   "notes": "Contrato em revisão"
 }
@@ -91,7 +86,7 @@ Endpoints para gerenciamento de dados do parceiro.
 
 ```json
 {
-  "code": "300",
-  "message": "Partner with id {id} not found"
+  "code": "107",
+  "message": "Partner auth with id {id} not found"
 }
 ```

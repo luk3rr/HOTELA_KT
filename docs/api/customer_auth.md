@@ -1,5 +1,5 @@
 # Customer Authentication
-Endpoints para registro e login de clientes.
+Endpoints para registro e login de clientes. Não é necessário autenticação para acessar esses endpoints.
 
 ---
 

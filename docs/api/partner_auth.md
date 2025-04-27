@@ -1,5 +1,5 @@
 # Partner Authentication
-Endpoints para registro e login de parceiros.
+Endpoints para registro e login de parceiros. Não é necessário autenticação para acessar esses endpoints.
 
 ---
 
