@@ -79,36 +79,3 @@ Endpoints para registro e login de parceiros.
   "message": "Invalid credentials"
 }
 ```
-
----
-
-## Exemplos com `curl`
-
-### Registrar parceiro
-
-```bash
-curl -X POST http://localhost:8080/auth/partner/register \
-     -H "Content-Type: application/json" \
-     -d '{
-              "email": "contato@pousadadomar.com.br",
-              "password": "senhaSuperSecreta123",
-              "name": "Pousada do Mar",
-              "cnpj": "12.345.678/0001-99",
-              "phone": "+55 31 99999-8888",
-              "address": "Rua das Gaivotas, 123 - Ubatuba, SP",
-              "contactName": "Maria Silva",
-              "contactPhone": "+55 11 98888-7777",
-              "contactEmail": "maria.silva@pousadadomar.com.br",
-              "contractSigned": true,
-              "status": "ACTIVE",
-              "notes": "Contrato assinado digitalmente no dia 20/03/2025"
-        }'
-```
-
-### Login do parceiro
-
-```bash
-curl -X POST http://localhost:8080/auth/partner/login \
-     -H "Content-Type: application/json" \
-     -d '{"email": "contato@pousadadomar.com.br", "password": "senhaSuperSecreta123"}'
-```

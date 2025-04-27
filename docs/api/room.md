@@ -155,38 +155,3 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
   "message": "Room with id {id} not found"
 }
 ```
-
----
-
-## Exemplos com `curl`
-
-### Criar quarto
-
-```bash
-curl -X POST http://localhost:8080/room/create \
-     -H "Content-Type: application/json" \
-     -d '{
-           "hotel_id": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1",
-           "number": "101",
-           "floor": 1,
-           "type": "Deluxe",
-           "price": 350.00,
-           "capacity": 2,
-           "status": 1,
-           "description": "Quarto com vista para o mar, cama king size e ar-condicionado."
-         }'
-```
-
-### Atualizar quarto
-
-```bash
-curl -X PUT http://localhost:8080/room/a1b2c3d4-e5f6-7890-abcd-1234567890ef/update \
-     -H "Content-Type: application/json" \
-     -d '{"price": 390.00, "description": "Agora com frigobar incluso e TV 55 polegadas."}'
-```
-
-### Excluir quarto
-
-```bash
-curl -X DELETE http://localhost:8080/room/a1b2c3d4-e5f6-7890-abcd-1234567890ef/delete
-```

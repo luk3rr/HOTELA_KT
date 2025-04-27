@@ -75,31 +75,3 @@ Endpoints para registro e login de clientes.
   "message": "Invalid credentials"
 }
 ```
-
----
-
-## Exemplos com `curl`
-
-### Registrar cliente
-
-```bash
-curl -X POST http://localhost:8080/auth/customer/register \
-     -H "Content-Type: application/json" \
-     -d '{
-              "email": "example@example.com",
-              "password": "password123",
-              "name": "John Doe",
-              "phone": "1234567890",
-              "idDocument": "12345678901",
-              "birthDate": "1990-01-01",
-              "address": "123 Example Street, City, Country"
-         }'
-```
-
-### Login do cliente
-
-```bash
-curl -X POST http://localhost:8080/auth/customer/login \
-     -H "Content-Type: application/json" \
-     -d '{"email": "example@example.com", "password": "password123"}'
-```

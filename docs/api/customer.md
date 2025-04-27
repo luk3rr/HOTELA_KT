@@ -85,21 +85,3 @@ Pode ocorrer também se a data de nascimento não for válida. Nesse caso, o pr�
   "message": "Customer auth with id {id} not found"
 }
 ```
-
-## Exemplos com `curl`
-
-### Criar cliente
-
-```bash
-curl -X POST http://localhost:8080/customer/create \
-     -H "Content-Type: application/json" \
-     -d '{"name": "João Silva", "email": "joao@email.com", "phone": "+55 11 98765-4321", "idDocument": "123.456.789-00", "birthDate": "1990-05-15", "address": "Rua Exemplo, 123, São Paulo, SP"}'
-```
-
-### Atualizar cliente
-
-```bash
-curl -X PUT http://localhost:8080/customer/f75d8bfa-9e94-4e93-ae5b-11b8ecf022fa/update \
-     -H "Content-Type: application/json" \
-     -d '{"name": "João Silva Filho", "email": "joao.silva@email.com", "phone": "+55 21 98765-4321", "idDocument": "123.456.789-10", "birthDate": "1990-05-16", "address": "Rua Nova, 456, São Paulo, SP"}'
-```

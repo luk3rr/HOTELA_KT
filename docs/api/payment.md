@@ -145,33 +145,3 @@ Endpoints para gerenciamento de pagamentos de reservas feitas por clientes.
   "message": "Payment with id {id} not found"
 }
 ```
-
----
-
-## Exemplos com `curl`
-
-### Criar pagamento
-
-```bash
-curl -X POST http://localhost:8080/payment/create \
-     -H "Content-Type: application/json" \
-     -d '{
-           "booking_id": "a7d3b2c1-5c4e-4f5d-91b0-1234e56c7d89",
-           "amount": 250.00,
-           "method": "CREDIT_CARD"
-         }'
-```
-
-### Atualizar pagamento
-
-```bash
-curl -X PUT http://localhost:8080/payment/b1234567-89ab-cdef-0123-456789abcdef/update \
-     -H "Content-Type: application/json" \
-     -d '{"status": "REFUNDED"}'
-```
-
-### Excluir pagamento
-
-```bash
-curl -X DELETE http://localhost:8080/payment/b1234567-89ab-cdef-0123-456789abcdef/delete
-```
