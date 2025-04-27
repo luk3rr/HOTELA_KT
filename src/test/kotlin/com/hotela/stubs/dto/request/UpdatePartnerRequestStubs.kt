@@ -1,4 +1,4 @@
-package com.hotela.stubs.request
+package com.hotela.stubs.dto.request
 
 import com.hotela.model.dto.request.UpdatePartnerRequest
 import com.hotela.model.enum.PartnerStatus

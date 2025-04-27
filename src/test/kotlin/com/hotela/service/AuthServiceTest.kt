@@ -5,9 +5,9 @@ import com.hotela.stubs.database.CustomerAuthStubs
 import com.hotela.stubs.database.CustomerStubs
 import com.hotela.stubs.database.PartnerAuthStubs
 import com.hotela.stubs.database.PartnerStubs
-import com.hotela.stubs.request.AuthRequestStubs
-import com.hotela.stubs.request.CustomerRegisterRequestStubs
-import com.hotela.stubs.request.PartnerRegisterRequestStubs
+import com.hotela.stubs.dto.request.AuthRequestStubs
+import com.hotela.stubs.dto.request.CustomerRegisterRequestStubs
+import com.hotela.stubs.dto.request.PartnerRegisterRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldNotBe

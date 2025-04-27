@@ -13,8 +13,8 @@ import com.hotela.stubs.database.CustomerStubs
 import com.hotela.stubs.database.HotelStubs
 import com.hotela.stubs.database.PartnerAuthStubs
 import com.hotela.stubs.database.PartnerStubs
-import com.hotela.stubs.request.CreateHotelRequestStubs
-import com.hotela.stubs.request.UpdateHotelRequestStubs
+import com.hotela.stubs.dto.request.CreateHotelRequestStubs
+import com.hotela.stubs.dto.request.UpdateHotelRequestStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe

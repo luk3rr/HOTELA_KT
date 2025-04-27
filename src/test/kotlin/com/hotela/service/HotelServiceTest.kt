@@ -5,8 +5,8 @@ import com.hotela.model.enum.AuthClaimKey
 import com.hotela.repository.HotelRepository
 import com.hotela.stubs.database.HotelStubs
 import com.hotela.stubs.database.PartnerAuthStubs
-import com.hotela.stubs.request.CreateHotelRequestStubs
-import com.hotela.stubs.request.UpdateHotelRequestStubs
+import com.hotela.stubs.dto.request.CreateHotelRequestStubs
+import com.hotela.stubs.dto.request.UpdateHotelRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe

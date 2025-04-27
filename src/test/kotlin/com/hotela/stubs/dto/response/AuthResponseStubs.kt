@@ -1,4 +1,4 @@
-package com.hotela.stubs.response
+package com.hotela.stubs.dto.response
 
 import com.hotela.model.dto.response.AuthResponse
 

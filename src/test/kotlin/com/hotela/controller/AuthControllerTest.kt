@@ -3,10 +3,10 @@ package com.hotela.controller
 import com.hotela.asGuest
 import com.hotela.model.dto.response.AuthResponse
 import com.hotela.service.AuthService
-import com.hotela.stubs.request.AuthRequestStubs
-import com.hotela.stubs.request.CustomerRegisterRequestStubs
-import com.hotela.stubs.request.PartnerRegisterRequestStubs
-import com.hotela.stubs.response.AuthResponseStubs
+import com.hotela.stubs.dto.request.AuthRequestStubs
+import com.hotela.stubs.dto.request.CustomerRegisterRequestStubs
+import com.hotela.stubs.dto.request.PartnerRegisterRequestStubs
+import com.hotela.stubs.dto.response.AuthResponseStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe

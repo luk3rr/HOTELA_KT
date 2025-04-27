@@ -10,7 +10,7 @@ import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.PartnerService
 import com.hotela.stubs.database.PartnerAuthStubs
 import com.hotela.stubs.database.PartnerStubs
-import com.hotela.stubs.request.UpdatePartnerRequestStubs
+import com.hotela.stubs.dto.request.UpdatePartnerRequestStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe

@@ -6,7 +6,7 @@ import com.hotela.repository.CustomerAuthRepository
 import com.hotela.repository.CustomerRepository
 import com.hotela.stubs.database.CustomerAuthStubs
 import com.hotela.stubs.database.CustomerStubs
-import com.hotela.stubs.request.UpdateCustomerRequestStubs
+import com.hotela.stubs.dto.request.UpdateCustomerRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
