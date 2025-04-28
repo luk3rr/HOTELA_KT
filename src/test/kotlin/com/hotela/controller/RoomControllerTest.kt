@@ -1,20 +1,18 @@
 package com.hotela.controller
 
 import com.hotela.asCustomer
+import com.hotela.asGuest
 import com.hotela.asPartner
-import com.hotela.error.ErrorResponse
-import com.hotela.error.HotelaException
-import com.hotela.model.database.Hotel
+import com.hotela.model.database.Room
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
-import com.hotela.service.HotelService
+import com.hotela.service.RoomService
 import com.hotela.stubs.database.CustomerAuthStubs
 import com.hotela.stubs.database.CustomerStubs
-import com.hotela.stubs.database.HotelStubs
 import com.hotela.stubs.database.PartnerAuthStubs
 import com.hotela.stubs.database.PartnerStubs
-import com.hotela.stubs.dto.request.CreateHotelRequestStubs
-import com.hotela.stubs.dto.request.UpdateHotelRequestStubs
+import com.hotela.stubs.database.RoomStubs
+import com.hotela.stubs.dto.request.CreateRoomRequestStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
@@ -25,41 +23,42 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
+import kotlin.jvm.java
 
-@WebFluxTest(controllers = [HotelController::class])
-class HotelControllerTest(
+@WebFluxTest(controllers = [RoomController::class])
+class RoomControllerTest(
     private val webTestClient: WebTestClient,
-    private val hotelService: HotelService,
+    private val roomService: RoomService,
 ) : FunSpec() {
     override fun extensions() = listOf(SpringExtension)
 
     @TestConfiguration
     class MockBeans {
         @Bean
-        fun hotelService(): HotelService = mockk<HotelService>()
+        fun roomService(): RoomService = mockk<RoomService>()
     }
 
     init {
+        val room = RoomStubs.create()
         val partner = PartnerStubs.create()
         val customer = CustomerStubs.create()
-        val hotel = HotelStubs.create(partnerId = partner.id)
         val customerAuth = CustomerAuthStubs.create(customerId = customer.id)
         val partnerAuth = PartnerAuthStubs.create(partnerId = partner.id)
 
-        context("POST /hotel/create") {
+        context("POST /room/create") {
             context("when the request is valid") {
-                test("should return 200 OK") {
+                test("should return 201 Created") {
                     coEvery {
-                        hotelService.createHotel(any(), any())
-                    } returns hotel
+                        roomService.createRoom(any(), any())
+                    } returns room
 
-                    val requestBody = CreateHotelRequestStubs.create()
+                    val requestBody = CreateRoomRequestStubs.create(hotelId = partner.id)
 
                     val response =
                         webTestClient
                             .asPartner(partner.id, partnerAuth.id)
                             .post()
-                            .uri("/hotel/create")
+                            .uri("/room/create")
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(requestBody)
                             .exchange()
@@ -71,19 +70,35 @@ class HotelControllerTest(
                             .returnResult()
                             .responseBody!!
 
-                    response.id shouldBe hotel.id
-                    response.message shouldBe "Hotel created successfully"
+                    response.id shouldBe room.id
+                    response.message shouldBe "Room created successfully"
                 }
             }
 
-            context("when an customer tries to create a hotel") {
-                test("should return 403 FORBIDDEN") {
-                    val requestBody = CreateHotelRequestStubs.create()
+            context("when an customer tries to create a room") {
+                test("should return 403 Forbidden") {
+                    val requestBody = CreateRoomRequestStubs.create(hotelId = partner.id)
 
                     webTestClient
                         .asCustomer(customer.id, customerAuth.id)
                         .post()
-                        .uri("/hotel/create")
+                        .uri("/room/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(requestBody)
+                        .exchange()
+                        .expectStatus()
+                        .isForbidden
+                }
+            }
+
+            context("when a guest tries to create a room") {
+                test("should return 403 Forbidden") {
+                    val requestBody = CreateRoomRequestStubs.create(hotelId = partner.id)
+
+                    webTestClient
+                        .asGuest()
+                        .post()
+                        .uri("/room/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(requestBody)
                         .exchange()
@@ -93,118 +108,68 @@ class HotelControllerTest(
             }
         }
 
-        context("GET /hotel/{id}") {
+        context("GET /room/{id}") {
             context("when the request is valid") {
                 test("should return 200 OK to partner") {
                     coEvery {
-                        hotelService.findById(any())
-                    } returns hotel
+                        roomService.findById(any())
+                    } returns room
 
                     val response =
                         webTestClient
                             .asPartner(partner.id, partnerAuth.id)
                             .get()
-                            .uri("/hotel/${hotel.id}")
+                            .uri("/room/${room.id}")
                             .exchange()
                             .expectStatus()
                             .isOk
                             .expectHeader()
                             .contentType(MediaType.APPLICATION_JSON)
-                            .expectBody(Hotel::class.java)
+                            .expectBody(Room::class.java)
                             .returnResult()
                             .responseBody!!
 
-                    response.id shouldBe hotel.id
+                    response.id shouldBe room.id
                 }
 
                 test("should return 200 OK to customer") {
                     coEvery {
-                        hotelService.findById(any())
-                    } returns hotel
+                        roomService.findById(any())
+                    } returns room
 
                     val response =
                         webTestClient
                             .asCustomer(customer.id, customerAuth.id)
                             .get()
-                            .uri("/hotel/${hotel.id}")
+                            .uri("/room/${room.id}")
                             .exchange()
                             .expectStatus()
                             .isOk
                             .expectHeader()
                             .contentType(MediaType.APPLICATION_JSON)
-                            .expectBody(Hotel::class.java)
+                            .expectBody(Room::class.java)
                             .returnResult()
                             .responseBody!!
 
-                    response.id shouldBe hotel.id
-                }
-            }
-
-            context("when the hotel does not exist") {
-                test("should return 404 NOT FOUND") {
-                    coEvery {
-                        hotelService.findById(any())
-                    } returns null
-
-                    val response =
-                        webTestClient
-                            .asPartner(partner.id, partnerAuth.id)
-                            .get()
-                            .uri("/hotel/${hotel.id}")
-                            .exchange()
-                            .expectStatus()
-                            .isNotFound
-                            .expectBody(ErrorResponse::class.java)
-                            .returnResult()
-                            .responseBody!!
-
-                    response.code shouldBe HotelaException.HOTEL_NOT_FOUND
-                    response.message shouldBe "Hotel with id ${hotel.id} not found"
+                    response.id shouldBe room.id
                 }
             }
         }
 
-        context("GET /hotel/partner/{partnerId}") {
+        context("PUT /room/update/{id}") {
             context("when the request is valid") {
                 test("should return 200 OK") {
                     coEvery {
-                        hotelService.findByPartnerId(any())
-                    } returns listOf(hotel)
+                        roomService.updateRoom(any(), any(), any())
+                    } returns room
 
-                    val response =
-                        webTestClient
-                            .asPartner(partner.id, partnerAuth.id)
-                            .get()
-                            .uri("/hotel/partner/${partner.id}")
-                            .exchange()
-                            .expectStatus()
-                            .isOk
-                            .expectHeader()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .expectBodyList(Hotel::class.java)
-                            .returnResult()
-                            .responseBody!!
-
-                    response.size shouldBe 1
-                    response[0].id shouldBe hotel.id
-                }
-            }
-        }
-
-        context("PUT /hotel/update/{id}") {
-            context("when the request is valid") {
-                test("should return 200 OK") {
-                    coEvery {
-                        hotelService.updateHotel(any(), any(), any())
-                    } returns hotel
-
-                    val requestBody = UpdateHotelRequestStubs.create()
+                    val requestBody = CreateRoomRequestStubs.create(hotelId = partner.id)
 
                     val response =
                         webTestClient
                             .asPartner(partner.id, partnerAuth.id)
                             .put()
-                            .uri("/hotel/update/${hotel.id}")
+                            .uri("/room/update/${room.id}")
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(requestBody)
                             .exchange()
@@ -216,47 +181,78 @@ class HotelControllerTest(
                             .returnResult()
                             .responseBody!!
 
-                    response.message shouldBe "Hotel updated successfully"
+                    response.message shouldBe "Room updated successfully"
                 }
-            }
 
-            context("when the hotel does not exist") {
-                test("should return 404 NOT FOUND") {
-                    coEvery {
-                        hotelService.updateHotel(any(), any(), any())
-                    } throws HotelaException.HotelNotFoundException(hotel.id)
-
-                    val requestBody = UpdateHotelRequestStubs.create()
-
-                    val response =
-                        webTestClient
-                            .asPartner(partner.id, partnerAuth.id)
-                            .put()
-                            .uri("/hotel/update/${hotel.id}")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(requestBody)
-                            .exchange()
-                            .expectStatus()
-                            .isNotFound
-                            .expectBody(ErrorResponse::class.java)
-                            .returnResult()
-                            .responseBody!!
-
-                    response.code shouldBe HotelaException.HOTEL_NOT_FOUND
-                    response.message shouldBe "Hotel with id ${hotel.id} not found"
-                }
-            }
-
-            context("when a customer tries to update a hotel") {
-                test("should return 403 FORBIDDEN") {
-                    val requestBody = UpdateHotelRequestStubs.create()
+                test("should return 403 Forbidden to customer") {
+                    val requestBody = CreateRoomRequestStubs.create(hotelId = partner.id)
 
                     webTestClient
                         .asCustomer(customer.id, customerAuth.id)
                         .put()
-                        .uri("/hotel/update/${hotel.id}")
+                        .uri("/room/update/${room.id}")
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(requestBody)
+                        .exchange()
+                        .expectStatus()
+                        .isForbidden
+                }
+
+                test("should return 403 Forbidden to guest") {
+                    val requestBody = CreateRoomRequestStubs.create(hotelId = partner.id)
+
+                    webTestClient
+                        .asGuest()
+                        .put()
+                        .uri("/room/update/${room.id}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(requestBody)
+                        .exchange()
+                        .expectStatus()
+                        .isForbidden
+                }
+            }
+        }
+
+        context("DELETE /room/delete/{id}") {
+            context("when the request is valid") {
+                test("should return 200 OK") {
+                    coEvery {
+                        roomService.deleteRoom(any(), any())
+                    } returns true
+
+                    val response =
+                        webTestClient
+                            .asPartner(partner.id, partnerAuth.id)
+                            .delete()
+                            .uri("/room/delete/${room.id}")
+                            .exchange()
+                            .expectStatus()
+                            .isOk
+                            .expectHeader()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .expectBody(ResourceUpdatedResponse::class.java)
+                            .returnResult()
+                            .responseBody!!
+
+                    response.message shouldBe "Room deleted successfully"
+                }
+
+                test("should return 403 Forbidden to customer") {
+                    webTestClient
+                        .asCustomer(customer.id, customerAuth.id)
+                        .delete()
+                        .uri("/room/delete/${room.id}")
+                        .exchange()
+                        .expectStatus()
+                        .isForbidden
+                }
+
+                test("should return 403 Forbidden to guest") {
+                    webTestClient
+                        .asGuest()
+                        .delete()
+                        .uri("/room/delete/${room.id}")
                         .exchange()
                         .expectStatus()
                         .isForbidden

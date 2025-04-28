@@ -125,7 +125,8 @@ sealed class HotelaException(
     @ResponseStatus(HttpStatus.CONFLICT)
     class RoomAlreadyExistsException(
         id: UUID,
-    ) : HotelaException(ROOM_ALREADY_EXISTS, "Room with id $id already exists")
+        msg: String = "Room with id $id already exists",
+    ) : HotelaException(ROOM_ALREADY_EXISTS, msg)
 
     // 6xx - Booking
     @ResponseStatus(HttpStatus.NOT_FOUND)

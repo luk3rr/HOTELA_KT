@@ -1,5 +1,5 @@
 # Room
-Endpoints para gerenciamento de quartos vinculados a um hotel.
+Endpoints para gerenciamento de quartos vinculados a um hotel. Requer autenticação via JWT.
 
 ---
 
@@ -19,7 +19,8 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
 
 ```json
 {
-  "hotel_id": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1",
+  "id": "29523f15-2e03-47a3-947e-54eb3df6941e",
+  "hotelId": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1",
   "number": "101",
   "floor": 1,
   "type": "Deluxe",
@@ -49,7 +50,7 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
 
 ```json
 {
-  "hotel_id": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1",
+  "hotelId": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1",
   "number": "101",
   "floor": 1,
   "type": "Deluxe",
@@ -69,6 +70,15 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
 }
 ```
 
+**Resposta de erro (`404 Not Found`):**
+
+```json
+{
+  "code": "400",
+  "message": "Hotel with id {id} not found"
+}
+```
+
 **Resposta de erro (`400 Bad Request`):**
 
 ```json
@@ -80,7 +90,7 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
 
 ---
 
-### PUT `/room/{id}/update`
+### PUT `/room/update/{id}`
 
 **Descrição:** Atualiza os dados de um quarto.
 
@@ -129,7 +139,7 @@ Endpoints para gerenciamento de quartos vinculados a um hotel.
 
 ---
 
-### DELETE `/room/{id}/delete`
+### DELETE `/room/delete/{id}`
 
 **Descrição:** Remove um quarto do sistema.
 

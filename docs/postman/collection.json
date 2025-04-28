@@ -530,6 +530,209 @@
 			]
 		},
 		{
+			"name": "Room",
+			"item": [
+				{
+					"name": "Create room",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Guarda o id do hotel criado",
+									"let jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"room_id\", jsonData.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{partner_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"{{hotel_id}}\",\n  \"number\": \"101\",\n  \"floor\": 1,\n  \"type\": \"Deluxe\",\n  \"price\": 350.00,\n  \"capacity\": 2,\n  \"status\": \"AVAILABLE\",\n  \"description\": \"Quarto com vista para o mar, cama king size e ar-condicionado.\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/room/create",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"room",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update room",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{partner_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": \"860.00\",\n  \"status\": \"BOOKED\",\n  \"description\": \"A spacious suite with a king-size bed and a balcony\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/room/update/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"room",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{room_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find room by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{partner_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/room/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"room",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{room_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Customer",
 			"item": [
 				{
@@ -539,9 +742,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// guarda o id do hotel e do parceiro dono",
-									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"partner_id\", jsonData.partnerId);"
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -652,6 +853,128 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Partner",
+			"item": [
+				{
+					"name": "Find partner by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{partner_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/partner/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"partner",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{partner_user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update partner",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{partner_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Hotel Bela Vista Ltda\",\n  \"email\": \"novocontato@belavista.com\",\n  \"phone\": \"(11) 1234-9876\",\n  \"contactName\": \"João Pereira\",\n  \"status\": \"INACTIVE\",\n  \"notes\": \"Contrato em revisão\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/partner/update",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"partner",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [
@@ -725,6 +1048,10 @@
 		},
 		{
 			"key": "partner_user_id",
+			"value": ""
+		},
+		{
+			"key": "room_id",
 			"value": ""
 		}
 	]
