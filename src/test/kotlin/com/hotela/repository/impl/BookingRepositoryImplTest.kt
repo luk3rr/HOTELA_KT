@@ -49,6 +49,7 @@ class BookingRepositoryImplTest :
             every { mockRow.get("customer_id", UUID::class.java) } returns booking.customerId
             every { mockRow.get("hotel_id", UUID::class.java) } returns booking.hotelId
             every { mockRow.get("room_id", UUID::class.java) } returns booking.roomId
+            every { mockRow.get("booked_at", LocalDateTime::class.java) } returns booking.bookedAt
             every { mockRow.get("checkin", LocalDateTime::class.java) } returns booking.checkin
             every { mockRow.get("checkout", LocalDateTime::class.java) } returns booking.checkout
             every { mockRow.get("guests", Int::class.java) } returns booking.guests
@@ -140,6 +141,31 @@ class BookingRepositoryImplTest :
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("hotelId", booking.hotelId)
+                genericDatabaseSpec.bind("status", listOf(BookingStatus.IN_PROGRESS))
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Booking>>())
+                rowsFetchSpec.all().collectList()
+            }
+        }
+
+        should("successfully find running bookings by hotel id") {
+            bookingRepositoryImpl.findRunningBookingsByHotelId(booking.hotelId) shouldBe listOf(booking)
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("hotelId", booking.hotelId)
+                genericDatabaseSpec.bind("status", listOf(BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS))
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Booking>>())
+                rowsFetchSpec.all().collectList()
+            }
+        }
+
+        should("successfully find finished bookings by hotel id") {
+            bookingRepositoryImpl.findFinishedBookingsByHotelId(booking.hotelId) shouldBe listOf(booking)
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("hotelId", booking.hotelId)
+                genericDatabaseSpec.bind("status", listOf(BookingStatus.CANCELLED, BookingStatus.COMPLETED))
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Booking>>())
                 rowsFetchSpec.all().collectList()
             }

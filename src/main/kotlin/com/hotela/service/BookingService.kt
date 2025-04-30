@@ -26,6 +26,10 @@ class BookingService(
 
     suspend fun findInProgressBookingsByHotelId(hotelId: UUID) = bookingRepository.findInProgressBookingsByHotelId(hotelId)
 
+    suspend fun findRunningBookingsByHotelId(hotelId: UUID) = bookingRepository.findRunningBookingsByHotelId(hotelId)
+
+    suspend fun findFinishedBookingsByHotelId(hotelId: UUID) = bookingRepository.findFinishedBookingsByHotelId(hotelId)
+
     suspend fun findByRoomId(roomId: UUID) = bookingRepository.findByRoomId(roomId)
 
     suspend fun createBooking(
@@ -148,7 +152,7 @@ class BookingService(
         room: Room,
         request: Booking,
     ): Boolean {
-        val bookings = bookingRepository.findInProgressBookingsByHotelId(hotel.id)
+        val bookings = bookingRepository.findRunningBookingsByHotelId(hotel.id)
 
         return bookings.none { booking ->
             if (booking.id == request.id) return@none false

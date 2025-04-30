@@ -20,4 +20,11 @@ class RestExceptionHandler {
             HttpStatus.INTERNAL_SERVER_ERROR,
         )
     }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> =
+        ResponseEntity(
+            ErrorResponse(HotelaException.INVALID_DATA, e.message ?: "Invalid data"),
+            HttpStatus.BAD_REQUEST,
+        )
 }

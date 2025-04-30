@@ -85,6 +85,30 @@ class BookingServiceTest :
                 }
             }
 
+            And("calling findRunningBookingsByHotelId") {
+                When("it should return the booking") {
+                    coEvery { bookingRepository.findRunningBookingsByHotelId(hotel.id) } returns listOf(booking)
+
+                    Then("it should return the booking") {
+                        val result = bookingService.findRunningBookingsByHotelId(hotel.id)
+
+                        result shouldBe listOf(booking)
+                    }
+                }
+            }
+
+            And("calling findFinishedBookingsByHotelId") {
+                When("it should return the booking") {
+                    coEvery { bookingRepository.findFinishedBookingsByHotelId(hotel.id) } returns listOf(booking)
+
+                    Then("it should return the booking") {
+                        val result = bookingService.findFinishedBookingsByHotelId(hotel.id)
+
+                        result shouldBe listOf(booking)
+                    }
+                }
+            }
+
             And("calling findByRoomId") {
                 When("it should return the booking") {
                     coEvery { bookingRepository.findByRoomId(room.id) } returns listOf(booking)
@@ -104,7 +128,7 @@ class BookingServiceTest :
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
                     coEvery { bookingRepository.create(any()) } returns booking
-                    coEvery { bookingRepository.findInProgressBookingsByHotelId(any()) } returns emptyList()
+                    coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns emptyList()
 
                     Then("it should return the booking") {
                         val result = bookingService.createBooking(createBookingRequest, jwtToken)
@@ -181,7 +205,7 @@ class BookingServiceTest :
                 }
 
                 When("room is not available for the selected dates") {
-                    coEvery { bookingRepository.findInProgressBookingsByHotelId(any()) } returns
+                    coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns
                         listOf(
                             booking,
                             anotherBookingInProgress,
@@ -203,7 +227,7 @@ class BookingServiceTest :
 
                 When("room cannot accommodate the number of guests") {
                     val invalidCreateBookingRequest = createBookingRequest.copy(guests = room.capacity + 1)
-                    coEvery { bookingRepository.findInProgressBookingsByHotelId(any()) } returns emptyList()
+                    coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns emptyList()
 
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
@@ -225,7 +249,7 @@ class BookingServiceTest :
 
                 When("it should return the booking") {
                     coEvery { bookingRepository.findById(any()) } returns booking
-                    coEvery { bookingRepository.findInProgressBookingsByHotelId(any()) } returns listOf(booking)
+                    coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns listOf(booking)
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
                     coEvery { bookingRepository.update(any()) } returns booking
@@ -338,7 +362,7 @@ class BookingServiceTest :
                 }
 
                 When("room is not available for the selected dates") {
-                    coEvery { bookingRepository.findInProgressBookingsByHotelId(any()) } returns
+                    coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns
                         listOf(
                             booking,
                             anotherBookingInProgress,
@@ -362,7 +386,7 @@ class BookingServiceTest :
                 When("room cannot accommodate the number of guests") {
                     val invalidUpdateBookingRequest = updateBookingRequest.copy(guests = room.capacity + 1)
 
-                    coEvery { bookingRepository.findInProgressBookingsByHotelId(any()) } returns listOf(booking)
+                    coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns listOf(booking)
 
                     coEvery { bookingRepository.findById(any()) } returns booking
                     coEvery { hotelService.findById(any()) } returns hotel

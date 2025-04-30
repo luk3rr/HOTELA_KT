@@ -73,6 +73,7 @@ CREATE TABLE booking
 (
     id          uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
     customer_id uuid NOT NULL,
+    hotel_id    uuid NOT NULL,
     room_id     uuid NOT NULL,
     booked_at   timestamp NOT NULL DEFAULT now(),
     checkin     timestamp NOT NULL,

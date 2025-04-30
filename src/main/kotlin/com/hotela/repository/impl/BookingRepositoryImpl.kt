@@ -46,8 +46,31 @@ class BookingRepositoryImpl(
 
     override suspend fun findInProgressBookingsByHotelId(hotelId: UUID): List<Booking> =
         databaseClient
-            .sql(FIND_IN_PROGRESS_BOOKINGS_BY_HOTEL_ID)
+            .sql(FIND_BOOKINGS_BY_HOTEL_ID_AND_STATUS)
             .bind("hotelId", hotelId)
+            .bind("status", listOf(BookingStatus.IN_PROGRESS))
+            .map { row, _ ->
+                mapper(row)
+            }.all()
+            .collectList()
+            .awaitSingleOrNull() ?: emptyList()
+
+    override suspend fun findRunningBookingsByHotelId(hotelId: UUID): List<Booking> =
+        databaseClient
+            .sql(FIND_BOOKINGS_BY_HOTEL_ID_AND_STATUS)
+            .bind("hotelId", hotelId)
+            .bind("status", listOf(BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS))
+            .map { row, _ ->
+                mapper(row)
+            }.all()
+            .collectList()
+            .awaitSingleOrNull() ?: emptyList()
+
+    override suspend fun findFinishedBookingsByHotelId(hotelId: UUID): List<Booking> =
+        databaseClient
+            .sql(FIND_BOOKINGS_BY_HOTEL_ID_AND_STATUS)
+            .bind("hotelId", hotelId)
+            .bind("status", listOf(BookingStatus.CANCELLED, BookingStatus.COMPLETED))
             .map { row, _ ->
                 mapper(row)
             }.all()
@@ -92,6 +115,7 @@ class BookingRepositoryImpl(
             customerId = row.get("customer_id", UUID::class.java)!!,
             hotelId = row.get("hotel_id", UUID::class.java)!!,
             roomId = row.get("room_id", UUID::class.java)!!,
+            bookedAt = row.get("booked_at", LocalDateTime::class.java)!!,
             checkin = row.get("checkin", LocalDateTime::class.java)!!,
             checkout = row.get("checkout", LocalDateTime::class.java)!!,
             guests = row.get("guests", Int::class.java)!!,
@@ -128,9 +152,9 @@ class BookingRepositoryImpl(
             RETURNING *
         """
 
-        private const val FIND_IN_PROGRESS_BOOKINGS_BY_HOTEL_ID = """
+        private const val FIND_BOOKINGS_BY_HOTEL_ID_AND_STATUS = """
             SELECT * FROM booking
-            WHERE hotel_id = :hotelId AND status = 'IN_PROGRESS'
+            WHERE hotel_id = :hotelId AND status IN (:status)
         """
     }
 }

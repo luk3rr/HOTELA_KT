@@ -9,6 +9,7 @@ data class Booking(
     val customerId: UUID,
     val hotelId: UUID,
     val roomId: UUID,
+    val bookedAt: LocalDateTime = LocalDateTime.now(),
     val checkin: LocalDateTime,
     val checkout: LocalDateTime,
     val guests: Int,
@@ -17,10 +18,14 @@ data class Booking(
 ) {
     companion object {
         const val MINIMUM_GUESTS = 1
+        const val MINIMUM_NIGHTS = 1
     }
 
     init {
         require(checkout.isAfter(checkin)) { "Checkout must be after checkin" }
+        require(checkout.isAfter(checkin.plusDays(1))) {
+            "Checkout must be at least $MINIMUM_NIGHTS nights after checkin"
+        }
         require(guests >= MINIMUM_GUESTS) { "Number of guests must be at least $MINIMUM_GUESTS" }
         notes?.let { require(it.isNotBlank()) { "Booking notes cannot be blank" } }
     }
