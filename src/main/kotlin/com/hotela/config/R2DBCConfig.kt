@@ -36,15 +36,15 @@ class R2DBCConfig(
                 .username(r2dbcUsername)
                 .password(r2dbcPassword)
                 .codecRegistrar(
-                    EnumCodec.builder()
+                    EnumCodec
+                        .builder()
                         .withEnum("partner_status", PartnerStatus::class.java)
                         .withEnum("room_status", RoomStatus::class.java)
                         .withEnum("payment_method", PaymentMethod::class.java)
                         .withEnum("payment_status", PaymentStatus::class.java)
                         .withEnum("booking_status", BookingStatus::class.java)
-                        .build()
-                )
-                .build(),
+                        .build(),
+                ).build(),
         )
     }
 }

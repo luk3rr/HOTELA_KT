@@ -33,7 +33,7 @@ class BookingServiceTest :
 
         Given("a booking service") {
             val hotel = HotelStubs.create()
-            val room = RoomStubs.create(hotel.id)
+            val room = RoomStubs.create(hotelId = hotel.id)
             val roomInAnotherHotel = RoomStubs.create(UUID.fromString("00ba37ad-10fe-47ba-b375-463f566da178"))
             val customer = CustomerStubs.create()
             val anotherCustomerId = UUID.fromString("b6299563-9fd6-4030-8a3b-2c90ee1a0042")

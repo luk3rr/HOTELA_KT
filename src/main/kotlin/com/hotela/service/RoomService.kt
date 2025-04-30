@@ -99,13 +99,22 @@ class RoomService(
     }
 
     private suspend fun validateRoom(room: Room) {
-        val rooms = roomRepository.findByHotelId(room.hotelId).filter { r -> r.id != room.hotelId }
-
-        require(!rooms.any { it.number == room.number }) {
+        if (!isRoomNumberAvailable(room)) {
             throw HotelaException.RoomAlreadyExistsException(
                 id = room.id,
                 msg = "Room with number ${room.number} already exists",
             )
+        }
+    }
+
+    private suspend fun isRoomNumberAvailable(room: Room): Boolean {
+        val rooms = roomRepository.findByHotelId(room.hotelId)
+
+        return rooms.none {
+            val isSameRoom = it.id == room.id
+            val isSameNumber = it.number == room.number
+
+            !isSameRoom && isSameNumber
         }
     }
 }

@@ -6,9 +6,12 @@ import java.math.BigDecimal
 import java.util.UUID
 
 object RoomStubs {
-    fun create(hotelId: UUID = UUID.fromString("d6382730-8f96-49ec-8b74-43c5489c8647")): Room =
+    fun create(
+        id: UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
+        hotelId: UUID = UUID.fromString("d6382730-8f96-49ec-8b74-43c5489c8647"),
+    ): Room =
         Room(
-            id = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
+            id = id,
             hotelId = hotelId,
             number = "101",
             floor = 1,

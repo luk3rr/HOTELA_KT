@@ -33,8 +33,9 @@ class RoomServiceTest :
             val anotherPartnerUserId = UUID.fromString("d97cd785-88c1-46b3-a172-22f697e9bea4")
             val hotel = HotelStubs.create(partnerId = partner.id)
             val room = RoomStubs.create(hotelId = hotel.id)
-            val roomWithSameNumber =
+            val anotherRoomWithSameNumber =
                 RoomStubs.create(
+                    id = UUID.fromString("385d040a-067a-47f4-aa66-fdd1bec4d61d"),
                     hotelId = hotel.id,
                 )
             val anotherRoom = RoomStubs.createAnother(hotelId = hotel.id)
@@ -87,8 +88,8 @@ class RoomServiceTest :
                         val createRoomRequestWithSameNumber =
                             CreateRoomRequestStubs.create(
                                 hotelId = hotel.id,
-                                number = roomWithSameNumber.number,
-                                floor = roomWithSameNumber.floor,
+                                number = anotherRoomWithSameNumber.number,
+                                floor = anotherRoomWithSameNumber.floor,
                             )
 
                         Then("it should throw an exception") {
@@ -130,26 +131,28 @@ class RoomServiceTest :
             When("calling updateRoom") {
                 And("requester has permissions") {
                     every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to partner.id.toString())
-                    coEvery { roomRepository.findById(room.id) } returns room
-                    coEvery { hotelService.findById(hotel.id) } returns hotel
+                    coEvery { roomRepository.findById(any()) } returns room
+                    coEvery { hotelService.findById(any()) } returns hotel
 
                     And("already exists a room with the same number") {
+                        coEvery { roomRepository.findByHotelId(any()) } returns
+                            listOf(
+                                room,
+                                anotherRoomWithSameNumber,
+                                anotherRoom,
+                            )
+
                         val updateRoomRequestWithSameNumber =
                             UpdateRoomRequestStubs.create(
-                                number = roomWithSameNumber.number,
-                                floor = roomWithSameNumber.floor,
+                                number = anotherRoomWithSameNumber.number,
+                                floor = anotherRoomWithSameNumber.floor,
                             )
 
                         Then("it should throw an exception") {
-                            coEvery { roomRepository.findByHotelId(any()) } returns
-                                listOf(
-                                    room,
-                                    anotherRoom,
-                                )
 
                             val exception =
                                 shouldThrow<HotelaException.RoomAlreadyExistsException> {
-                                    roomService.updateRoom(room.id, updateRoomRequestWithSameNumber, jwtToken)
+                                    roomService.updateRoom(anotherRoomWithSameNumber.id, updateRoomRequestWithSameNumber, jwtToken)
                                 }
 
                             coVerify(exactly = 0) { roomRepository.update(any()) }
@@ -160,10 +163,10 @@ class RoomServiceTest :
                     }
 
                     And("not already exists a room with the same number") {
+                        coEvery { roomRepository.findByHotelId(hotel.id) } returns listOf(room, anotherRoom)
                         val updateRoomRequest = UpdateRoomRequestStubs.create()
 
                         Then("it should update the room") {
-                            coEvery { roomRepository.findByHotelId(hotel.id) } returns listOf(room, anotherRoom)
                             coEvery { roomRepository.update(any()) } returns room
 
                             val result = roomService.updateRoom(room.id, updateRoomRequest, jwtToken)
