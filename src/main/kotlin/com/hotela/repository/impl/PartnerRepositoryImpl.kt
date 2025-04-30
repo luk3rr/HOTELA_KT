@@ -49,12 +49,31 @@ class PartnerRepositoryImpl(
             .bind("email", partner.email)
             .bind("phone", partner.phone)
             .bind("address", partner.address)
-            .bind("contact_name", partner.contactName)
-            .bind("contact_email", partner.contactEmail)
-            .bind("contact_phone", partner.contactPhone)
-            .bind("contract_signed", partner.contractSigned)
+            .bind("contactName", partner.contactName)
+            .bind("contactEmail", partner.contactEmail)
+            .bind("contactPhone", partner.contactPhone)
+            .bind("contractSigned", partner.contractSigned)
             .bind("status", partner.status)
-            .bind("created_at", partner.createdAt)
+            .bind("createdAt", partner.createdAt)
+            .bind("notes", partner.notes)
+            .map { row, _ -> mapper(row) }
+            .awaitSingle()
+
+    override suspend fun update(partner: Partner): Partner =
+        databaseClient
+            .sql(UPDATE)
+            .bind("id", partner.id)
+            .bind("name", partner.name)
+            .bind("cnpj", partner.cnpj)
+            .bind("email", partner.email)
+            .bind("phone", partner.phone)
+            .bind("address", partner.address)
+            .bind("contactName", partner.contactName)
+            .bind("contactEmail", partner.contactEmail)
+            .bind("contactPhone", partner.contactPhone)
+            .bind("contractSigned", partner.contractSigned)
+            .bind("status", partner.status)
+            .bind("createdAt", partner.createdAt)
             .bind("notes", partner.notes)
             .map { row, _ -> mapper(row) }
             .awaitSingle()
@@ -91,7 +110,16 @@ class PartnerRepositoryImpl(
 
         private const val SAVE = """
             INSERT INTO partner (id, name, cnpj, email, phone, address, contact_name, contact_email, contact_phone, contract_signed, status, created_at, notes)
-            VALUES (:id, :name, :cnpj, :email, :phone, :address, :contact_name, :contact_email, :contact_phone, :contract_signed, :status, :created_at, :notes)
+            VALUES (:id, :name, :cnpj, :email, :phone, :address, :contactName, :contactEmail, :contactPhone, :contractSigned, :status, :createdAt, :notes)
+            RETURNING *
+        """
+
+        private const val UPDATE = """
+            UPDATE partner
+            SET name = :name, cnpj = :cnpj, email = :email, phone = :phone, address = :address,
+                contact_name = :contactName, contact_email = :contactEmail, contact_phone = :contactPhone,
+                contract_signed = :contractSigned, status = :status, created_at = :createdAt, notes = :notes
+            WHERE id = :id
             RETURNING *
         """
     }

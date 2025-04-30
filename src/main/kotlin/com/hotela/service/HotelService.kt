@@ -5,6 +5,8 @@ import com.hotela.model.database.Hotel
 import com.hotela.model.dto.request.CreateHotelRequest
 import com.hotela.model.dto.request.UpdateHotelRequest
 import com.hotela.repository.HotelRepository
+import com.hotela.util.getAuthId
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -19,15 +21,13 @@ class HotelService(
 
     suspend fun createHotel(
         payload: CreateHotelRequest,
-        partnerAuthId: UUID,
+        token: JwtAuthenticationToken,
     ): Hotel {
+        val partnerAuthId = token.getAuthId()
+
         val partnerAuth =
             partnerAuthService.findById(partnerAuthId)
                 ?: throw HotelaException.InvalidCredentialsException()
-
-        if (partnerAuth.id != payload.partnerAuthId) {
-            throw HotelaException.AccessDeniedException()
-        }
 
         val hotel =
             Hotel(
@@ -51,9 +51,11 @@ class HotelService(
 
     suspend fun updateHotel(
         id: UUID,
-        partnerAuthId: UUID,
         payload: UpdateHotelRequest,
+        token: JwtAuthenticationToken,
     ): Hotel {
+        val partnerAuthId = token.getAuthId()
+
         val hotel = hotelRepository.findById(id) ?: throw HotelaException.HotelNotFoundException(id)
 
         val partnerAuth =

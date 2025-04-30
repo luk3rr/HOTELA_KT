@@ -1,4 +1,4 @@
-package com.hotela.stubs
+package com.hotela.stubs.dto.request
 
 import com.hotela.model.dto.request.UpdateHotelRequest
 

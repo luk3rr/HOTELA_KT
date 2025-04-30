@@ -1,10 +1,8 @@
 package com.hotela.model.dto.request
 
 import java.math.BigDecimal
-import java.util.UUID
 
 data class CreateHotelRequest(
-    val partnerAuthId: UUID,
     val name: String,
     val address: String,
     val city: String,

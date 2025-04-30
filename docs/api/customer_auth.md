@@ -1,5 +1,5 @@
 # Customer Authentication
-Endpoints para registro e login de clientes.
+Endpoints para registro e login de clientes. Não é necessário autenticação para acessar esses endpoints.
 
 ---
 
@@ -30,8 +30,7 @@ Endpoints para registro e login de clientes.
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "type": "Bearer",
-  "expireAt": "2025-04-18T14:00:00Z"
+  "type": "Bearer"
 }
 ```
 
@@ -64,8 +63,7 @@ Endpoints para registro e login de clientes.
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "type": "Bearer",
-  "expire_at": "2025-04-18T14:00:00Z"
+  "type": "Bearer"
 }
 ```
 
@@ -76,32 +74,4 @@ Endpoints para registro e login de clientes.
   "code": "101",
   "message": "Invalid credentials"
 }
-```
-
----
-
-## Exemplos com `curl`
-
-### Registrar cliente
-
-```bash
-curl -X POST http://localhost:8080/auth/customer/register \
-     -H "Content-Type: application/json" \
-     -d '{
-              "email": "example@example.com",
-              "password": "password123",
-              "name": "John Doe",
-              "phone": "1234567890",
-              "idDocument": "12345678901",
-              "birthDate": "1990-01-01",
-              "address": "123 Example Street, City, Country"
-         }'
-```
-
-### Login do cliente
-
-```bash
-curl -X POST http://localhost:8080/auth/customer/login \
-     -H "Content-Type: application/json" \
-     -d '{"email": "example@example.com", "password": "password123"}'
 ```

@@ -16,6 +16,8 @@ sealed class HotelaException(
         const val ACCESS_DENIED = "103"
         const val CUSTOMER_AUTH_ALREADY_EXISTS = "104"
         const val PARTNER_AUTH_ALREADY_EXISTS = "105"
+        const val CUSTOMER_AUTH_NOT_FOUND = "106"
+        const val PARTNER_AUTH_NOT_FOUND = "107"
 
         // 2xx - Customer
         const val CUSTOMER_NOT_FOUND = "200"
@@ -71,6 +73,16 @@ sealed class HotelaException(
         id: UUID,
     ) : HotelaException(PARTNER_AUTH_ALREADY_EXISTS, "Partner auth with id $id already exists")
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    class CustomerAuthNotFoundException(
+        id: UUID,
+    ) : HotelaException(CUSTOMER_AUTH_NOT_FOUND, "Customer auth with id $id not found")
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    class PartnerAuthNotFoundException(
+        id: UUID,
+    ) : HotelaException(PARTNER_AUTH_NOT_FOUND, "Partner auth with id $id not found")
+
     // 2xx - Customer
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class CustomerNotFoundException(
@@ -113,7 +125,8 @@ sealed class HotelaException(
     @ResponseStatus(HttpStatus.CONFLICT)
     class RoomAlreadyExistsException(
         id: UUID,
-    ) : HotelaException(ROOM_ALREADY_EXISTS, "Room with id $id already exists")
+        msg: String = "Room with id $id already exists",
+    ) : HotelaException(ROOM_ALREADY_EXISTS, msg)
 
     // 6xx - Booking
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -140,7 +153,9 @@ sealed class HotelaException(
 
     // 9xx - General
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    class InvalidDataException : HotelaException(INVALID_DATA, "Invalid data provided")
+    class InvalidDataException(
+        msg: String = "Invalid data provided",
+    ) : HotelaException(INVALID_DATA, msg)
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     class FieldIsRequiredButWasNullOrEmptyException(

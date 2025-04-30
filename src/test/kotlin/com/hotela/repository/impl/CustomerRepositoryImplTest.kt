@@ -1,7 +1,7 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.database.Customer
-import com.hotela.stubs.CustomerStubs
+import com.hotela.stubs.database.CustomerStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -106,6 +106,23 @@ class CustomerRepositoryImplTest :
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("email", customer.email)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Boolean>>())
+            }
+        }
+
+        should("successfully update a customer") {
+            customerRepositoryImpl.update(customer) shouldBe customer
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("id", customer.id)
+                genericDatabaseSpec.bind("name", customer.name)
+                genericDatabaseSpec.bind("email", customer.email)
+                genericDatabaseSpec.bind("phone", customer.phone)
+                genericDatabaseSpec.bind("idDocument", customer.idDocument)
+                genericDatabaseSpec.bind("birthDate", customer.birthDate)
+                genericDatabaseSpec.bind("address", customer.address)
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Customer>>())
+                rowsFetchSpec.first()
             }
         }
     })

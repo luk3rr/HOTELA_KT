@@ -35,22 +35,30 @@ class ProjectConfig : AbstractProjectConfig() {
 
 fun WebTestClient.asGuest(): WebTestClient = this.mutateWith(mockJwt()).mutateWith(csrf())
 
-fun WebTestClient.asCustomer(customerId: UUID): WebTestClient =
+fun WebTestClient.asCustomer(
+    userId: UUID,
+    authId: UUID,
+): WebTestClient =
     this
         .mutateWith(
             mockJwt()
                 .authorities(SimpleGrantedAuthority("ROLE_${Role.CUSTOMER}"))
                 .jwt { jwt ->
-                    jwt.claim(AuthClaimKey.CUSTOMER.key, customerId.toString())
+                    jwt.claim(AuthClaimKey.USERID.key, userId.toString())
+                    jwt.claim(AuthClaimKey.AUTHID.key, authId.toString())
                 },
         ).mutateWith(csrf())
 
-fun WebTestClient.asPartner(partnerId: UUID): WebTestClient =
+fun WebTestClient.asPartner(
+    userId: UUID,
+    authId: UUID,
+): WebTestClient =
     this
         .mutateWith(
             mockJwt()
                 .authorities(SimpleGrantedAuthority("ROLE_${Role.PARTNER}"))
                 .jwt { jwt ->
-                    jwt.claim(AuthClaimKey.PARTNER.key, partnerId.toString())
+                    jwt.claim(AuthClaimKey.USERID.key, authId.toString())
+                    jwt.claim(AuthClaimKey.AUTHID.key, userId.toString())
                 },
         ).mutateWith(csrf())

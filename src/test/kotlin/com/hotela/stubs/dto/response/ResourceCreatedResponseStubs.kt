@@ -1,4 +1,4 @@
-package com.hotela.stubs
+package com.hotela.stubs.dto.response
 
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import java.util.UUID

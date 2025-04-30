@@ -2,7 +2,7 @@ package com.hotela.repository.impl
 
 import com.hotela.model.database.Partner
 import com.hotela.model.enum.PartnerStatus
-import com.hotela.stubs.PartnerStubs
+import com.hotela.stubs.database.PartnerStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -101,7 +101,7 @@ class PartnerRepositoryImplTest :
             }
         }
 
-        should("successfully save a partner") {
+        should("successfully create a partner") {
             partnerRepositoryImpl.create(partner) shouldBe partner
 
             verify(exactly = 1) {
@@ -112,12 +112,35 @@ class PartnerRepositoryImplTest :
                 genericDatabaseSpec.bind("email", partner.email)
                 genericDatabaseSpec.bind("phone", partner.phone)
                 genericDatabaseSpec.bind("address", partner.address)
-                genericDatabaseSpec.bind("contact_name", partner.contactName)
-                genericDatabaseSpec.bind("contact_email", partner.contactEmail)
-                genericDatabaseSpec.bind("contact_phone", partner.contactPhone)
-                genericDatabaseSpec.bind("contract_signed", partner.contractSigned)
+                genericDatabaseSpec.bind("contactName", partner.contactName)
+                genericDatabaseSpec.bind("contactEmail", partner.contactEmail)
+                genericDatabaseSpec.bind("contactPhone", partner.contactPhone)
+                genericDatabaseSpec.bind("contractSigned", partner.contractSigned)
                 genericDatabaseSpec.bind("status", partner.status)
-                genericDatabaseSpec.bind("created_at", partner.createdAt)
+                genericDatabaseSpec.bind("createdAt", partner.createdAt)
+                genericDatabaseSpec.bind("notes", partner.notes)
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Partner>>())
+                rowsFetchSpec.first()
+            }
+        }
+
+        should("successfully update a partner") {
+            partnerRepositoryImpl.update(partner) shouldBe partner
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("id", partner.id)
+                genericDatabaseSpec.bind("name", partner.name)
+                genericDatabaseSpec.bind("cnpj", partner.cnpj)
+                genericDatabaseSpec.bind("email", partner.email)
+                genericDatabaseSpec.bind("phone", partner.phone)
+                genericDatabaseSpec.bind("address", partner.address)
+                genericDatabaseSpec.bind("contactName", partner.contactName)
+                genericDatabaseSpec.bind("contactEmail", partner.contactEmail)
+                genericDatabaseSpec.bind("contactPhone", partner.contactPhone)
+                genericDatabaseSpec.bind("contractSigned", partner.contractSigned)
+                genericDatabaseSpec.bind("status", partner.status)
+                genericDatabaseSpec.bind("createdAt", partner.createdAt)
                 genericDatabaseSpec.bind("notes", partner.notes)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Partner>>())
                 rowsFetchSpec.first()

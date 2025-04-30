@@ -19,7 +19,8 @@ data class Hotel(
     val longitude: BigDecimal,
 ) {
     companion object {
-        val COORDINATES_INTERVAL = -90.0..90.0
+        val LATITUDE_INTERVAL = -90.0..90.0
+        val LONGITUDE_INTERVAL = -180.0..180.0
         val RATING_INTERVAL = BigDecimal.ZERO..BigDecimal("5.0")
         const val RATING_DECIMAL_PLACES = 1
         const val MAX_DESCRIPTION_LENGTH = 500
@@ -42,7 +43,7 @@ data class Hotel(
             }
         }
         website?.let { require(it.isNotBlank()) { "Hotel website cannot be blank" } }
-        require(latitude.toDouble() in COORDINATES_INTERVAL) { "Hotel latitude must be between $COORDINATES_INTERVAL" }
-        require(longitude.toDouble() in COORDINATES_INTERVAL) { "Hotel longitude must be between $COORDINATES_INTERVAL" }
+        require(latitude.toDouble() in LATITUDE_INTERVAL) { "Hotel latitude must be between $LATITUDE_INTERVAL" }
+        require(longitude.toDouble() in LONGITUDE_INTERVAL) { "Hotel longitude must be between $LONGITUDE_INTERVAL" }
     }
 }

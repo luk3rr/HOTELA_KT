@@ -1,5 +1,5 @@
 # Hotel
-Endpoints para gerenciamento de hotéis vinculados a parceiros.
+Endpoints para gerenciamento de hotéis vinculados a parceiros. Requer autenticação via JWT.
 
 ---
 
@@ -108,7 +108,6 @@ Se não houver hotéis associados ao parceiro, a resposta será uma lista vazia.
 
 ```json
 {
-  "partnerAuthId": "b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae",
   "name": "Hotel das Palmeiras",
   "address": "Rua Exemplo, 123",
   "city": "São Paulo",
@@ -153,7 +152,7 @@ Caso o parceiro não esteja autenticado ou autorizado.
 
 ---
 
-### PUT `/hotel/{id}/update`
+### PUT `/hotel/update/{id}`
 
 **Descrição:** Atualiza os dados de um hotel.
 
@@ -190,40 +189,4 @@ Caso o parceiro não esteja autenticado ou autorizado.
   "code": "400",
   "message": "Hotel with id {id} not found"
 }
-```
-
----
-
-## Exemplos com `curl`
-
-### Criar hotel
-
-```bash
-curl -X POST http://localhost:8080/hotel/create \
-     -H "Content-Type: application/json" \
-     -d '{
-           "partner_id": "b1d3c1c9-5612-4aa4-9d1a-1f4206f8b6ae",
-           "name": "Hotel Bela Vista",
-           "address": "Av. das Flores, 1000",
-           "city": "São Paulo",
-           "state": "SP",
-           "zip_code": "01234-567",
-           "phone": "(11) 1234-5678",
-           "description": "Hotel com vista panorâmica e piscina aquecida.",
-           "website": "https://www.belavista.com",
-           "latitude": -23.550520,
-           "longitude": -46.633308
-         }'
-```
-
-### Atualizar hotel
-
-```bash
-curl -X PUT http://localhost:8080/hotel/c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1/update \
-     -H "Content-Type: application/json" \
-     -d '{
-           "name": "Hotel Bela Vista Premium",
-           "description": "Reformado em 2024 com novos quartos e spa.",
-           "website": "https://www.belavistapremium.com"
-         }'
 ```

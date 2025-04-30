@@ -1,0 +1,18 @@
+package com.hotela.repository
+
+import com.hotela.model.database.Booking
+import java.util.UUID
+
+interface BookingRepository {
+    suspend fun findById(id: UUID): Booking?
+
+    suspend fun findByRoomId(roomId: UUID): List<Booking>
+
+    suspend fun findByHotelId(hotelId: UUID): List<Booking>
+
+    suspend fun findInProgressBookingsByHotelId(hotelId: UUID): List<Booking>
+
+    suspend fun create(booking: Booking): Booking
+
+    suspend fun update(booking: Booking): Booking
+}
