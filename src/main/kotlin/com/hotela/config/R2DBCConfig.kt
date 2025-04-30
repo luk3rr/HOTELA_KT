@@ -1,6 +1,10 @@
 package com.hotela.config
 
+import com.hotela.model.enum.BookingStatus
 import com.hotela.model.enum.PartnerStatus
+import com.hotela.model.enum.PaymentMethod
+import com.hotela.model.enum.PaymentStatus
+import com.hotela.model.enum.RoomStatus
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration
 import io.r2dbc.postgresql.PostgresqlConnectionFactory
 import io.r2dbc.postgresql.codec.EnumCodec
@@ -31,7 +35,15 @@ class R2DBCConfig(
                 .database(uri.path.removePrefix("/"))
                 .username(r2dbcUsername)
                 .password(r2dbcPassword)
-                .codecRegistrar(EnumCodec.builder().withEnum("partner_status", PartnerStatus::class.java).build())
+                .codecRegistrar(
+                    EnumCodec.builder()
+                        .withEnum("partner_status", PartnerStatus::class.java)
+                        .withEnum("room_status", RoomStatus::class.java)
+                        .withEnum("payment_method", PaymentMethod::class.java)
+                        .withEnum("payment_status", PaymentStatus::class.java)
+                        .withEnum("booking_status", BookingStatus::class.java)
+                        .build()
+                )
                 .build(),
         )
     }
