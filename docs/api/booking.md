@@ -19,14 +19,14 @@ Endpoints para gerenciamento de reservas feitas por clientes.
 
 ```json
 {
-  "customer_id": "e2f9c4d1-8e2e-4a3c-9111-4321abcd1234",
-  "hotel_id": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1",
-  "room_id": "da3c9e2b-7d2a-4c7f-a3f4-123abc789000",
-  "booked_at": "2025-04-17T14:22:00Z",
+  "customerId": "e2f9c4d1-8e2e-4a3c-9111-4321abcd1234",
+  "hotelId": "c2f8e6a9-4d3e-4c3f-92e0-9a14f88ec2e1",
+  "roomId": "da3c9e2b-7d2a-4c7f-a3f4-123abc789000",
   "checkin": "2025-05-01T20:00:00Z",
   "checkout": "2025-05-05T12:00:00Z",
   "guests": 2,
-  "status": "CONFIRMED"
+  "status": "CONFIRMED",
+  "notes": "Please prepare the room with extra pillows."
 }
 ```
 
@@ -64,8 +64,6 @@ Endpoints para gerenciamento de reservas feitas por clientes.
 {
   "id": "{generated_uuid}",
   "message": "Booking created successfully",
-  "booked_at": "2025-04-17T14:22:00Z",
-  "status": "CONFIRMED"
 }
 ```
 
@@ -80,7 +78,7 @@ Endpoints para gerenciamento de reservas feitas por clientes.
 
 ---
 
-### PUT `/booking/{id}/update`
+### PUT `/booking/update/{id}`
 
 **Descrição:** Atualiza os dados de uma reserva.
 
@@ -115,83 +113,6 @@ Endpoints para gerenciamento de reservas feitas por clientes.
 {
   "code": "900",
   "message": "Invalid data provided"
-}
-```
-
-**Resposta de erro (`404 Not Found`):**
-
-```json
-{
-  "code": "600",
-  "message": "Booking with id {id} not found"
-}
-```
-
----
-
-### **PUT** `/booking/{id}/cancel`
-
-**Descrição:** Cancela uma reserva existente.  
-Em vez de excluir a reserva, atualiza o status dela para `"CANCELLED"`
-
----
-
-#### **Parâmetro de caminho**
-
-| Parâmetro | Tipo | Descrição                     |
-|-----------|------|-------------------------------|
-| `id`      | UUID | ID da reserva a ser cancelada |
-
----
-
-#### **Resposta de sucesso (`200 OK`)**
-
-```json
-{
-  "message": "Booking cancelled successfully",
-  "status": "CANCELLED"
-}
-```
-
----
-
-**Resposta de erro (`404 Not Found`)**
-
-```json
-{
-  "code": "600",
-  "message": "Booking with id {id} not found"
-}
-```
-
----
-
-**Resposta de erro (`409 Conflict`)**
-
-```json
-{
-  "code": "601",
-  "message": "Booking with id {id} already cancelled"
-}
-```
-
----
-
-### DELETE `/booking/{id}/delete`
-
-**Descrição:** Remove uma reserva do sistema.
-
-**Parâmetro de caminho:**
-
-| Parâmetro | Tipo | Descrição                      |
-|-----------|------|--------------------------------|
-| `id`      | UUID | O ID da reserva a ser removida |
-
-**Resposta de sucesso (`200 OK`):**
-
-```json
-{
-  "message": "Booking deleted successfully"
 }
 ```
 

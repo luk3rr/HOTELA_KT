@@ -153,7 +153,9 @@ sealed class HotelaException(
 
     // 9xx - General
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    class InvalidDataException : HotelaException(INVALID_DATA, "Invalid data provided")
+    class InvalidDataException(
+        msg: String = "Invalid data provided",
+    ) : HotelaException(INVALID_DATA, msg)
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     class FieldIsRequiredButWasNullOrEmptyException(
