@@ -10,6 +10,8 @@ interface ReviewRepository {
 
     suspend fun findByCustomerId(customerId: UUID): List<Review>
 
+    suspend fun findByBookingId(bookingId: UUID): Review?
+
     suspend fun create(review: Review): Review
 
     suspend fun update(review: Review): Review

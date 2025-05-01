@@ -43,6 +43,14 @@ class ReviewRepositoryImpl(
             .collectList()
             .awaitSingleOrNull() ?: emptyList()
 
+    override suspend fun findByBookingId(bookingId: UUID): Review? =
+        databaseClient
+            .sql(FIND_BY_BOOKING_ID)
+            .bind("bookingId", bookingId)
+            .map { row, _ ->
+                mapper(row)
+            }.awaitSingleOrNull()
+
     override suspend fun create(review: Review): Review =
         databaseClient
             .sql(CREATE_REVIEW)
@@ -94,6 +102,10 @@ class ReviewRepositoryImpl(
             JOIN booking b ON r.bookingId = b.bookingId
             JOIN customer c ON b.customerId = c.id
             WHERE customer_id = :customerId
+        """
+
+        private const val FIND_BY_BOOKING_ID = """
+            SELECT * FROM review WHERE booking_id = :bookingId
         """
 
         private const val CREATE_REVIEW = """

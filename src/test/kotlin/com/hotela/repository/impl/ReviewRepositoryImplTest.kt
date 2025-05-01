@@ -113,6 +113,17 @@ class ReviewRepositoryImplTest :
             }
         }
 
+        should("successfully find a review by booking ID") {
+            reviewRepositoryImpl.findByBookingId(review.bookingId) shouldBe review
+
+            verify(exactly = 1) {
+                databaseClient.sql(any<String>())
+                genericDatabaseSpec.bind("bookingId", review.bookingId)
+                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Review>>())
+                rowsFetchSpec.first()
+            }
+        }
+
         should("successfully find reviews by customer ID") {
             reviewRepositoryImpl.findByCustomerId(review.bookingId) shouldBe listOf(review)
 

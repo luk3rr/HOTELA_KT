@@ -19,11 +19,11 @@ Endpoints para gerenciamento de avaliações feitas por clientes sobre hotéis.
 
 ```json
 {
-  "hotel_id": "9f8e7d6c-5b4a-3210-1234-abcdefabcdef",
-  "customer_id": "45f8e7d6c-5b4a-3210-1234-abcxefabckef",
+  "bookingId": "9f8e7d6c-5b4a-3210-1234-abcdefabcdef",
   "rating": 4,
   "comment": "Hotel bem localizado e limpo.",
-  "reviewed_at": "2025-04-17T15:30:00Z"
+  "reviewedAt": "2025-04-17T15:30:00Z",
+  "updatedAt": "2025-04-18T10:00:00Z"
 }
 ```
 
@@ -46,8 +46,7 @@ Endpoints para gerenciamento de avaliações feitas por clientes sobre hotéis.
 
 ```json
 {
-  "hotel_id": "9f8e7d6c-5b4a-3210-1234-abcdefabcdef",
-  "customer_id": "45f8e7d6c-5b4a-3210-1234-abcxefabckef",
+  "bookingId": "9f8e7d6c-5b4a-3210-1234-abcdefabcdef",
   "rating": 4,
   "comment": "Hotel bem localizado e limpo."
 }

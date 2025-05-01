@@ -11,7 +11,7 @@ object ReviewStubs {
         rating: Int = 5,
         comment: String = "Great stay!",
         reviewedAt: LocalDateTime = LocalDateTime.now(),
-        updatedAt: LocalDateTime = LocalDateTime.now()
+        updatedAt: LocalDateTime = LocalDateTime.now(),
     ): Review =
         Review(
             id = id,
@@ -19,6 +19,6 @@ object ReviewStubs {
             rating = rating,
             comment = comment,
             reviewedAt = reviewedAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
         )
 }
