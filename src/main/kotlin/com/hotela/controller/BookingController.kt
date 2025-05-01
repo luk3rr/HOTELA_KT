@@ -60,4 +60,32 @@ class BookingController(
             message = "Booking updated successfully",
         )
     }
+
+    @PutMapping("/checkin/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).CUSTOMER) or hasRole(T(com.hotela.model.enum.Role).PARTNER)")
+    suspend fun checkIn(
+        @PathVariable id: UUID,
+        principal: JwtAuthenticationToken,
+    ): ResourceUpdatedResponse {
+        bookingService.checkIn(id, principal)
+
+        return ResourceUpdatedResponse(
+            message = "Checked in successfully",
+        )
+    }
+
+    @PutMapping("/checkout/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).CUSTOMER) or hasRole(T(com.hotela.model.enum.Role).PARTNER)")
+    suspend fun checkOut(
+        @PathVariable id: UUID,
+        principal: JwtAuthenticationToken,
+    ): ResourceUpdatedResponse {
+        bookingService.checkOut(id, principal)
+
+        return ResourceUpdatedResponse(
+            message = "Checked out successfully",
+        )
+    }
 }

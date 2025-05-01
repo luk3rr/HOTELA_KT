@@ -75,10 +75,8 @@ class BookingService(
             bookingRepository.findById(id)
                 ?: throw HotelaException.BookingNotFoundException(id)
 
-        if (booking.customerId != customerId) {
-            throw HotelaException.InvalidDataException(
-                "Booking $id does not belong to customer $customerId",
-            )
+        if (!isRequesterBookingOrHotelOwner(booking, customerId)) {
+            throw HotelaException.InvalidCredentialsException()
         }
 
         val hotel =
@@ -103,6 +101,48 @@ class BookingService(
         return bookingRepository.update(updatedBooking)
     }
 
+    suspend fun checkIn(
+        id: UUID,
+        token: JwtAuthenticationToken,
+    ): Booking {
+        val requesterUserId = token.getUserId()
+
+        val booking =
+            bookingRepository.findById(id)
+                ?: throw HotelaException.BookingNotFoundException(id)
+
+        if (!isRequesterBookingOrHotelOwner(booking, requesterUserId)) {
+            throw HotelaException.InvalidCredentialsException()
+        }
+
+        return updateBookingStatus(booking, BookingStatus.IN_PROGRESS)
+    }
+
+    suspend fun checkOut(
+        id: UUID,
+        token: JwtAuthenticationToken,
+    ): Booking {
+        val requesterUserId = token.getUserId()
+
+        val booking =
+            bookingRepository.findById(id)
+                ?: throw HotelaException.BookingNotFoundException(id)
+
+        if (!isRequesterBookingOrHotelOwner(booking, requesterUserId)) {
+            throw HotelaException.InvalidCredentialsException()
+        }
+
+        return updateBookingStatus(booking, BookingStatus.COMPLETED)
+    }
+
+    private suspend fun updateBookingStatus(
+        booking: Booking,
+        status: BookingStatus,
+    ): Booking {
+        val updatedBooking = booking.copy(status = status)
+        return bookingRepository.update(updatedBooking)
+    }
+
     private suspend fun validateBooking(
         hotel: Hotel,
         room: Room,
@@ -114,7 +154,7 @@ class BookingService(
             )
         }
 
-        if (!isCheckinCheckoutValid(booking.checkin, booking.checkout)) {
+        if (!isCheckinCheckoutTimeValid(booking.checkin, booking.checkout)) {
             throw HotelaException.InvalidDataException(
                 "Check-in must be after now and check-out must be after check-in",
             )
@@ -138,7 +178,7 @@ class BookingService(
         room: Room,
     ): Boolean = hotel.id == room.hotelId
 
-    private fun isCheckinCheckoutValid(
+    private fun isCheckinCheckoutTimeValid(
         checkin: LocalDateTime,
         checkout: LocalDateTime,
     ): Boolean =
@@ -168,6 +208,17 @@ class BookingService(
         room: Room,
         numberOfGuests: Int,
     ): Boolean = room.capacity >= numberOfGuests
+
+    private suspend fun isRequesterBookingOrHotelOwner(
+        booking: Booking,
+        requesterUserId: UUID,
+    ): Boolean {
+        val hotel =
+            hotelService.findById(booking.hotelId)
+                ?: throw HotelaException.HotelNotFoundException(booking.hotelId)
+
+        return booking.customerId == requesterUserId || hotel.partnerId == requesterUserId
+    }
 
     companion object {
         const val CHECKIN_ALLOWED_TIME_WINDOW_MINUTES = 10L

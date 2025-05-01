@@ -2,6 +2,7 @@ package com.hotela.service
 
 import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
+import com.hotela.model.enum.BookingStatus
 import com.hotela.repository.BookingRepository
 import com.hotela.stubs.database.BookingStubs
 import com.hotela.stubs.database.CustomerStubs
@@ -9,7 +10,6 @@ import com.hotela.stubs.database.HotelStubs
 import com.hotela.stubs.database.RoomStubs
 import com.hotela.stubs.dto.request.CreateBookingRequestStubs
 import com.hotela.stubs.dto.request.UpdateBookingRequestStubs
-import com.hotela.util.getUserId
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -38,6 +38,8 @@ class BookingServiceTest :
             val customer = CustomerStubs.create()
             val anotherCustomerId = UUID.fromString("b6299563-9fd6-4030-8a3b-2c90ee1a0042")
             val booking = BookingStubs.create(hotelId = hotel.id, roomId = room.id, customerId = customer.id)
+            val bookingInProgress = BookingStubs.create(status = BookingStatus.IN_PROGRESS, customerId = customer.id)
+            val bookingCompleted = BookingStubs.create(status = BookingStatus.COMPLETED, customerId = customer.id)
             val anotherBookingInProgress =
                 BookingStubs.create(
                     id = UUID.fromString("b2c08ccd-a0b7-4793-aa09-4f6f56f3a4af"),
@@ -278,15 +280,16 @@ class BookingServiceTest :
                 When("customer id does not match") {
                     every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherCustomerId.toString())
                     coEvery { bookingRepository.findById(any()) } returns booking
+                    coEvery { hotelService.findById(any()) } returns hotel
 
-                    Then("it should throw InvalidDataException") {
+                    Then("it should throw InvalidCredentialsException") {
                         val exception =
-                            shouldThrow<HotelaException.InvalidDataException> {
+                            shouldThrow<HotelaException.InvalidCredentialsException> {
                                 bookingService.updateBooking(booking.id, updateBookingRequest, jwtToken)
                             }
 
-                        exception.code shouldBe HotelaException.INVALID_DATA
-                        exception.message shouldBe "Booking ${booking.id} does not belong to customer ${jwtToken.getUserId()}"
+                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
+                        exception.message shouldBe "Invalid credentials"
                     }
                 }
 
@@ -400,6 +403,103 @@ class BookingServiceTest :
 
                         exception.code shouldBe HotelaException.INVALID_DATA
                         exception.message shouldBe "Room ${room.id} cannot accommodate ${invalidUpdateBookingRequest.guests} guests"
+                    }
+                }
+            }
+
+            And("calling checkIn") {
+                require(booking.status == BookingStatus.CONFIRMED) {
+                    "Booking status must be CONFIRMED to check in"
+                }
+
+                When("requester is booking owner") {
+                    coEvery { bookingRepository.findById(any()) } returns booking
+                    coEvery { hotelService.findById(any()) } returns hotel
+                    coEvery { roomService.findById(any()) } returns room
+                    coEvery { bookingRepository.update(any()) } returns bookingInProgress
+
+                    Then("it should check in the booking") {
+                        val response = bookingService.checkIn(booking.id, jwtToken)
+
+                        response.status shouldBe BookingStatus.IN_PROGRESS
+                    }
+                }
+
+                When("requester is not booking owner") {
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherCustomerId.toString())
+                    coEvery { bookingRepository.findById(any()) } returns booking
+                    coEvery { hotelService.findById(any()) } returns hotel
+
+                    Then("it should throw InvalidCredentialsException") {
+                        val exception =
+                            shouldThrow<HotelaException.InvalidCredentialsException> {
+                                bookingService.checkIn(booking.id, jwtToken)
+                            }
+
+                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
+                        exception.message shouldBe "Invalid credentials"
+                    }
+                }
+
+                When("booking not found") {
+                    coEvery { bookingRepository.findById(any()) } returns null
+
+                    Then("it should throw BookingNotFoundException") {
+                        val exception =
+                            shouldThrow<HotelaException.BookingNotFoundException> {
+                                bookingService.checkIn(booking.id, jwtToken)
+                            }
+
+                        exception.code shouldBe HotelaException.BOOKING_NOT_FOUND
+                        exception.message shouldBe "Booking with id ${booking.id} not found"
+                    }
+                }
+            }
+
+            And("calling checkOut") {
+                require(bookingInProgress.status == BookingStatus.IN_PROGRESS) {
+                    "Booking status must be IN_PROGRESS to check out"
+                }
+
+                When("requester is booking owner") {
+                    coEvery { bookingRepository.findById(any()) } returns bookingInProgress
+                    coEvery { hotelService.findById(any()) } returns hotel
+                    coEvery { bookingRepository.update(any()) } returns bookingCompleted
+
+                    Then("it should check out the booking") {
+                        val response = bookingService.checkOut(bookingInProgress.id, jwtToken)
+
+                        response.status shouldBe BookingStatus.COMPLETED
+                    }
+                }
+
+                When("requester is not booking owner") {
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherCustomerId.toString())
+                    coEvery { bookingRepository.findById(any()) } returns bookingInProgress
+                    coEvery { hotelService.findById(any()) } returns hotel
+
+                    Then("it should throw InvalidCredentialsException") {
+                        val exception =
+                            shouldThrow<HotelaException.InvalidCredentialsException> {
+                                bookingService.checkOut(bookingInProgress.id, jwtToken)
+                            }
+
+                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
+                        exception.message shouldBe "Invalid credentials"
+                    }
+                }
+
+                When("booking not found") {
+                    coEvery { bookingRepository.findById(any()) } returns null
+
+                    Then("it should throw BookingNotFoundException") {
+                        val exception =
+                            shouldThrow<HotelaException.BookingNotFoundException> {
+                                bookingService.checkOut(bookingInProgress.id, jwtToken)
+                            }
+
+                        exception.code shouldBe HotelaException.BOOKING_NOT_FOUND
+                        exception.message shouldBe "Booking with id ${bookingInProgress.id} not found"
                     }
                 }
             }

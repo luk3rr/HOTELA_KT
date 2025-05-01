@@ -15,7 +15,7 @@ object BookingStubs {
         checkin: LocalDateTime = LocalDateTime.now().plusDays(1),
         checkout: LocalDateTime = LocalDateTime.now().plusDays(3),
         guests: Int = 2,
-        status: BookingStatus = BookingStatus.IN_PROGRESS,
+        status: BookingStatus = BookingStatus.CONFIRMED,
         notes: String? = "Test booking",
     ): Booking =
         Booking(

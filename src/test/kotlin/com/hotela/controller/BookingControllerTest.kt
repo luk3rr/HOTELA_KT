@@ -174,5 +174,71 @@ class BookingControllerTest(
                 }
             }
         }
+
+        context("PUT /booking/checkin/{id}") {
+            context("when the booking exists") {
+                test("should return 200 OK") {
+                    coEvery { bookingService.checkIn(any(), any()) } returns booking
+
+                    webTestClient
+                        .asCustomer(customer.id, customerAuth.id)
+                        .put()
+                        .uri("/booking/checkin/${booking.id}")
+                        .exchange()
+                        .expectStatus()
+                        .isOk
+                        .expectHeader()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .expectBody(ResourceUpdatedResponse::class.java)
+                        .consumeWith { response ->
+                            val responseBody = response.responseBody
+                            responseBody?.message shouldBe "Checked in successfully"
+                        }
+                }
+
+                test("should return 403 Forbidden when a guest tries to check in") {
+                    webTestClient
+                        .asGuest()
+                        .put()
+                        .uri("/booking/checkin/${booking.id}")
+                        .exchange()
+                        .expectStatus()
+                        .isForbidden
+                }
+            }
+        }
+
+        context("PUT /booking/checkout/{id}") {
+            context("when the booking exists") {
+                test("should return 200 OK") {
+                    coEvery { bookingService.checkOut(any(), any()) } returns booking
+
+                    webTestClient
+                        .asCustomer(customer.id, customerAuth.id)
+                        .put()
+                        .uri("/booking/checkout/${booking.id}")
+                        .exchange()
+                        .expectStatus()
+                        .isOk
+                        .expectHeader()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .expectBody(ResourceUpdatedResponse::class.java)
+                        .consumeWith { response ->
+                            val responseBody = response.responseBody
+                            responseBody?.message shouldBe "Checked out successfully"
+                        }
+                }
+
+                test("should return 403 Forbidden when a guest tries to check out") {
+                    webTestClient
+                        .asGuest()
+                        .put()
+                        .uri("/booking/checkout/${booking.id}")
+                        .exchange()
+                        .expectStatus()
+                        .isForbidden
+                }
+            }
+        }
     }
 }
