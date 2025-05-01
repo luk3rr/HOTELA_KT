@@ -5,12 +5,11 @@ import java.util.UUID
 
 data class Review(
     val id: UUID,
-    val customerId: UUID,
-    val hotelId: UUID,
-    val roomId: UUID,
+    val bookingId: UUID,
     val rating: Int,
     val comment: String? = null,
     val reviewedAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
     companion object {
         const val MAX_COMMENT_LENGTH = 500

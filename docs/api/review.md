@@ -73,7 +73,7 @@ Endpoints para gerenciamento de avaliações feitas por clientes sobre hotéis.
 
 ---
 
-### PUT `/review/{id}/update`
+### PUT `/review/update/{id}`
 
 **Descrição:** Atualiza uma avaliação existente (nota ou comentário).
 
@@ -106,35 +106,6 @@ Endpoints para gerenciamento de avaliações feitas por clientes sobre hotéis.
 {
   "code": "900",
   "message": "Invalid data provided"
-}
-```
-
-**Resposta de erro (`404 Not Found`):**
-
-```json
-{
-  "code": "600",
-  "message": "Review with id {id} not found"
-}
-```
-
----
-
-### DELETE `/review/{id}/delete`
-
-**Descrição:** Remove uma avaliação do sistema.
-
-**Parâmetro de caminho:**
-
-| Parâmetro | Tipo | Descrição             |
-|-----------|------|-----------------------|
-| `id`      | UUID | ID da avaliação alvo  |
-
-**Resposta de sucesso (`200 OK`):**
-
-```json
-{
-  "message": "Review deleted successfully"
 }
 ```
 

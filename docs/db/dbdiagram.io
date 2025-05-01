@@ -28,6 +28,8 @@ Enum payment_status {
 Enum booking_status {
   CONFIRMED
   CANCELLED
+  IN_PROGRESS
+  COMPLETED
 }
 
 Table partner {
@@ -80,8 +82,8 @@ Table customer {
   email varchar(255) [unique, not null]
   phone varchar(20) [not null]
   id_document varchar(50) [not null]
-  birth_date date
-  address varchar(255)
+  birth_date date [not null]
+  address varchar(255) [not null]
 }
 
 
@@ -109,9 +111,7 @@ Table payment {
 
 Table review {
   id uuid [pk]
-  customer_id uuid [not null, ref: > customer.id]
-  hotel_id uuid [not null, ref: > hotel.id]
-  room_id uuid [not null, ref: > room.id]
+  booking_id uuid [not null, ref: > booking.id]
   rating int [not null, note: "rating >= 1 and rating <= 5"]
   comment text
   reviewed_at datetime [not null, default: `now()`]

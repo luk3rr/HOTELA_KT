@@ -12,7 +12,7 @@ data class Payment(
     val transactionId: String,
     val amount: BigDecimal,
     val paymentMethod: PaymentMethod,
-    val status: PaymentStatus,
+    val status: PaymentStatus = PaymentStatus.PENDING,
     val paidAt: LocalDateTime = LocalDateTime.now(),
 ) {
     init {
