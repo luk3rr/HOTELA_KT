@@ -5,9 +5,9 @@ import java.util.UUID
 
 object CreateReviewRequestStubs {
     fun create(
-        bookingId: UUID,
-        rating: Int,
-        comment: String?,
+        bookingId: UUID = UUID.fromString("9e33708a-e03f-495f-bbd6-bff40f73d596"),
+        rating: Int = 5,
+        comment: String? = "Great experience!",
     ): CreateReviewRequest =
         CreateReviewRequest(
             bookingId = bookingId,

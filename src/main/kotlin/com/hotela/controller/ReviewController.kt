@@ -1,11 +1,11 @@
 package com.hotela.controller
 
 import com.hotela.error.HotelaException
-import com.hotela.model.dto.request.CreateBookingRequest
-import com.hotela.model.dto.request.UpdateBookingRequest
+import com.hotela.model.dto.request.CreateReviewRequest
+import com.hotela.model.dto.request.UpdateReviewRequest
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
-import com.hotela.service.BookingService
+import com.hotela.service.ReviewService
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
@@ -21,43 +21,43 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@RequestMapping("/booking")
+@RequestMapping("/review")
 @EnableReactiveMethodSecurity
-class BookingController(
-    private val bookingService: BookingService,
+class ReviewController(
+    private val reviewService: ReviewService,
 ) {
-    @GetMapping("/{id}")
-    suspend fun getBookingById(
+    @GetMapping("{id}")
+    suspend fun getReviewById(
         @PathVariable id: UUID,
-    ) = bookingService.findById(id) ?: throw HotelaException.BookingNotFoundException(id)
+    ) = reviewService.findById(id)
+        ?: throw HotelaException.ReviewNotFoundException(id)
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).CUSTOMER) or hasRole(T(com.hotela.model.enum.Role).PARTNER)")
-    suspend fun createBooking(
-        @RequestBody payload: CreateBookingRequest,
+    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).CUSTOMER)")
+    suspend fun createReview(
+        @RequestBody payload: CreateReviewRequest,
         principal: JwtAuthenticationToken,
     ): ResourceCreatedResponse {
-        val createdBooking = bookingService.createBooking(payload, principal)
+        val createdReview = reviewService.createReview(payload, principal)
 
         return ResourceCreatedResponse(
-            id = createdBooking.id,
-            message = "Booking created successfully",
+            id = createdReview.id,
+            message = "Review created successfully",
         )
     }
 
     @PutMapping("/update/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).CUSTOMER) or hasRole(T(com.hotela.model.enum.Role).PARTNER)")
-    suspend fun updateBooking(
+    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).CUSTOMER)")
+    suspend fun updateReview(
         @PathVariable id: UUID,
-        @RequestBody payload: UpdateBookingRequest,
+        @RequestBody payload: UpdateReviewRequest,
         principal: JwtAuthenticationToken,
     ): ResourceUpdatedResponse {
-        bookingService.updateBooking(id, payload, principal)
+        reviewService.updateReview(id, payload, principal)
 
         return ResourceUpdatedResponse(
-            message = "Booking updated successfully",
+            message = "Review updated successfully",
         )
     }
 }
