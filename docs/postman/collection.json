@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "dd255a8d-e636-4001-85b2-11a6d6483e6f",
+		"_postman_id": "2c501139-3f68-4924-84c7-3998ec9fd911",
 		"name": "hotela",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "42995810"
+		"_exporter_id": "44009295",
+		"_collection_link": "https://planetary-comet-7944103.postman.co/workspace/Lucas-Ara%C3%BAjo's-Workspace~94deadc0-b409-41df-8104-d334209cba12/collection/44009295-2c501139-3f68-4924-84c7-3998ec9fd911?action=share&source=collection_link&creator=44009295"
 	},
 	"item": [
 		{
@@ -265,7 +266,9 @@
 								"exec": [
 									"// Guarda o id do hotel criado",
 									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"hotel_id\", jsonData.id);"
+									"if (jsonData.id) {",
+									"    pm.collectionVariables.set(\"hotel_id\", jsonData.id);",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -540,7 +543,9 @@
 								"exec": [
 									"// Guarda o id do hotel criado",
 									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"room_id\", jsonData.id);"
+									"if (jsonData.id) {",
+									"    pm.collectionVariables.set(\"room_id\", jsonData.id);",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -723,6 +728,533 @@
 								{
 									"key": "id",
 									"value": "{{room_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking",
+			"item": [
+				{
+					"name": "Create booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Guarda o id do hotel criado",
+									"let jsonData = pm.response.json();",
+									"if (jsonData.id) {",
+									"    pm.collectionVariables.set(\"booking_id\", jsonData.id);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerId\": \"{{customer_user_id}}\",\n  \"hotelId\": \"{{hotel_id}}\",\n  \"roomId\": \"{{room_id}}\",\n  \"checkin\": \"2025-05-25T21:30:00\",\n  \"checkout\": \"2025-05-27T21:30:01\",\n  \"guests\": 2,\n  \"status\": \"CONFIRMED\",\n  \"notes\": \"Customer prefers a quiet room\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/booking/create",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"booking",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roomId\": \"{{room_id}}\",\n  \"checkin\": \"2025-05-11T15:00:00\",\n  \"checkout\": \"2025-05-16T11:00:00\",\n  \"guests\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/booking/update/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"booking",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{booking_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find booking by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/booking/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"booking",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{booking_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{server_addr}}/booking/checkin/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"booking",
+								"checkin",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{booking_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checkout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{server_addr}}/booking/checkout/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"booking",
+								"checkout",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{booking_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Review",
+			"item": [
+				{
+					"name": "Create review",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Guarda o id do hotel criado",
+									"let jsonData = pm.response.json();",
+									"if (jsonData.id) {",
+									"    pm.collectionVariables.set(\"review_id\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": \"{{booking_id}}\",\n  \"rating\": 4,\n  \"comment\": \"Hotel bem localizado e limpo.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/review/create",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"review",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update review",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excelente atendimento!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/review/update/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"review",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{review_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find review by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/review/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"review",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{review_id}}"
 								}
 							]
 						}
@@ -974,209 +1506,6 @@
 					"response": []
 				}
 			]
-		},
-		{
-			"name": "Booking",
-			"item": [
-				{
-					"name": "Create booking",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Guarda o id do hotel criado",
-									"let jsonData = pm.response.json();",
-									"pm.collectionVariables.set(\"booking_id\", jsonData.id);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "headerPrefix",
-									"value": "{{customer_token_type}}",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"customerId\": \"{{customer_user_id}}\",\n  \"hotelId\": \"{{hotel_id}}\",\n  \"roomId\": \"{{room_id}}\",\n  \"checkin\": \"2025-06-22T15:00:00\",\n  \"checkout\": \"2025-06-23T15:00:01\",\n  \"guests\": 2,\n  \"status\": \"CONFIRMED\",\n  \"notes\": \"Customer prefers a quiet room\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/booking/create",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"booking",
-								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update booking",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "headerPrefix",
-									"value": "{{customer_token_type}}",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"roomId\": \"{{room_id}}\",\n  \"checkin\": \"2025-05-11T15:00:00\",\n  \"checkout\": \"2025-05-16T11:00:00\",\n  \"guests\": 2\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/booking/update/:id",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"booking",
-								"update",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{booking_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Find booking by id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "headerPrefix",
-									"value": "{{customer_token_type}}",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/booking/:id",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"booking",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{booking_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
 		}
 	],
 	"variable": [
@@ -1258,6 +1587,10 @@
 		},
 		{
 			"key": "booking_id",
+			"value": ""
+		},
+		{
+			"key": "review_id",
 			"value": ""
 		}
 	]

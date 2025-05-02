@@ -124,3 +124,71 @@ Endpoints para gerenciamento de reservas feitas por clientes.
   "message": "Booking with id {id} not found"
 }
 ```
+
+### PUT `/booking/checkin/{id}`
+**Descrição:** Marca o check-in de uma reserva.
+
+**Parâmetro de caminho:**
+| Parâmetro | Tipo | Descrição               |
+|-----------|------|-------------------------|
+| `id`      | UUID | ID único da reserva     |
+
+**Resposta de sucesso (`200 OK`):**
+
+```json
+{
+  "message": "Checked in successfully"
+}
+```
+
+**Resposta de erro (`404 Not Found`):**
+
+```json
+{
+  "code": "600",
+  "message": "Booking with id {id} not found"
+}
+```
+
+**Resposta de erro (`400 Bad Request`):**
+
+```json
+{
+  "code": "900",
+  "message": "Check-in is not allowed at this time"
+}
+```
+
+### PUT `/booking/checkout/{id}`
+**Descrição:** Marca o check-out de uma reserva.
+
+**Parâmetro de caminho:**
+| Parâmetro | Tipo | Descrição               |
+|-----------|------|-------------------------|
+| `id`      | UUID | ID único da reserva     |
+
+**Resposta de sucesso (`200 OK`):**
+
+```json
+{
+  "message": "Checked out successfully"
+}
+```
+
+**Resposta de erro (`404 Not Found`):**
+
+```json
+{
+  "code": "600",
+  "message": "Booking with id {id} not found"
+}
+```
+
+**Resposta de erro (`400 Bad Request`):**
+
+```json
+{
+  "code": "900",
+  "message": "Booking is not in progress"
+}
+```

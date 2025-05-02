@@ -115,6 +115,10 @@ class BookingService(
             throw HotelaException.InvalidCredentialsException()
         }
 
+        if (!isWithinAllowedCheckInWindow(booking)) {
+            throw HotelaException.InvalidDataException("Check-in is not allowed at this time")
+        }
+
         return updateBookingStatus(booking, BookingStatus.IN_PROGRESS)
     }
 
@@ -130,6 +134,10 @@ class BookingService(
 
         if (!isRequesterBookingOrHotelOwner(booking, requesterUserId)) {
             throw HotelaException.InvalidCredentialsException()
+        }
+
+        if (!isBookingInProgress(booking)) {
+            throw HotelaException.InvalidDataException("Booking is not in progress")
         }
 
         return updateBookingStatus(booking, BookingStatus.COMPLETED)
@@ -219,6 +227,14 @@ class BookingService(
 
         return booking.customerId == requesterUserId || hotel.partnerId == requesterUserId
     }
+
+    private fun isWithinAllowedCheckInWindow(booking: Booking): Boolean {
+        val now = LocalDateTime.now()
+        val checkinTimeWindow = booking.checkin.minusMinutes(CHECKIN_ALLOWED_TIME_WINDOW_MINUTES)
+        return now.isAfter(checkinTimeWindow) && now.isBefore(booking.checkout)
+    }
+
+    private fun isBookingInProgress(booking: Booking): Boolean = booking.status == BookingStatus.IN_PROGRESS
 
     companion object {
         const val CHECKIN_ALLOWED_TIME_WINDOW_MINUTES = 10L

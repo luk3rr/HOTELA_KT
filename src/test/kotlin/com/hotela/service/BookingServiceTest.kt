@@ -16,6 +16,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import java.time.LocalDateTime
@@ -418,6 +419,9 @@ class BookingServiceTest :
                     coEvery { roomService.findById(any()) } returns room
                     coEvery { bookingRepository.update(any()) } returns bookingInProgress
 
+                    mockkStatic(LocalDateTime::class)
+                    every { LocalDateTime.now() } returns booking.checkin
+
                     Then("it should check in the booking") {
                         val response = bookingService.checkIn(booking.id, jwtToken)
 
@@ -452,6 +456,26 @@ class BookingServiceTest :
 
                         exception.code shouldBe HotelaException.BOOKING_NOT_FOUND
                         exception.message shouldBe "Booking with id ${booking.id} not found"
+                    }
+                }
+
+                When("scheduled check-in time has not arrived yet") {
+                    coEvery { bookingRepository.findById(any()) } returns booking
+                    coEvery { hotelService.findById(any()) } returns hotel
+
+                    mockkStatic(LocalDateTime::class)
+                    every {
+                        LocalDateTime.now()
+                    } returns booking.checkin.minusMinutes(BookingService.CHECKIN_ALLOWED_TIME_WINDOW_MINUTES + 1)
+
+                    Then("it should throw InvalidDataException") {
+                        val exception =
+                            shouldThrow<HotelaException.InvalidDataException> {
+                                bookingService.checkIn(booking.id, jwtToken)
+                            }
+
+                        exception.code shouldBe HotelaException.INVALID_DATA
+                        exception.message shouldBe "Check-in is not allowed at this time"
                     }
                 }
             }
@@ -500,6 +524,21 @@ class BookingServiceTest :
 
                         exception.code shouldBe HotelaException.BOOKING_NOT_FOUND
                         exception.message shouldBe "Booking with id ${bookingInProgress.id} not found"
+                    }
+                }
+
+                When("booking is not in progress") {
+                    coEvery { bookingRepository.findById(any()) } returns bookingCompleted
+                    coEvery { hotelService.findById(any()) } returns hotel
+
+                    Then("it should throw InvalidDataException") {
+                        val exception =
+                            shouldThrow<HotelaException.InvalidDataException> {
+                                bookingService.checkOut(bookingCompleted.id, jwtToken)
+                            }
+
+                        exception.code shouldBe HotelaException.INVALID_DATA
+                        exception.message shouldBe "Booking is not in progress"
                     }
                 }
             }
