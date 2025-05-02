@@ -53,7 +53,7 @@ class ReviewRepositoryImpl(
 
     override suspend fun create(review: Review): Review =
         databaseClient
-            .sql(CREATE_REVIEW)
+            .sql(CREATE)
             .bind("id", review.id)
             .bind("bookingId", review.bookingId)
             .bind("rating", review.rating)
@@ -66,7 +66,7 @@ class ReviewRepositoryImpl(
 
     override suspend fun update(review: Review): Review =
         databaseClient
-            .sql(UPDATE_REVIEW)
+            .sql(UPDATE)
             .bind("id", review.id)
             .bind("rating", review.rating)
             .bind("comment", review.comment)
@@ -108,13 +108,13 @@ class ReviewRepositoryImpl(
             SELECT * FROM review WHERE booking_id = :bookingId
         """
 
-        private const val CREATE_REVIEW = """
-            INSERT INTO review (id, customer_id, hotel_id, rating, comment, reviewed_at, updated_at)
-            VALUES (:id, :customerId, :hotelId, :rating, :comment, :reviewedAt, :updatedAt)
+        private const val CREATE = """
+            INSERT INTO review (id, booking_id, rating, comment, reviewed_at, updated_at)
+            VALUES (:id, :bookingId, :rating, :comment, :reviewedAt, :updatedAt)
             RETURNING *
         """
 
-        private const val UPDATE_REVIEW = """
+        private const val UPDATE = """
             UPDATE review SET rating = :rating, comment = :comment, updated_at = :updatedAt
             WHERE id = :id
             RETURNING *

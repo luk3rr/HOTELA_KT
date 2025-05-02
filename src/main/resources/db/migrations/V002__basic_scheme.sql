@@ -90,7 +90,8 @@ CREATE TABLE review
     booking_id  uuid NOT NULL,
     rating      int NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment     text,
-    reviewed_at timestamp NOT NULL DEFAULT now()
+    reviewed_at timestamp NOT NULL DEFAULT now(),
+    updated_at  timestamp NOT NULL DEFAULT now()
 );
 
 CREATE TABLE customer_auth
