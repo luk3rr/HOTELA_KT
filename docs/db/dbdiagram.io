@@ -45,7 +45,7 @@ Enum user_role {
 }
 
 Table auth_credential {
-  id uuid [pk, default: `gen_random_uuid()`, note: 'Chave primária única para cada credencial']
+  id uuid [pk, note: 'Chave primária única para cada credencial']
   login_email varchar(255) [unique, not null, note: 'Email de login, único globalmente. Max 254 para compatibilidade.']
   password_hash varchar(255) [not null, note: 'Hash da senha (ex: bcrypt)']
   user_type user_role [not null, note: 'Indica se a credencial é de um CUSTOMER ou PARTNER']
@@ -56,7 +56,7 @@ Table auth_credential {
 }
 
 Table address {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   street_address varchar(255) [not null]
   number varchar(16) [note: 'Número do endereço, pode conter letras ex: 123B']
   complement varchar(128)
@@ -70,40 +70,40 @@ Table address {
 }
 
 Table partner {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   auth_credential_id uuid [unique, not null, ref: > auth_credential.id, note: 'FK para as credenciais de login do parceiro. Relação 1:1']
+  address_id uuid [ref: > address.id, note: 'FK para o endereço principal do parceiro']
   company_name varchar(255) [note: 'Nome fantasia ou principal da empresa parceira']
   legal_name varchar(255) [not null, note: 'Razão Social, se aplicável, ou nome do parceiro']
   email varchar(255) [unique, note: 'Email de contato principal da empresa (pode ser diferente do login_email)']
   phone varchar(32) [not null, note: 'Telefone principal formatado, ex: +55 (XX) XXXXX-XXXX']
-  tax_id varchar(64) [note: 'Identificador fiscal nacional (ex: CNPJ, EIN, VAT, etc.)']
   tax_id_type varchar(32) [note: 'Tipo do identificador fiscal (ex: CNPJ, EIN, VAT)']
-  address_id uuid [ref: > address.id, note: 'FK para o endereço principal do parceiro']
+  tax_id_value varchar(64) [note: 'Identificador fiscal nacional (ex: CNPJ, EIN, VAT, etc.)']
   contract_signed_at date [note: 'Data em que o contrato foi assinado']
   status partner_status [not null, default: 'ACTIVE']
   notes text
 }
 
 Table hotel {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   partner_id uuid [not null, ref: > partner.id]
+  address_id uuid [not null, ref: > address.id, note: 'Endereço do hotel. Um hotel DEVE ter um endereço.']
   name varchar(255) [not null]
   phone varchar(32) [not null]
   email varchar(255)
   website varchar(255)
   description text
   star_rating decimal(2,1) [not null, default: 0.0, note: 'Ex: 3.5. Implementar com CHECK (star_rating >= 0.0 AND star_rating <= 5.0)']
-  address_id uuid [not null, ref: > address.id, note: 'Endereço do hotel. Um hotel DEVE ter um endereço.']
 }
 
 Table room_type {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   name varchar(255) [unique, not null, note: 'Ex: Standard Solteiro, Casal Deluxe, Suíte Presidencial Vista Mar']
   description text
 }
 
 Table room {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   hotel_id uuid [not null, ref: > hotel.id]
   room_type_id uuid [not null, ref: > room_type.id]
   room_id varchar(32) [not null, note: 'Número ou identificador do quarto no hotel (ex: 101, 203A, "Suíte Lagoa")']
@@ -115,7 +115,7 @@ Table room {
 }
 
 Table customer {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   auth_credential_id uuid [unique, not null, ref: > auth_credential.id, note: 'FK para as credenciais de login do cliente. Relação 1:1']
   name varchar(255) [not null]
   phone varchar(18) [not null]
@@ -127,7 +127,7 @@ Table customer {
 }
 
 Table booking {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   customer_id uuid [not null, ref: > customer.id]
   hotel_id uuid [not null, ref: > hotel.id, note: 'Denormalizado para facilitar queries, mas consistente com room.hotel_id']
   room_id uuid [not null, ref: > room.id]
@@ -140,7 +140,7 @@ Table booking {
 }
 
 Table payment {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   booking_id uuid [not null, ref: > booking.id]
   external_transaction_id varchar(255) [unique, not null, note: 'ID da transação fornecido pelo gateway de pagamento']
   amount_paid decimal(10,2) [not null]
@@ -152,7 +152,7 @@ Table payment {
 }
 
 Table review {
-  id uuid [pk, default: `gen_random_uuid()`]
+  id uuid [pk]
   booking_id uuid [not null, unique, ref: > booking.id, note: 'Garante um review por reserva']
   customer_id uuid [not null, ref: > customer.id, note: 'Normalizado do booking.customer_id para facilitar queries de reviews por cliente']
   hotel_id uuid [not null, ref: > hotel.id, note: 'Normalizado do booking.hotel_id para facilitar queries de reviews por hotel']
