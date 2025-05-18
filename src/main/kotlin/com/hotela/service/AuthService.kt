@@ -1,10 +1,10 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
-import com.hotela.model.database.Customer
-import com.hotela.model.database.CustomerAuth
-import com.hotela.model.database.Partner
-import com.hotela.model.database.PartnerAuth
+import com.hotela.model.db.Customer
+import com.hotela.model.db.CustomerAuth
+import com.hotela.model.db.Partner
+import com.hotela.model.db.PartnerAuth
 import com.hotela.model.dto.request.AuthRequest
 import com.hotela.model.dto.request.CustomerRegisterRequest
 import com.hotela.model.dto.request.PartnerRegisterRequest

@@ -1,7 +1,7 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.database.Hotel
-import com.hotela.stubs.database.HotelStubs
+import com.hotela.model.db.Hotel
+import com.hotela.stubs.db.HotelStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks

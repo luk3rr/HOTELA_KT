@@ -1,6 +1,6 @@
 package com.hotela.repository
 
-import com.hotela.model.database.Review
+import com.hotela.model.db.Review
 import java.util.UUID
 
 interface ReviewRepository {

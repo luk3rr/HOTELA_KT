@@ -1,6 +1,6 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.database.Partner
+import com.hotela.model.db.Partner
 import com.hotela.model.enum.PartnerStatus
 import com.hotela.repository.PartnerRepository
 import io.r2dbc.spi.Row

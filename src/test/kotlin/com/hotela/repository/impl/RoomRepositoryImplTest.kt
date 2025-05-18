@@ -1,8 +1,8 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.database.Room
+import com.hotela.model.db.Room
 import com.hotela.model.enum.RoomStatus
-import com.hotela.stubs.database.RoomStubs
+import com.hotela.stubs.db.RoomStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks

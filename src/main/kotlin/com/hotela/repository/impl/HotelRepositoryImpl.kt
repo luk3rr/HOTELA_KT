@@ -1,6 +1,6 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.database.Hotel
+import com.hotela.model.db.Hotel
 import com.hotela.repository.HotelRepository
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.reactor.awaitSingleOrNull

@@ -2,15 +2,15 @@ package com.hotela.controller
 
 import com.hotela.asCustomer
 import com.hotela.asGuest
-import com.hotela.model.database.Booking
+import com.hotela.model.db.Booking
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.BookingService
-import com.hotela.stubs.database.BookingStubs
-import com.hotela.stubs.database.CustomerAuthStubs
-import com.hotela.stubs.database.CustomerStubs
-import com.hotela.stubs.database.HotelStubs
-import com.hotela.stubs.database.RoomStubs
+import com.hotela.stubs.db.BookingStubs
+import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.CustomerStubs
+import com.hotela.stubs.db.HotelStubs
+import com.hotela.stubs.db.RoomStubs
 import com.hotela.stubs.dto.request.CreateBookingRequestStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension

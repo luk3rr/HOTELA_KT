@@ -4,8 +4,8 @@ import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.repository.PartnerAuthRepository
 import com.hotela.repository.PartnerRepository
-import com.hotela.stubs.database.PartnerAuthStubs
-import com.hotela.stubs.database.PartnerStubs
+import com.hotela.stubs.db.PartnerAuthStubs
+import com.hotela.stubs.db.PartnerStubs
 import com.hotela.stubs.dto.request.UpdatePartnerRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec

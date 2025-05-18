@@ -1,10 +1,10 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
-import com.hotela.stubs.database.CustomerAuthStubs
-import com.hotela.stubs.database.CustomerStubs
-import com.hotela.stubs.database.PartnerAuthStubs
-import com.hotela.stubs.database.PartnerStubs
+import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.CustomerStubs
+import com.hotela.stubs.db.PartnerAuthStubs
+import com.hotela.stubs.db.PartnerStubs
 import com.hotela.stubs.dto.request.AuthRequestStubs
 import com.hotela.stubs.dto.request.CustomerRegisterRequestStubs
 import com.hotela.stubs.dto.request.PartnerRegisterRequestStubs

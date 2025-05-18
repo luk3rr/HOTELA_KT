@@ -1,4 +1,4 @@
-package com.hotela.model.database
+package com.hotela.model.db
 
 import com.hotela.model.enum.RoomStatus
 import java.math.BigDecimal

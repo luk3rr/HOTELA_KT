@@ -1,6 +1,6 @@
-package com.hotela.stubs.database
+package com.hotela.stubs.db
 
-import com.hotela.model.database.Payment
+import com.hotela.model.db.Payment
 import com.hotela.model.enum.PaymentMethod
 import com.hotela.model.enum.PaymentStatus
 import java.math.BigDecimal

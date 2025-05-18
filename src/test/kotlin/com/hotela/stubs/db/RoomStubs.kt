@@ -1,6 +1,6 @@
-package com.hotela.stubs.database
+package com.hotela.stubs.db
 
-import com.hotela.model.database.Room
+import com.hotela.model.db.Room
 import com.hotela.model.enum.RoomStatus
 import java.math.BigDecimal
 import java.util.UUID

@@ -1,6 +1,6 @@
 package com.hotela.repository
 
-import com.hotela.model.database.Booking
+import com.hotela.model.db.Booking
 import java.util.UUID
 
 interface BookingRepository {

@@ -1,6 +1,6 @@
-package com.hotela.stubs.database
+package com.hotela.stubs.db
 
-import com.hotela.model.database.CustomerAuth
+import com.hotela.model.db.CustomerAuth
 import java.time.LocalDateTime
 import java.util.UUID
 

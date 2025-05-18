@@ -1,8 +1,8 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
-import com.hotela.model.database.Booking
-import com.hotela.model.database.Review
+import com.hotela.model.db.Booking
+import com.hotela.model.db.Review
 import com.hotela.model.dto.request.CreateReviewRequest
 import com.hotela.model.dto.request.UpdateReviewRequest
 import com.hotela.model.enum.BookingStatus

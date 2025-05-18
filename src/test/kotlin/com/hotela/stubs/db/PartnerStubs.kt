@@ -1,6 +1,6 @@
-package com.hotela.stubs.database
+package com.hotela.stubs.db
 
-import com.hotela.model.database.Partner
+import com.hotela.model.db.Partner
 import com.hotela.model.enum.PartnerStatus
 import java.time.LocalDateTime
 import java.util.UUID

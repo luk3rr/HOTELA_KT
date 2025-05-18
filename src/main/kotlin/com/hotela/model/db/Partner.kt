@@ -1,4 +1,4 @@
-package com.hotela.model.database
+package com.hotela.model.db
 
 import com.hotela.model.enum.PartnerStatus
 import java.time.LocalDateTime

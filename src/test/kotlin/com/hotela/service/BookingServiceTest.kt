@@ -4,10 +4,10 @@ import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.model.enum.BookingStatus
 import com.hotela.repository.BookingRepository
-import com.hotela.stubs.database.BookingStubs
-import com.hotela.stubs.database.CustomerStubs
-import com.hotela.stubs.database.HotelStubs
-import com.hotela.stubs.database.RoomStubs
+import com.hotela.stubs.db.BookingStubs
+import com.hotela.stubs.db.CustomerStubs
+import com.hotela.stubs.db.HotelStubs
+import com.hotela.stubs.db.RoomStubs
 import com.hotela.stubs.dto.request.CreateBookingRequestStubs
 import com.hotela.stubs.dto.request.UpdateBookingRequestStubs
 import io.kotest.assertions.throwables.shouldThrow

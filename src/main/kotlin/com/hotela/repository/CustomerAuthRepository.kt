@@ -1,6 +1,6 @@
 package com.hotela.repository
 
-import com.hotela.model.database.CustomerAuth
+import com.hotela.model.db.CustomerAuth
 import java.util.UUID
 
 interface CustomerAuthRepository {

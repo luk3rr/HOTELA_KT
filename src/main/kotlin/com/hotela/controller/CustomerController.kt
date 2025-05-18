@@ -1,7 +1,7 @@
 package com.hotela.controller
 
 import com.hotela.error.HotelaException
-import com.hotela.model.database.Customer
+import com.hotela.model.db.Customer
 import com.hotela.model.dto.request.UpdateCustomerRequest
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.CustomerService

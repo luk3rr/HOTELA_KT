@@ -1,7 +1,7 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
-import com.hotela.model.database.Partner
+import com.hotela.model.db.Partner
 import com.hotela.model.dto.request.UpdatePartnerRequest
 import com.hotela.repository.PartnerAuthRepository
 import com.hotela.repository.PartnerRepository

@@ -1,6 +1,6 @@
-package com.hotela.stubs.database
+package com.hotela.stubs.db
 
-import com.hotela.model.database.Booking
+import com.hotela.model.db.Booking
 import com.hotela.model.enum.BookingStatus
 import java.time.LocalDateTime
 import java.util.UUID

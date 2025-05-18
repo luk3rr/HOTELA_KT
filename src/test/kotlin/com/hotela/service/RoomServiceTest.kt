@@ -3,9 +3,9 @@ package com.hotela.service
 import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.repository.RoomRepository
-import com.hotela.stubs.database.HotelStubs
-import com.hotela.stubs.database.PartnerStubs
-import com.hotela.stubs.database.RoomStubs
+import com.hotela.stubs.db.HotelStubs
+import com.hotela.stubs.db.PartnerStubs
+import com.hotela.stubs.db.RoomStubs
 import com.hotela.stubs.dto.request.CreateRoomRequestStubs
 import com.hotela.stubs.dto.request.UpdateRoomRequestStubs
 import io.kotest.assertions.throwables.shouldThrow

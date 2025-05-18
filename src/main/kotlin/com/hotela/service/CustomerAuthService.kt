@@ -1,7 +1,7 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
-import com.hotela.model.database.CustomerAuth
+import com.hotela.model.db.CustomerAuth
 import com.hotela.repository.CustomerAuthRepository
 import org.springframework.stereotype.Service
 import java.util.UUID

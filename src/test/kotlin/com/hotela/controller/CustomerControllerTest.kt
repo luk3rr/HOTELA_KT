@@ -5,11 +5,11 @@ import com.hotela.asGuest
 import com.hotela.asPartner
 import com.hotela.error.ErrorResponse
 import com.hotela.error.HotelaException
-import com.hotela.model.database.Customer
+import com.hotela.model.db.Customer
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.CustomerService
-import com.hotela.stubs.database.CustomerAuthStubs
-import com.hotela.stubs.database.CustomerStubs
+import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.dto.request.UpdateCustomerRequestStubs
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension

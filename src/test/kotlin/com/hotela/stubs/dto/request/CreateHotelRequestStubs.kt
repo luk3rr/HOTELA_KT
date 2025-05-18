@@ -1,6 +1,6 @@
 package com.hotela.stubs.dto.request
 
-import com.hotela.model.database.Hotel
+import com.hotela.model.db.Hotel
 import com.hotela.model.dto.request.CreateHotelRequest
 import java.math.BigDecimal
 

@@ -1,6 +1,6 @@
 package com.hotela.service
 
-import com.hotela.model.database.PartnerAuth
+import com.hotela.model.db.PartnerAuth
 import com.hotela.repository.PartnerAuthRepository
 import org.springframework.stereotype.Service
 import java.util.UUID

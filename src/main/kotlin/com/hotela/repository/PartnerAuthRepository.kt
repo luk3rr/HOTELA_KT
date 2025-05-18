@@ -1,6 +1,6 @@
 package com.hotela.repository
 
-import com.hotela.model.database.PartnerAuth
+import com.hotela.model.db.PartnerAuth
 import java.util.UUID
 
 interface PartnerAuthRepository {

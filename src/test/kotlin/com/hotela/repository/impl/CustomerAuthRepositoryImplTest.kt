@@ -1,7 +1,7 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.database.CustomerAuth
-import com.hotela.stubs.database.CustomerAuthStubs
+import com.hotela.model.db.CustomerAuth
+import com.hotela.stubs.db.CustomerAuthStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks

@@ -1,6 +1,6 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.database.Booking
+import com.hotela.model.db.Booking
 import com.hotela.model.enum.BookingStatus
 import com.hotela.repository.BookingRepository
 import io.r2dbc.spi.Row

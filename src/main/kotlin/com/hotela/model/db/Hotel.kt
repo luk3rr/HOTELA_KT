@@ -1,4 +1,4 @@
-package com.hotela.model.database
+package com.hotela.model.db
 
 import java.math.BigDecimal
 import java.util.UUID

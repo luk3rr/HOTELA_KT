@@ -1,11 +1,11 @@
-package com.hotela.model.database
+package com.hotela.model.db
 
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class PartnerAuth(
+data class CustomerAuth(
     val id: UUID,
-    val partnerId: UUID,
+    val customerId: UUID,
     val email: String,
     val passwordHash: String,
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -13,7 +13,7 @@ data class PartnerAuth(
     val active: Boolean = true,
 ) {
     init {
-        require(email.isNotBlank()) { "Partner email cannot be blank" }
-        require(passwordHash.isNotBlank()) { "Partner password hash cannot be blank" }
+        require(email.isNotBlank()) { "Customer email cannot be blank" }
+        require(passwordHash.isNotBlank()) { "Customer password hash cannot be blank" }
     }
 }

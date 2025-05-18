@@ -1,7 +1,7 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
-import com.hotela.model.database.Room
+import com.hotela.model.db.Room
 import com.hotela.model.dto.request.CreateRoomRequest
 import com.hotela.model.dto.request.UpdateRoomRequest
 import com.hotela.repository.RoomRepository

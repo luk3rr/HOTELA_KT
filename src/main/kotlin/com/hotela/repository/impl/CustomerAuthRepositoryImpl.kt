@@ -1,6 +1,6 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.database.CustomerAuth
+import com.hotela.model.db.CustomerAuth
 import com.hotela.repository.CustomerAuthRepository
 import io.r2dbc.spi.Row
 import org.springframework.r2dbc.core.DatabaseClient
