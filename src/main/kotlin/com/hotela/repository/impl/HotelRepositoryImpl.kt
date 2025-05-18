@@ -1,6 +1,9 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.db.Hotel
+import com.hotela.model.domain.ContactInfo
+import com.hotela.model.domain.Email
+import com.hotela.model.domain.PhoneNumber
 import com.hotela.repository.HotelRepository
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -38,17 +41,13 @@ class HotelRepositoryImpl(
             .sql(SAVE)
             .bind("id", hotel.id)
             .bind("partnerId", hotel.partnerId)
+            .bind("addressId", hotel.addressId)
             .bind("name", hotel.name)
-            .bind("address", hotel.address)
-            .bind("city", hotel.city)
-            .bind("state", hotel.state)
-            .bind("zipCode", hotel.zipCode)
-            .bind("phone", hotel.phone)
-            .bind("rating", hotel.rating)
-            .bind("description", hotel.description)
+            .bind("email", hotel.contactInfo.email)
+            .bind("phone", hotel.contactInfo.phone)
             .bind("website", hotel.website)
-            .bind("latitude", hotel.latitude)
-            .bind("longitude", hotel.longitude)
+            .bind("description", hotel.description)
+            .bind("rating", hotel.starRating)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()!!
@@ -58,16 +57,11 @@ class HotelRepositoryImpl(
             .sql(UPDATE)
             .bind("id", hotel.id)
             .bind("name", hotel.name)
-            .bind("address", hotel.address)
-            .bind("city", hotel.city)
-            .bind("state", hotel.state)
-            .bind("zipCode", hotel.zipCode)
-            .bind("phone", hotel.phone)
-            .bind("rating", hotel.rating)
-            .bind("description", hotel.description)
+            .bind("email", hotel.contactInfo.email)
+            .bind("phone", hotel.contactInfo.phone)
             .bind("website", hotel.website)
-            .bind("latitude", hotel.latitude)
-            .bind("longitude", hotel.longitude)
+            .bind("description", hotel.description)
+            .bind("rating", hotel.starRating)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()!!
@@ -76,17 +70,15 @@ class HotelRepositoryImpl(
         Hotel(
             id = row.get("id", UUID::class.java)!!,
             partnerId = row.get("partner_id", UUID::class.java)!!,
+            addressId = row.get("address_id", UUID::class.java)!!,
             name = row.get("name", String::class.java)!!,
-            address = row.get("address", String::class.java)!!,
-            city = row.get("city", String::class.java)!!,
-            state = row.get("state", String::class.java)!!,
-            zipCode = row.get("zip_code", String::class.java)!!,
-            phone = row.get("phone", String::class.java)!!,
-            rating = row.get("rating", BigDecimal::class.java)!!,
-            description = row.get("description", String::class.java),
+            contactInfo = ContactInfo(
+                email = row.get("email", Email::class.java)!!,
+                phone = row.get("phone", PhoneNumber::class.java)!!
+            ),
             website = row.get("website", String::class.java),
-            latitude = row.get("latitude", BigDecimal::class.java)!!,
-            longitude = row.get("longitude", BigDecimal::class.java)!!,
+            description = row.get("description", String::class.java),
+            starRating = row.get("rating", BigDecimal::class.java),
         )
 
     companion object {
@@ -100,9 +92,9 @@ class HotelRepositoryImpl(
 
         private const val SAVE = """
             INSERT INTO hotel (
-                id, partner_id, name, address, city, state, zip_code, phone, rating, description, website, latitude, longitude
+                id, partner_id, address_id, name, email, phone, website, description, rating
             ) VALUES (
-                :id, :partnerId, :name, :address, :city, :state, :zipCode, :phone, :rating, :description, :website, :latitude, :longitude
+                :id, :partnerId, :addressId, :name, :email, :phone, :website, :description, :rating
             )
             RETURNING *
         """
@@ -110,16 +102,11 @@ class HotelRepositoryImpl(
         private const val UPDATE = """
             UPDATE hotel SET
                 name = :name,
-                address = :address,
-                city = :city,
-                state = :state,
-                zip_code = :zipCode,
+                email = :email,
                 phone = :phone,
-                rating = :rating,
-                description = :description,
                 website = :website,
-                latitude = :latitude,
-                longitude = :longitude
+                description = :description,
+                rating = :rating
             WHERE id = :id
             RETURNING *
         """

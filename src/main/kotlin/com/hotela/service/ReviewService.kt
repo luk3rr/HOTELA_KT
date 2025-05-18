@@ -10,7 +10,7 @@ import com.hotela.repository.ReviewRepository
 import com.hotela.util.getUserId
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 
 @Service
@@ -42,8 +42,12 @@ class ReviewService(
             Review(
                 id = UUID.randomUUID(),
                 bookingId = booking.id,
+                customerId = token.getUserId(),
+                hotelId = booking.hotelId,
                 rating = payload.rating,
+                title = payload.title,
                 comment = payload.comment,
+                isAnonymous = payload.isAnonymous,
             )
 
         validateReview(booking, token)
@@ -66,9 +70,11 @@ class ReviewService(
 
         val updatedReview =
             review.copy(
-                rating = payload.rating,
-                comment = payload.comment,
-                updatedAt = LocalDateTime.now(),
+                rating = payload.rating ?: review.rating,
+                title = payload.title ?: review.title,
+                comment = payload.comment ?: review.comment,
+                updatedAt = Instant.now(),
+                isAnonymous = payload.isAnonymous ?: review.isAnonymous,
             )
 
         validateReview(booking, token)
@@ -96,7 +102,7 @@ class ReviewService(
         customerId: UUID,
     ): Boolean = booking.customerId == customerId
 
-    private fun isBookingCompleted(booking: Booking): Boolean = booking.status == BookingStatus.COMPLETED
+    private fun isBookingCompleted(booking: Booking): Boolean = booking.status == BookingStatus.CHECKED_OUT
 
     private suspend fun isBookingAlreadyReviewed(booking: Booking): Boolean = reviewRepository.findByBookingId(booking.id) != null
 }

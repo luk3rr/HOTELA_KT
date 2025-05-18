@@ -3,7 +3,7 @@ package com.hotela.model.db
 import com.hotela.model.enum.BookingStatus
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.UUID
+import java.util.*
 
 data class Booking(
     val id: UUID,
@@ -20,6 +20,19 @@ data class Booking(
     companion object {
         const val MINIMUM_GUESTS = 1
         const val MINIMUM_NIGHTS = 1
+
+        val RUNNING_BOOKINGS_STATUS = setOf(
+            BookingStatus.PENDING_CONFIRMATION,
+            BookingStatus.CONFIRMED,
+            BookingStatus.CHECKED_IN,
+        )
+
+        val FINISHED_BOOKINGS_STATUS = setOf(
+            BookingStatus.CANCELLED_BY_CUSTOMER,
+            BookingStatus.CANCELLED_BY_HOTEL,
+            BookingStatus.CHECKED_OUT,
+            BookingStatus.NO_SHOW,
+        )
     }
 
     init {
@@ -30,4 +43,6 @@ data class Booking(
         require(numberOfGuests >= MINIMUM_GUESTS) { "Number of guests must be at least $MINIMUM_GUESTS" }
         specialRequests?.let { require(it.isNotBlank()) { "Special requests cannot be blank" } }
     }
+
+    fun isInProgress(): Boolean = this.status in RUNNING_BOOKINGS_STATUS
 }

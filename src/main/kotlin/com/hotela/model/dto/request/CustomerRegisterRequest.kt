@@ -1,6 +1,5 @@
 package com.hotela.model.dto.request
 
-import com.hotela.model.db.Address
 import com.hotela.model.domain.ContactInfo
 import com.hotela.model.domain.DocumentId
 import com.hotela.model.domain.Email
@@ -17,5 +16,5 @@ data class CustomerRegisterRequest(
     val documentId: DocumentId,
     val birthDate: Instant? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    val address: Address,
+    val address: CreateAddressRequest,
 )

@@ -8,6 +8,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -56,8 +57,12 @@ class ReviewRepositoryImpl(
             .sql(CREATE)
             .bind("id", review.id)
             .bind("bookingId", review.bookingId)
+            .bind("customerId", review.customerId)
+            .bind("hotelId", review.hotelId)
             .bind("rating", review.rating)
+            .bind("title", review.title)
             .bind("comment", review.comment)
+            .bind("isAnonymous", review.isAnonymous)
             .bind("reviewedAt", review.reviewedAt)
             .bind("updatedAt", review.updatedAt)
             .map { row, _ ->
@@ -69,7 +74,10 @@ class ReviewRepositoryImpl(
             .sql(UPDATE)
             .bind("id", review.id)
             .bind("rating", review.rating)
+            .bind("title", review.title)
             .bind("comment", review.comment)
+            .bind("isAnonymous", review.isAnonymous)
+            .bind("reviewedAt", review.reviewedAt)
             .bind("updatedAt", review.updatedAt)
             .map { row, _ ->
                 mapper(row)
@@ -79,10 +87,14 @@ class ReviewRepositoryImpl(
         Review(
             id = row.get("id", UUID::class.java)!!,
             bookingId = row.get("booking_id", UUID::class.java)!!,
+            customerId = row.get("customer_id", UUID::class.java)!!,
+            hotelId = row.get("hotel_id", UUID::class.java)!!,
             rating = row.get("rating", Int::class.java)!!,
-            comment = row.get("comment", String::class.java),
-            reviewedAt = row.get("reviewed_at", LocalDateTime::class.java)!!,
-            updatedAt = row.get("updated_at", LocalDateTime::class.java)!!,
+            title = row.get("title", String::class.java)!!,
+            comment = row.get("comment", String::class.java)!!,
+            isAnonymous = row.get("is_anonymous", Boolean::class.java)!!,
+            reviewedAt = row.get("reviewed_at", Instant::class.java)!!,
+            updatedAt = row.get("updated_at", Instant::class.java)!!,
         )
 
     companion object {
@@ -91,16 +103,12 @@ class ReviewRepositoryImpl(
         """
 
         private const val FIND_BY_HOTEL_ID = """
-            SELECT * FROM review r 
-            JOIN booking b ON r.bookingId = b.bookingId
-            JOIN hotel h ON b.hotelId = h.id
+            SELECT * FROM review
             WHERE hotel_id = :hotelId
         """
 
         private const val FIND_BY_CUSTOMER_ID = """
-            SELECT * FROM review r
-            JOIN booking b ON r.bookingId = b.bookingId
-            JOIN customer c ON b.customerId = c.id
+            SELECT * FROM review
             WHERE customer_id = :customerId
         """
 
@@ -109,13 +117,19 @@ class ReviewRepositoryImpl(
         """
 
         private const val CREATE = """
-            INSERT INTO review (id, booking_id, rating, comment, reviewed_at, updated_at)
-            VALUES (:id, :bookingId, :rating, :comment, :reviewedAt, :updatedAt)
+            INSERT INTO review (id, booking_id, customer_id, hotel_id, rating, title, comment, is_anonymous, reviewed_at, updated_at)
+            VALUES (:id, :bookingId, :customerId, :hotelId, :rating, :title, :comment, :isAnonymous, :reviewedAt, :updatedAt)
             RETURNING *
         """
 
         private const val UPDATE = """
-            UPDATE review SET rating = :rating, comment = :comment, updated_at = :updatedAt
+            UPDATE review 
+            SET rating = :rating, 
+                title = :title, 
+                comment = :comment, 
+                is_anonymous = :isAnonymous, 
+                reviewed_at = :reviewedAt, 
+                updated_at = :updatedAt
             WHERE id = :id
             RETURNING *
         """

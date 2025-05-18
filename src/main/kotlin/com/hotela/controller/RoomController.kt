@@ -62,18 +62,4 @@ class RoomController(
             message = "Room updated successfully",
         )
     }
-
-    @DeleteMapping("/delete/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole(T(com.hotela.model.enum.Role).PARTNER)")
-    suspend fun deleteRoom(
-        @PathVariable id: UUID,
-        principal: JwtAuthenticationToken,
-    ): ResourceUpdatedResponse {
-        roomService.deleteRoom(id, principal)
-
-        return ResourceUpdatedResponse(
-            message = "Room deleted successfully",
-        )
-    }
 }

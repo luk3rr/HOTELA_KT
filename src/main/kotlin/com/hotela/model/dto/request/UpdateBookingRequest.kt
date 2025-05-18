@@ -2,7 +2,6 @@ package com.hotela.model.dto.request
 
 import com.hotela.model.enum.BookingStatus
 import java.time.Instant
-import java.time.LocalDateTime
 import java.util.UUID
 
 data class UpdateBookingRequest(

@@ -6,6 +6,8 @@ import com.hotela.asPartner
 import com.hotela.error.ErrorResponse
 import com.hotela.error.HotelaException
 import com.hotela.model.db.Customer
+import com.hotela.model.domain.ContactInfo
+import com.hotela.model.domain.DocumentId
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.CustomerService
 import com.hotela.stubs.db.AuthCredentialStubs
@@ -39,16 +41,6 @@ class CustomerControllerTest(
         val customer = CustomerStubs.create()
         val customerAuth = AuthCredentialStubs.create(customer.id)
         val updateCustomerRequest = UpdateCustomerRequestStubs.create()
-
-        require(
-            customer.name != updateCustomerRequest.name &&
-                customer.phone != updateCustomerRequest.phone &&
-                customer.idDocument != updateCustomerRequest.idDocument &&
-                customer.birthDate != updateCustomerRequest.birthDate &&
-                customer.address != updateCustomerRequest.address,
-        ) {
-            "Customer and UpdateCustomerRequest should have different values"
-        }
 
         context("GET /customer/{id}") {
             context("when the customer exists") {
@@ -103,10 +95,19 @@ class CustomerControllerTest(
             val customerUpdated =
                 customer.copy(
                     name = updateCustomerRequest.name ?: customer.name,
-                    phone = updateCustomerRequest.phone ?: customer.phone,
-                    idDocument = updateCustomerRequest.idDocument ?: customer.idDocument,
+                    contactInfo = ContactInfo(
+                        email = updateCustomerRequest.contactInfo?.email
+                            ?: customer.contactInfo.email,
+                        phone = updateCustomerRequest.contactInfo?.phone
+                            ?: customer.contactInfo.phone,
+                    ),
+                    documentId = DocumentId(
+                        type = updateCustomerRequest.documentId?.type
+                            ?: customer.documentId.type,
+                        value = updateCustomerRequest.documentId?.value
+                            ?: customer.documentId.value,
+                    ),
                     birthDate = updateCustomerRequest.birthDate ?: customer.birthDate,
-                    address = updateCustomerRequest.address ?: customer.address,
                 )
 
             context("when the customer exists") {

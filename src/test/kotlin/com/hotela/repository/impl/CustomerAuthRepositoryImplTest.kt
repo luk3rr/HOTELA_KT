@@ -20,7 +20,7 @@ import java.util.function.BiFunction
 class CustomerAuthRepositoryImplTest :
     ShouldSpec({
         val databaseClient = mockk<DatabaseClient>()
-        val customerAuthRepositoryImpl = CustomerAuthRepositoryImpl(databaseClient)
+        val customerAuthRepositoryImpl = AuthCredentialRepositoryImpl(databaseClient)
 
         val customerAuth = AuthCredentialStubs.create()
         val genericDatabaseSpec = mockk<DatabaseClient.GenericExecuteSpec>()
@@ -73,7 +73,7 @@ class CustomerAuthRepositoryImplTest :
         }
 
         should("successfully find a customer auth by email") {
-            customerAuthRepositoryImpl.findByEmail(customerAuth.email) shouldBe customerAuth
+            customerAuthRepositoryImpl.findByLoginEmail(customerAuth.email) shouldBe customerAuth
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
@@ -108,7 +108,7 @@ class CustomerAuthRepositoryImplTest :
         should("successfully check if a customer auth exists by email") {
             every { mockRow.get("exists", Boolean::class.java) } returns true
 
-            customerAuthRepositoryImpl.existsByEmail(customerAuth.email) shouldBe true
+            customerAuthRepositoryImpl.existsByLoginEmail(customerAuth.email) shouldBe true
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())

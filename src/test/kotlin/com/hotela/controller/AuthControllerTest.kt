@@ -2,7 +2,7 @@ package com.hotela.controller
 
 import com.hotela.asGuest
 import com.hotela.model.dto.response.AuthResponse
-import com.hotela.service.AuthService
+import com.hotela.service.AuthCredentialService
 import com.hotela.stubs.dto.request.AuthRequestStubs
 import com.hotela.stubs.dto.request.CustomerRegisterRequestStubs
 import com.hotela.stubs.dto.request.PartnerRegisterRequestStubs
@@ -21,14 +21,14 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @WebFluxTest(controllers = [AuthController::class])
 class AuthControllerTest(
     private val webTestClient: WebTestClient,
-    private val authService: AuthService,
+    private val authCredentialService: AuthCredentialService,
 ) : FunSpec() {
     override fun extensions() = listOf(SpringExtension)
 
     @TestConfiguration
     class MockBeans {
         @Bean
-        fun authService(): AuthService = mockk<AuthService>()
+        fun authService(): AuthCredentialService = mockk<AuthCredentialService>()
     }
 
     init {
@@ -38,7 +38,7 @@ class AuthControllerTest(
             context("when the request is valid") {
                 test("should return 200 OK") {
                     coEvery {
-                        authService.partnerRegister(any())
+                        authCredentialService.partnerRegister(any())
                     } returns authResponse
 
                     val requestBody = PartnerRegisterRequestStubs.create()
@@ -69,7 +69,7 @@ class AuthControllerTest(
             context("when the request is valid") {
                 test("should return 200 OK") {
                     coEvery {
-                        authService.partnerLogin(any())
+                        authCredentialService.partnerLogin(any())
                     } returns authResponse
 
                     val requestBody = AuthRequestStubs.create()
@@ -100,7 +100,7 @@ class AuthControllerTest(
             context("when the request is valid") {
                 test("should return 200 OK") {
                     coEvery {
-                        authService.customerLogin(any())
+                        authCredentialService.login(any())
                     } returns authResponse
 
                     val requestBody = AuthRequestStubs.create()
@@ -131,7 +131,7 @@ class AuthControllerTest(
             context("when the request is valid") {
                 test("should return 200 OK") {
                     coEvery {
-                        authService.customerRegister(any())
+                        authCredentialService.customerRegister(any())
                     } returns authResponse
 
                     val requestBody = CustomerRegisterRequestStubs.create()

@@ -78,7 +78,7 @@ class BookingServiceTest :
 
             And("calling findInProgressBookingsByHotelId") {
                 When("it should return the booking") {
-                    coEvery { bookingRepository.findInProgressBookingsByHotelId(hotel.id) } returns listOf(booking)
+                    coEvery { bookingRepository.findCheckedInBookingsByHotelId(hotel.id) } returns listOf(booking)
 
                     Then("it should return the booking") {
                         val result = bookingService.findInProgressBookingsByHotelId(hotel.id)

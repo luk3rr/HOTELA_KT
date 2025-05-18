@@ -1,7 +1,7 @@
 package com.hotela.repository
 
 import com.hotela.model.db.Room
-import java.util.UUID
+import java.util.*
 
 interface RoomRepository {
     suspend fun findById(id: UUID): Room?
@@ -11,6 +11,4 @@ interface RoomRepository {
     suspend fun create(room: Room): Room
 
     suspend fun update(room: Room): Room
-
-    suspend fun delete(id: UUID): Boolean
 }

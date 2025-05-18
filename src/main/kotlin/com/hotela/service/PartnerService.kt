@@ -2,10 +2,10 @@ package com.hotela.service
 
 import com.hotela.error.HotelaException
 import com.hotela.model.db.Partner
+import com.hotela.model.domain.Email
 import com.hotela.model.dto.request.UpdatePartnerRequest
-import com.hotela.repository.PartnerAuthRepository
 import com.hotela.repository.PartnerRepository
-import com.hotela.util.getAuthId
+import com.hotela.util.getUserId
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -13,46 +13,31 @@ import java.util.UUID
 @Service
 class PartnerService(
     private val partnerRepository: PartnerRepository,
-    private val partnerAuthRepository: PartnerAuthRepository,
 ) {
     suspend fun findById(id: UUID): Partner? = partnerRepository.findById(id)
 
-    suspend fun findByEmail(email: String): Partner? = partnerRepository.findByEmail(email)
+    suspend fun findByEmail(email: Email): Partner? = partnerRepository.findByEmail(email)
 
-    suspend fun existsByEmail(email: String): Boolean = partnerRepository.existsByEmail(email)
-
-    suspend fun createPartner(partner: Partner): Partner {
-        if (partnerRepository.existsByEmail(partner.email)) {
-            throw HotelaException.EmailAlreadyRegisteredException()
-        }
-
-        return partnerRepository.create(partner)
-    }
+    suspend fun existsByEmail(email: Email): Boolean = partnerRepository.existsByEmail(email)
 
     suspend fun updatePartner(
         payload: UpdatePartnerRequest,
         token: JwtAuthenticationToken,
     ): Partner {
-        val partnerAuthId = token.getAuthId()
-
-        val partnerAuth =
-            partnerAuthRepository.findById(partnerAuthId)
-                ?: throw HotelaException.PartnerAuthNotFoundException(partnerAuthId)
+        val partnerId = token.getUserId()
 
         val existingPartner =
-            partnerRepository.findById(partnerAuth.partnerId)
-                ?: throw HotelaException.PartnerNotFoundException(partnerAuth.partnerId)
+            partnerRepository.findById(partnerId)
+                ?: throw HotelaException.PartnerNotFoundException(partnerId)
 
         val updatedPartner =
             existingPartner.copy(
-                name = payload.name ?: existingPartner.name,
-                cnpj = payload.cnpj ?: existingPartner.cnpj,
-                phone = payload.phone ?: existingPartner.phone,
-                address = payload.address ?: existingPartner.address,
-                contactName = payload.contactName ?: existingPartner.contactName,
-                contactPhone = payload.contactPhone ?: existingPartner.contactPhone,
-                contactEmail = payload.contactEmail ?: existingPartner.contactEmail,
-                contractSigned = payload.contractSigned ?: existingPartner.contractSigned,
+                companyName = payload.companyName ?: existingPartner.companyName,
+                legalName = payload.legalName ?: existingPartner.legalName,
+                contactInfo = payload.contactInfo ?: existingPartner.contactInfo,
+                documentId = payload.documentId ?: existingPartner.documentId,
+                contractSignedAt = payload.contractSignedAt
+                    ?: existingPartner.contractSignedAt,
                 status = payload.status ?: existingPartner.status,
                 notes = payload.notes ?: existingPartner.notes,
             )

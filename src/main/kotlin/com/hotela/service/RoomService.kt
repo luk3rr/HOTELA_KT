@@ -29,10 +29,10 @@ class RoomService(
             Room(
                 id = UUID.randomUUID(),
                 hotelId = payload.hotelId,
+                roomTypeId = payload.roomTypeId,
                 number = payload.number,
                 floor = payload.floor,
-                type = payload.type,
-                price = payload.price,
+                pricePerNight = payload.pricePerNight,
                 capacity = payload.capacity,
                 status = payload.status,
                 description = payload.description,
@@ -56,10 +56,10 @@ class RoomService(
 
         val room =
             existingRoom.copy(
+                roomTypeId = payload.roomTypeId ?: existingRoom.roomTypeId,
                 number = payload.number ?: existingRoom.number,
                 floor = payload.floor ?: existingRoom.floor,
-                type = payload.type ?: existingRoom.type,
-                price = payload.price ?: existingRoom.price,
+                pricePerNight = payload.pricePerNight ?: existingRoom.pricePerNight,
                 capacity = payload.capacity ?: existingRoom.capacity,
                 status = payload.status ?: existingRoom.status,
                 description = payload.description ?: existingRoom.description,
@@ -68,19 +68,6 @@ class RoomService(
         validateRoom(room)
 
         return roomRepository.update(room)
-    }
-
-    suspend fun deleteRoom(
-        id: UUID,
-        token: JwtAuthenticationToken,
-    ): Boolean {
-        val room =
-            roomRepository.findById(id)
-                ?: throw HotelaException.RoomNotFoundException(id)
-
-        validateRequesterPermissions(token, room.hotelId)
-
-        return roomRepository.delete(id)
     }
 
     private suspend fun validateRequesterPermissions(

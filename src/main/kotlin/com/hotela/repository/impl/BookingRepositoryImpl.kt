@@ -9,7 +9,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 
 @Component
@@ -44,11 +44,11 @@ class BookingRepositoryImpl(
             .collectList()
             .awaitSingleOrNull() ?: emptyList()
 
-    override suspend fun findInProgressBookingsByHotelId(hotelId: UUID): List<Booking> =
+    override suspend fun findCheckedInBookingsByHotelId(hotelId: UUID): List<Booking> =
         databaseClient
             .sql(FIND_BOOKINGS_BY_HOTEL_ID_AND_STATUS)
             .bind("hotelId", hotelId)
-            .bind("status", listOf(BookingStatus.IN_PROGRESS))
+            .bind("status", setOf(BookingStatus.CHECKED_IN))
             .map { row, _ ->
                 mapper(row)
             }.all()
@@ -59,7 +59,7 @@ class BookingRepositoryImpl(
         databaseClient
             .sql(FIND_BOOKINGS_BY_HOTEL_ID_AND_STATUS)
             .bind("hotelId", hotelId)
-            .bind("status", listOf(BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS))
+            .bind("status", Booking.RUNNING_BOOKINGS_STATUS)
             .map { row, _ ->
                 mapper(row)
             }.all()
@@ -70,7 +70,7 @@ class BookingRepositoryImpl(
         databaseClient
             .sql(FIND_BOOKINGS_BY_HOTEL_ID_AND_STATUS)
             .bind("hotelId", hotelId)
-            .bind("status", listOf(BookingStatus.CANCELLED, BookingStatus.COMPLETED))
+            .bind("status", Booking.FINISHED_BOOKINGS_STATUS)
             .map { row, _ ->
                 mapper(row)
             }.all()
@@ -84,11 +84,12 @@ class BookingRepositoryImpl(
             .bind("customerId", booking.customerId)
             .bind("hotelId", booking.hotelId)
             .bind("roomId", booking.roomId)
+            .bind("bookedAt", booking.bookedAt)
             .bind("checkin", booking.checkin)
             .bind("checkout", booking.checkout)
-            .bind("guests", booking.guests)
+            .bind("numberOfGuests", booking.numberOfGuests)
             .bind("status", booking.status)
-            .bind("notes", booking.notes)
+            .bind("specialRequests", booking.specialRequests)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()!!
@@ -97,14 +98,13 @@ class BookingRepositoryImpl(
         databaseClient
             .sql(UPDATE)
             .bind("id", booking.id)
-            .bind("customerId", booking.customerId)
-            .bind("hotelId", booking.hotelId)
             .bind("roomId", booking.roomId)
+            .bind("bookedAt", booking.bookedAt)
             .bind("checkin", booking.checkin)
             .bind("checkout", booking.checkout)
-            .bind("guests", booking.guests)
+            .bind("numberOfGuests", booking.numberOfGuests)
             .bind("status", booking.status)
-            .bind("notes", booking.notes)
+            .bind("specialRequests", booking.specialRequests)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()!!
@@ -115,12 +115,12 @@ class BookingRepositoryImpl(
             customerId = row.get("customer_id", UUID::class.java)!!,
             hotelId = row.get("hotel_id", UUID::class.java)!!,
             roomId = row.get("room_id", UUID::class.java)!!,
-            bookedAt = row.get("booked_at", LocalDateTime::class.java)!!,
-            checkin = row.get("checkin", LocalDateTime::class.java)!!,
-            checkout = row.get("checkout", LocalDateTime::class.java)!!,
-            guests = row.get("guests", Int::class.java)!!,
+            bookedAt = row.get("booked_at", Instant::class.java)!!,
+            checkin = row.get("checkin", Instant::class.java)!!,
+            checkout = row.get("checkout", Instant::class.java)!!,
+            numberOfGuests = row.get("numberOfGuests", Int::class.java)!!,
             status = row.get("status", BookingStatus::class.java)!!,
-            notes = row.get("notes", String::class.java),
+            specialRequests = row.get("specialRequests", String::class.java),
         )
 
     companion object {
@@ -140,14 +140,14 @@ class BookingRepositoryImpl(
         """
 
         private const val SAVE = """
-            INSERT INTO booking (id, customer_id, hotel_id, room_id, checkin, checkout, guests, status, notes)
-            VALUES (:id, :customerId, :hotelId, :roomId, :checkin, :checkout, :guests, :status, :notes)
+            INSERT INTO booking (id, customer_id, hotel_id, room_id, booked_at, checkin, checkout, number_of_guests, status, special_requests)
+            VALUES (:id, :customerId, :hotelId, :roomId, :bookedAt, :checkin, :checkout, :numberOfGuests, :status, :specialRequests)
             RETURNING *
         """
 
         private const val UPDATE = """
             UPDATE booking
-            SET customer_id = :customerId, hotel_id = :hotelId, room_id = :roomId, checkin = :checkin, checkout = :checkout, guests = :guests, status = :status, notes = :notes
+            SET room_id = :roomId, booked_at = :bookedAt, checkin = :checkin, checkout = :checkout, number_of_guests = :numberOfGuests, status = :status, special_requests = :specialRequests
             WHERE id = :id
             RETURNING *
         """

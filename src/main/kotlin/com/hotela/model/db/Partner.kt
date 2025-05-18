@@ -10,7 +10,6 @@ import java.util.*
 data class Partner(
     val id: UUID,
     val authCredentialId: UUID,
-    val addressId: UUID,
     val companyName: String,
     val legalName: String,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)

@@ -1,19 +1,23 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
+import com.hotela.model.db.Address
 import com.hotela.model.db.Hotel
 import com.hotela.model.dto.request.CreateHotelRequest
 import com.hotela.model.dto.request.UpdateHotelRequest
+import com.hotela.model.enum.Role
+import com.hotela.repository.AddressRepository
 import com.hotela.repository.HotelRepository
 import com.hotela.util.getAuthId
+import com.hotela.util.getRole
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class HotelService(
-    private val partnerAuthService: PartnerAuthService,
     private val hotelRepository: HotelRepository,
+    private val addressRepository: AddressRepository,
 ) {
     suspend fun findById(id: UUID) = hotelRepository.findById(id)
 
@@ -23,28 +27,38 @@ class HotelService(
         payload: CreateHotelRequest,
         token: JwtAuthenticationToken,
     ): Hotel {
-        val partnerAuthId = token.getAuthId()
+        val userRole = token.getRole()
 
-        val partnerAuth =
-            partnerAuthService.findById(partnerAuthId)
-                ?: throw HotelaException.InvalidCredentialsException()
+        if (userRole != Role.PARTNER) {
+            throw HotelaException.AccessDeniedException()
+        }
+
+        val address = Address(
+            id = UUID.randomUUID(),
+            streetAddress = payload.address.streetAddress,
+            number = payload.address.number,
+            complement = payload.address.complement,
+            neighborhood = payload.address.neighborhood,
+            city = payload.address.city,
+            stateProvince = payload.address.stateProvince,
+            postalCode = payload.address.postalCode,
+            countryCode = payload.address.countryCode,
+            latitude = payload.address.latitude,
+            longitude = payload.address.longitude,
+        )
 
         val hotel =
             Hotel(
                 id = UUID.randomUUID(),
-                partnerId = partnerAuth.partnerId,
+                partnerId = token.getAuthId(),
+                addressId = address.id,
                 name = payload.name,
-                address = payload.address,
-                city = payload.city,
-                state = payload.state,
-                zipCode = payload.zipCode,
-                phone = payload.phone,
-                rating = payload.rating,
-                description = payload.description,
+                contactInfo = payload.contactInfo,
                 website = payload.website,
-                latitude = payload.latitude,
-                longitude = payload.longitude,
+                description = payload.description,
             )
+
+        addressRepository.create(address)
 
         return hotelRepository.create(hotel)
     }
@@ -56,29 +70,24 @@ class HotelService(
     ): Hotel {
         val partnerAuthId = token.getAuthId()
 
+        val userRole = token.getRole()
+
+        if (userRole != Role.PARTNER) {
+            throw HotelaException.AccessDeniedException()
+        }
+
         val hotel = hotelRepository.findById(id) ?: throw HotelaException.HotelNotFoundException(id)
 
-        val partnerAuth =
-            partnerAuthService.findById(partnerAuthId)
-                ?: throw HotelaException.InvalidCredentialsException()
-
-        if (partnerAuth.partnerId != hotel.partnerId) {
+        if (partnerAuthId != hotel.partnerId) {
             throw HotelaException.AccessDeniedException()
         }
 
         val updatedHotel =
             hotel.copy(
                 name = payload.name ?: hotel.name,
-                address = payload.address ?: hotel.address,
-                city = payload.city ?: hotel.city,
-                state = payload.state ?: hotel.state,
-                zipCode = payload.zipCode ?: hotel.zipCode,
-                phone = payload.phone ?: hotel.phone,
-                rating = payload.rating ?: hotel.rating,
-                description = payload.description ?: hotel.description,
+                contactInfo = payload.contactInfo ?: hotel.contactInfo,
                 website = payload.website ?: hotel.website,
-                latitude = payload.latitude ?: hotel.latitude,
-                longitude = payload.longitude ?: hotel.longitude,
+                description = payload.description ?: hotel.description,
             )
 
         return hotelRepository.update(updatedHotel)

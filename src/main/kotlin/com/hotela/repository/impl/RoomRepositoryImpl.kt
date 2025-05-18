@@ -39,10 +39,10 @@ class RoomRepositoryImpl(
             .sql(SAVE)
             .bind("id", room.id)
             .bind("hotelId", room.hotelId)
+            .bind("roomTypeId", room.roomTypeId)
             .bind("number", room.number)
             .bind("floor", room.floor)
-            .bind("type", room.type)
-            .bind("price", room.price)
+            .bind("pricePerNight", room.pricePerNight)
             .bind("capacity", room.capacity)
             .bind("status", room.status)
             .bind("description", room.description)
@@ -54,10 +54,10 @@ class RoomRepositoryImpl(
         databaseClient
             .sql(UPDATE)
             .bind("id", room.id)
+            .bind("roomTypeId", room.roomTypeId)
             .bind("number", room.number)
             .bind("floor", room.floor)
-            .bind("type", room.type)
-            .bind("price", room.price)
+            .bind("pricePerNight", room.pricePerNight)
             .bind("capacity", room.capacity)
             .bind("status", room.status)
             .bind("description", room.description)
@@ -65,22 +65,14 @@ class RoomRepositoryImpl(
                 mapper(row)
             }.awaitSingleOrNull()!!
 
-    override suspend fun delete(id: UUID): Boolean =
-        databaseClient
-            .sql(DELETE)
-            .bind("id", id)
-            .map { row, _ ->
-                row.get("deleted", Boolean::class.java)!!
-            }.awaitSingleOrNull() ?: false
-
     private fun mapper(row: Row): Room =
         Room(
             id = row.get("id", UUID::class.java)!!,
             hotelId = row.get("hotel_id", UUID::class.java)!!,
+            roomTypeId = row.get("room_type_id", UUID::class.java)!!,
             number = row.get("number", String::class.java)!!,
             floor = row.get("floor", Int::class.java)!!,
-            type = row.get("type", String::class.java)!!,
-            price = row.get("price", BigDecimal::class.java)!!,
+            pricePerNight = row.get("price_per_night", BigDecimal::class.java)!!,
             capacity = row.get("capacity", Int::class.java)!!,
             status = row.get("status", RoomStatus::class.java)!!,
             description = row.get("description", String::class.java),
@@ -96,26 +88,22 @@ class RoomRepositoryImpl(
         """
 
         private const val SAVE = """
-            INSERT INTO room (id, hotel_id, number, floor, type, price, capacity, status, description) 
-            VALUES (:id, :hotelId, :number, :floor, :type, :price, :capacity, :status, :description)
+            INSERT INTO room (id, hotel_id, room_type_id, number, floor, price_per_night, capacity, status, description)
+            VALUES (:id, :hotelId, :roomTypeId, :number, :floor, :pricePerNight, :capacity, :status, :description)
             RETURNING *
         """
 
         private const val UPDATE = """
-            UPDATE room SET 
-                number = :number, 
-                floor = :floor, 
-                type = :type,
-                price = :price, 
+            UPDATE room 
+            SET room_type_id = :roomTypeId,
+                number = :number,
+                floor = :floor,
+                price_per_night = :pricePerNight,
                 capacity = :capacity,
-                status = :status, 
-                description = :description 
+                status = :status,
+                description = :description
             WHERE id = :id
             RETURNING *
-        """
-
-        private const val DELETE = """
-            DELETE FROM room WHERE id = :id
         """
     }
 }

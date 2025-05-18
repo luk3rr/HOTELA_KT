@@ -11,7 +11,8 @@ import com.hotela.repository.BookingRepository
 import com.hotela.util.getUserId
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @Service
@@ -24,7 +25,8 @@ class BookingService(
 
     suspend fun findByHotelId(hotelId: UUID) = bookingRepository.findByHotelId(hotelId)
 
-    suspend fun findInProgressBookingsByHotelId(hotelId: UUID) = bookingRepository.findInProgressBookingsByHotelId(hotelId)
+    suspend fun findInProgressBookingsByHotelId(hotelId: UUID) =
+        bookingRepository.findCheckedInBookingsByHotelId(hotelId)
 
     suspend fun findRunningBookingsByHotelId(hotelId: UUID) = bookingRepository.findRunningBookingsByHotelId(hotelId)
 
@@ -54,9 +56,8 @@ class BookingService(
                 roomId = room.id,
                 checkin = payload.checkin,
                 checkout = payload.checkout,
-                guests = payload.guests,
-                status = BookingStatus.CONFIRMED,
-                notes = payload.notes,
+                numberOfGuests = payload.numberOfGuests,
+                specialRequests = payload.specialRequests
             )
 
         validateBooking(hotel, room, booking)
@@ -92,8 +93,8 @@ class BookingService(
                 roomId = payload.roomId ?: booking.roomId,
                 checkin = payload.checkin ?: booking.checkin,
                 checkout = payload.checkout ?: booking.checkout,
-                guests = payload.guests ?: booking.guests,
-                notes = payload.notes ?: booking.notes,
+                numberOfGuests = payload.numberOfGuests ?: booking.numberOfGuests,
+                specialRequests = payload.specialRequests ?: booking.specialRequests,
             )
 
         validateBooking(hotel, room, updatedBooking)
@@ -119,7 +120,7 @@ class BookingService(
             throw HotelaException.InvalidDataException("Check-in is not allowed at this time")
         }
 
-        return updateBookingStatus(booking, BookingStatus.IN_PROGRESS)
+        return updateBookingStatus(booking, BookingStatus.CHECKED_IN)
     }
 
     suspend fun checkOut(
@@ -136,11 +137,11 @@ class BookingService(
             throw HotelaException.InvalidCredentialsException()
         }
 
-        if (!isBookingInProgress(booking)) {
+        if (!booking.isInProgress()) {
             throw HotelaException.InvalidDataException("Booking is not in progress")
         }
 
-        return updateBookingStatus(booking, BookingStatus.COMPLETED)
+        return updateBookingStatus(booking, BookingStatus.CHECKED_OUT)
     }
 
     private suspend fun updateBookingStatus(
@@ -174,9 +175,9 @@ class BookingService(
             )
         }
 
-        if (!isNumberOfGuestsValid(room, booking.guests)) {
+        if (!isNumberOfGuestsValid(room, booking.numberOfGuests)) {
             throw HotelaException.InvalidDataException(
-                "Room ${room.id} cannot accommodate ${booking.guests} guests",
+                "Room ${room.id} cannot accommodate ${booking.numberOfGuests} guests",
             )
         }
     }
@@ -187,13 +188,13 @@ class BookingService(
     ): Boolean = hotel.id == room.hotelId
 
     private fun isCheckinCheckoutTimeValid(
-        checkin: LocalDateTime,
-        checkout: LocalDateTime,
+        checkin: Instant,
+        checkout: Instant,
     ): Boolean =
         checkin.isBefore(checkout) &&
-            checkin.isAfter(
-                LocalDateTime.now().minusMinutes(CHECKIN_ALLOWED_TIME_WINDOW_MINUTES),
-            )
+                checkin.isAfter(
+                    Instant.now().minus(CHECKIN_ALLOWED_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES),
+                )
 
     private suspend fun isRoomAvailability(
         hotel: Hotel,
@@ -229,12 +230,10 @@ class BookingService(
     }
 
     private fun isWithinAllowedCheckInWindow(booking: Booking): Boolean {
-        val now = LocalDateTime.now()
-        val checkinTimeWindow = booking.checkin.minusMinutes(CHECKIN_ALLOWED_TIME_WINDOW_MINUTES)
+        val now = Instant.now()
+        val checkinTimeWindow = booking.checkin.minus(CHECKIN_ALLOWED_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES)
         return now.isAfter(checkinTimeWindow) && now.isBefore(booking.checkout)
     }
-
-    private fun isBookingInProgress(booking: Booking): Boolean = booking.status == BookingStatus.IN_PROGRESS
 
     companion object {
         const val CHECKIN_ALLOWED_TIME_WINDOW_MINUTES = 10L

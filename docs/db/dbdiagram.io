@@ -78,7 +78,6 @@ Table address {
 Table partner {
   id uuid [pk, default: `gen_random_uuid()`]
   auth_credential_id uuid [unique, not null, ref: > auth_credential.id, note: 'FK para as credenciais de login do parceiro. Relação 1:1']
-  address_id uuid [ref: > address.id, note: 'FK para o endereço principal do parceiro']
   company_name varchar(255) [note: 'Nome fantasia ou principal da empresa parceira']
   legal_name varchar(255) [not null, note: 'Razão Social, se aplicável, ou nome do parceiro']
   email varchar(255) [unique, note: 'Email de contato principal da empresa (pode ser diferente do login_email)']

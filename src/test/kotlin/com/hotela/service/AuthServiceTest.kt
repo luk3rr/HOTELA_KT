@@ -26,8 +26,8 @@ class AuthServiceTest :
         val partnerService = mockk<PartnerService>()
         val customerAuthService = mockk<CustomerAuthService>()
 
-        val authService =
-            AuthService(
+        val authCredentialService =
+            AuthCredentialService(
                 jwtEncoder = jwtEncoder,
                 jwtDecoder = jwtDecoder,
                 customerService = customerService,
@@ -55,7 +55,7 @@ class AuthServiceTest :
                     coEvery { partnerAuthService.findByEmail(authRequest.email) } returns partnerAuth
                     coEvery { jwtEncoder.encode(any()) } returns mockk(relaxed = true)
 
-                    val result = authService.partnerLogin(authRequest)
+                    val result = authCredentialService.partnerLogin(authRequest)
 
                     result.token shouldNotBe null
                 }
@@ -66,7 +66,7 @@ class AuthServiceTest :
                     coEvery { partnerAuthService.findByEmail(authRequest.email) } returns null
 
                     shouldThrow<HotelaException.InvalidCredentialsException> {
-                        authService.partnerLogin(authRequest)
+                        authCredentialService.partnerLogin(authRequest)
                     }
                 }
             }
@@ -77,7 +77,7 @@ class AuthServiceTest :
                     coEvery { jwtEncoder.encode(any()) } returns mockk(relaxed = true)
 
                     shouldThrow<HotelaException.InvalidCredentialsException> {
-                        authService.partnerLogin(authRequest)
+                        authCredentialService.partnerLogin(authRequest)
                     }
                 }
             }
@@ -91,7 +91,7 @@ class AuthServiceTest :
                     coEvery { partnerAuthService.createPartnerAuth(any()) } returns partnerAuth
                     coEvery { jwtEncoder.encode(any()) } returns mockk(relaxed = true)
 
-                    val result = authService.partnerRegister(partnerRegisterRequest)
+                    val result = authCredentialService.partnerRegister(partnerRegisterRequest)
 
                     result.token shouldNotBe null
                 }
@@ -102,7 +102,7 @@ class AuthServiceTest :
                     coEvery { partnerAuthService.existsByEmail(partnerRegisterRequest.email) } returns true
 
                     shouldThrow<HotelaException.EmailAlreadyRegisteredException> {
-                        authService.partnerRegister(partnerRegisterRequest)
+                        authCredentialService.partnerRegister(partnerRegisterRequest)
                     }
                 }
             }
@@ -114,7 +114,7 @@ class AuthServiceTest :
                     coEvery { customerAuthService.findByEmail(authRequest.email) } returns customerAuth
                     coEvery { jwtEncoder.encode(any()) } returns mockk(relaxed = true)
 
-                    val result = authService.customerLogin(authRequest)
+                    val result = authCredentialService.login(authRequest)
 
                     result.token shouldNotBe null
                 }
@@ -125,7 +125,7 @@ class AuthServiceTest :
                     coEvery { customerAuthService.findByEmail(authRequest.email) } returns null
 
                     shouldThrow<HotelaException.InvalidCredentialsException> {
-                        authService.customerLogin(authRequest)
+                        authCredentialService.login(authRequest)
                     }
                 }
             }
@@ -136,7 +136,7 @@ class AuthServiceTest :
                     coEvery { jwtEncoder.encode(any()) } returns mockk(relaxed = true)
 
                     shouldThrow<HotelaException.InvalidCredentialsException> {
-                        authService.customerLogin(authRequest)
+                        authCredentialService.login(authRequest)
                     }
                 }
             }
@@ -150,7 +150,7 @@ class AuthServiceTest :
                     coEvery { customerAuthService.createCustomerAuth(any()) } returns customerAuth
                     coEvery { jwtEncoder.encode(any()) } returns mockk(relaxed = true)
 
-                    val result = authService.customerRegister(customerRegisterRequest)
+                    val result = authCredentialService.customerRegister(customerRegisterRequest)
 
                     result.token shouldNotBe null
                 }
@@ -161,7 +161,7 @@ class AuthServiceTest :
                     coEvery { customerAuthService.existsByEmail(customerRegisterRequest.email) } returns true
 
                     shouldThrow<HotelaException.EmailAlreadyRegisteredException> {
-                        authService.customerRegister(customerRegisterRequest)
+                        authCredentialService.customerRegister(customerRegisterRequest)
                     }
                 }
             }

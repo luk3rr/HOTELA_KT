@@ -2,10 +2,11 @@ package com.hotela.model.dto.request
 
 import com.hotela.model.enum.RoomStatus
 import java.math.BigDecimal
+import java.util.UUID
 
 data class UpdateRoomRequest(
-    val roomTypeId: String?,
-    val roomId: String?,
+    val roomTypeId: UUID?,
+    val number: String?,
     val floor: Int?,
     val pricePerNight: BigDecimal?,
     val capacity: Int?,

@@ -37,8 +37,8 @@ class BookingControllerTest(
     }
 
     init {
-        val customer = CustomerStubs.create()
-        val customerAuth = AuthCredentialStubs.create(customerId = customer.id)
+        val customerAuth = AuthCredentialStubs.create()
+        val customer = CustomerStubs.create(authCredentialId = customerAuth.id)
         val hotel = HotelStubs.create()
         val room = RoomStubs.create(hotel.id)
         val booking = BookingStubs.create(customerId = customer.id, hotelId = hotel.id, roomId = room.id)

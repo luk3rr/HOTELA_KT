@@ -1,14 +1,20 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.db.Customer
+import com.hotela.model.domain.ContactInfo
+import com.hotela.model.domain.DocumentId
+import com.hotela.model.domain.Email
+import com.hotela.model.domain.PhoneNumber
+import com.hotela.model.enum.DocumentIdType
 import com.hotela.repository.CustomerRepository
 import io.r2dbc.spi.Row
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
+import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
-import java.time.LocalDate
-import java.util.UUID
+import java.time.Instant
+import java.util.*
 
 @Component
 class CustomerRepositoryImpl(
@@ -22,7 +28,7 @@ class CustomerRepositoryImpl(
                 mapper(row)
             }.awaitSingleOrNull()
 
-    override suspend fun findByEmail(email: String): Customer? =
+    override suspend fun findByEmail(email: Email): Customer? =
         databaseClient
             .sql(FIND_BY_EMAIL)
             .bind("email", email)
@@ -30,7 +36,7 @@ class CustomerRepositoryImpl(
                 mapper(row)
             }.awaitSingleOrNull()
 
-    override suspend fun existsByEmail(email: String): Boolean =
+    override suspend fun existsByEmail(email: Email): Boolean =
         databaseClient
             .sql(EXISTS_BY_EMAIL)
             .bind("email", email)
@@ -42,12 +48,14 @@ class CustomerRepositoryImpl(
         databaseClient
             .sql(SAVE)
             .bind("id", customer.id)
+            .bind("authCredentialId", customer.authCredentialId)
+            .bind("addressId", customer.addressId)
             .bind("name", customer.name)
-            .bind("email", customer.email)
-            .bind("phone", customer.phone)
-            .bind("idDocument", customer.idDocument)
+            .bind("email", customer.contactInfo.email)
+            .bind("phone", customer.contactInfo.phone)
+            .bind("documentIdType", customer.documentId.type)
+            .bind("documentIdValue", customer.documentId.value)
             .bind("birthDate", customer.birthDate)
-            .bind("address", customer.address)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingle()
@@ -57,11 +65,11 @@ class CustomerRepositoryImpl(
             .sql(UPDATE)
             .bind("id", customer.id)
             .bind("name", customer.name)
-            .bind("email", customer.email)
-            .bind("phone", customer.phone)
-            .bind("idDocument", customer.idDocument)
+            .bind("email", customer.contactInfo.email)
+            .bind("phone", customer.contactInfo.phone)
+            .bind("documentIdType", customer.documentId.type)
+            .bind("documentIdValue", customer.documentId.value)
             .bind("birthDate", customer.birthDate)
-            .bind("address", customer.address)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingle()
@@ -69,12 +77,18 @@ class CustomerRepositoryImpl(
     private fun mapper(row: Row): Customer =
         Customer(
             id = row.get("id", UUID::class.java)!!,
+            authCredentialId = row.get("auth_credential_id", UUID::class.java)!!,
+            addressId = row.get("address_id", UUID::class.java)!!,
             name = row.get("name", String::class.java)!!,
-            email = row.get("email", String::class.java)!!,
-            phone = row.get("phone", String::class.java)!!,
-            idDocument = row.get("id_document", String::class.java)!!,
-            birthDate = row.get("birth_date", LocalDate::class.java)!!,
-            address = row.get("address", String::class.java)!!,
+            contactInfo = ContactInfo(
+                email = row.get("email", Email::class.java)!!,
+                phone = row.get("phone", PhoneNumber::class.java)!!
+            ),
+            documentId = DocumentId(
+                type = row.get("document_id_type", DocumentIdType::class.java)!!,
+                value = row.get("document_id_value", String::class.java)!!
+            ),
+            birthDate = row.get("birth_date", Instant::class.java)
         )
 
     companion object {
@@ -91,14 +105,16 @@ class CustomerRepositoryImpl(
         """
 
         private const val SAVE = """
-        INSERT INTO customer (id, name, email, phone, id_document, birth_date, address)
-        VALUES (:id, :name, :email, :phone, :idDocument, :birthDate, :address)
+        INSERT INTO customer (
+        id, auth_credential_id, address_id, name, email, phone, document_id_type, document_id_value, birth_date
+        )
+        VALUES (:id, :authCredentialId, :addressId, :name, :email, :phone, :documentIdType, :documentIdValue, :birthDate)
         RETURNING *
         """
 
         private const val UPDATE = """
         UPDATE customer
-        SET name = :name, email = :email, phone = :phone, id_document = :idDocument, birth_date = :birthDate, address = :address
+        SET name = :name, email = :email, phone = :phone, :documentIdType, :documentIdValue, :birthDate
         WHERE id = :id
         RETURNING *
         """

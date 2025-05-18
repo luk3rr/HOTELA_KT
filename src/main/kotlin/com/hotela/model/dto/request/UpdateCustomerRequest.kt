@@ -1,6 +1,5 @@
 package com.hotela.model.dto.request
 
-import com.hotela.model.db.Address
 import com.hotela.model.domain.ContactInfo
 import com.hotela.model.domain.DocumentId
 import org.springframework.data.relational.core.mapping.Embedded
@@ -13,6 +12,4 @@ data class UpdateCustomerRequest(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val documentId: DocumentId?,
     val birthDate: Instant?,
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    val address: Address? = null,
 )

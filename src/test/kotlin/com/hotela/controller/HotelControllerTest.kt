@@ -7,11 +7,11 @@ import com.hotela.error.HotelaException
 import com.hotela.model.db.Hotel
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
+import com.hotela.model.enum.Role
 import com.hotela.service.HotelService
 import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.db.HotelStubs
-import com.hotela.stubs.db.PartnerAuthStubs
 import com.hotela.stubs.db.PartnerStubs
 import com.hotela.stubs.dto.request.CreateHotelRequestStubs
 import com.hotela.stubs.dto.request.UpdateHotelRequestStubs
@@ -43,8 +43,8 @@ class HotelControllerTest(
         val partner = PartnerStubs.create()
         val customer = CustomerStubs.create()
         val hotel = HotelStubs.create(partnerId = partner.id)
-        val customerAuth = AuthCredentialStubs.create(customerId = customer.id)
-        val partnerAuth = PartnerAuthStubs.create(partnerId = partner.id)
+        val customerAuth = AuthCredentialStubs.create(role = Role.CUSTOMER)
+        val partnerAuth = AuthCredentialStubs.create(role = Role.PARTNER)
 
         context("POST /hotel/create") {
             context("when the request is valid") {

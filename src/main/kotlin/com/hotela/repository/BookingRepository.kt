@@ -10,7 +10,7 @@ interface BookingRepository {
 
     suspend fun findByHotelId(hotelId: UUID): List<Booking>
 
-    suspend fun findInProgressBookingsByHotelId(hotelId: UUID): List<Booking>
+    suspend fun findCheckedInBookingsByHotelId(hotelId: UUID): List<Booking>
 
     suspend fun findRunningBookingsByHotelId(hotelId: UUID): List<Booking>
 

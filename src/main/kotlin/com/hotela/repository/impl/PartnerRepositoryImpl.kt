@@ -1,6 +1,11 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.db.Partner
+import com.hotela.model.domain.ContactInfo
+import com.hotela.model.domain.DocumentId
+import com.hotela.model.domain.Email
+import com.hotela.model.domain.PhoneNumber
+import com.hotela.model.enum.DocumentIdType
 import com.hotela.model.enum.PartnerStatus
 import com.hotela.repository.PartnerRepository
 import io.r2dbc.spi.Row
@@ -9,7 +14,7 @@ import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 
 @Component
@@ -24,7 +29,7 @@ class PartnerRepositoryImpl(
                 mapper(row)
             }.awaitSingleOrNull()
 
-    override suspend fun findByEmail(email: String): Partner? =
+    override suspend fun findByEmail(email: Email): Partner? =
         databaseClient
             .sql(FIND_BY_EMAIL)
             .bind("email", email)
@@ -32,7 +37,7 @@ class PartnerRepositoryImpl(
                 mapper(row)
             }.awaitSingleOrNull()
 
-    override suspend fun existsByEmail(email: String): Boolean =
+    override suspend fun existsByEmail(email: Email): Boolean =
         databaseClient
             .sql(EXISTS_BY_EMAIL)
             .bind("email", email)
@@ -44,17 +49,15 @@ class PartnerRepositoryImpl(
         databaseClient
             .sql(SAVE)
             .bind("id", partner.id)
-            .bind("name", partner.name)
-            .bind("cnpj", partner.cnpj)
-            .bind("email", partner.email)
-            .bind("phone", partner.phone)
-            .bind("address", partner.address)
-            .bind("contactName", partner.contactName)
-            .bind("contactEmail", partner.contactEmail)
-            .bind("contactPhone", partner.contactPhone)
-            .bind("contractSigned", partner.contractSigned)
+            .bind("authCredentialId", partner.authCredentialId)
+            .bind("companyName", partner.companyName)
+            .bind("legalName", partner.legalName)
+            .bind("email", partner.contactInfo.email)
+            .bind("phone", partner.contactInfo.phone)
+            .bind("documentIdType", partner.documentId.type)
+            .bind("documentIdValue", partner.documentId.value)
+            .bind("contractSignedAt", partner.contractSignedAt)
             .bind("status", partner.status)
-            .bind("createdAt", partner.createdAt)
             .bind("notes", partner.notes)
             .map { row, _ -> mapper(row) }
             .awaitSingle()
@@ -63,17 +66,14 @@ class PartnerRepositoryImpl(
         databaseClient
             .sql(UPDATE)
             .bind("id", partner.id)
-            .bind("name", partner.name)
-            .bind("cnpj", partner.cnpj)
-            .bind("email", partner.email)
-            .bind("phone", partner.phone)
-            .bind("address", partner.address)
-            .bind("contactName", partner.contactName)
-            .bind("contactEmail", partner.contactEmail)
-            .bind("contactPhone", partner.contactPhone)
-            .bind("contractSigned", partner.contractSigned)
+            .bind("companyName", partner.companyName)
+            .bind("legalName", partner.legalName)
+            .bind("email", partner.contactInfo.email)
+            .bind("phone", partner.contactInfo.phone)
+            .bind("documentIdType", partner.documentId.type)
+            .bind("documentIdValue", partner.documentId.value)
+            .bind("contractSignedAt", partner.contractSignedAt)
             .bind("status", partner.status)
-            .bind("createdAt", partner.createdAt)
             .bind("notes", partner.notes)
             .map { row, _ -> mapper(row) }
             .awaitSingle()
@@ -81,18 +81,20 @@ class PartnerRepositoryImpl(
     private fun mapper(row: Row): Partner =
         Partner(
             id = row.get("id", UUID::class.java)!!,
-            name = row.get("name", String::class.java)!!,
-            cnpj = row.get("cnpj", String::class.java)!!,
-            email = row.get("email", String::class.java)!!,
-            phone = row.get("phone", String::class.java)!!,
-            address = row.get("address", String::class.java)!!,
-            contactName = row.get("contact_name", String::class.java)!!,
-            contactEmail = row.get("contact_email", String::class.java)!!,
-            contactPhone = row.get("contact_phone", String::class.java)!!,
-            contractSigned = row.get("contract_signed", Boolean::class.java)!!,
+            authCredentialId = row.get("auth_credential_id", UUID::class.java)!!,
+            companyName = row.get("company_name", String::class.java)!!,
+            legalName = row.get("legal_name", String::class.java)!!,
+            contactInfo = ContactInfo(
+                email = row.get("email", Email::class.java)!!,
+                phone = row.get("phone", PhoneNumber::class.java)!!
+            ),
+            documentId = DocumentId(
+                type = row.get("document_id_type", DocumentIdType::class.java)!!,
+                value = row.get("document_id_value", String::class.java)!!
+            ),
+            contractSignedAt = row.get("contract_signed_at", Instant::class.java)!!,
             status = row.get("status", PartnerStatus::class.java)!!,
-            createdAt = row.get("created_at", LocalDateTime::class.java)!!,
-            notes = row.get("notes", String::class.java)!!,
+            notes = row.get("notes", String::class.java),
         )
 
     companion object {
@@ -109,16 +111,24 @@ class PartnerRepositoryImpl(
         """
 
         private const val SAVE = """
-            INSERT INTO partner (id, name, cnpj, email, phone, address, contact_name, contact_email, contact_phone, contract_signed, status, created_at, notes)
-            VALUES (:id, :name, :cnpj, :email, :phone, :address, :contactName, :contactEmail, :contactPhone, :contractSigned, :status, :createdAt, :notes)
+            INSERT INTO partner (id, auth_credential_id, company_name, legal_name, email, phone,
+                document_id_type, document_id_value, contract_signed_at, status, notes)
+            VALUES (:id, :authCredentialId, :companyName, :legalName, :email, :phone,
+                :documentIdType, :documentIdValue, :contractSignedAt, :status, :notes)
             RETURNING *
         """
 
         private const val UPDATE = """
             UPDATE partner
-            SET name = :name, cnpj = :cnpj, email = :email, phone = :phone, address = :address,
-                contact_name = :contactName, contact_email = :contactEmail, contact_phone = :contactPhone,
-                contract_signed = :contractSigned, status = :status, created_at = :createdAt, notes = :notes
+            SET company_name = :companyName,
+                legal_name = :legalName,
+                email = :email,
+                phone = :phone,
+                document_id_type = :documentIdType,
+                document_id_value = :documentIdValue,
+                contract_signed_at = :contractSignedAt,
+                status = :status,
+                notes = :notes
             WHERE id = :id
             RETURNING *
         """

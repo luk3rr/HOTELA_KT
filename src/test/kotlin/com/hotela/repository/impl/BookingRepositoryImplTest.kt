@@ -13,7 +13,6 @@ import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.RowsFetchSpec
-import org.springframework.r2dbc.core.bind
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 import java.util.UUID
@@ -136,7 +135,7 @@ class BookingRepositoryImplTest :
         }
 
         should("successfully find in-progress bookings by hotel id") {
-            bookingRepositoryImpl.findInProgressBookingsByHotelId(booking.hotelId) shouldBe listOf(booking)
+            bookingRepositoryImpl.findCheckedInBookingsByHotelId(booking.hotelId) shouldBe listOf(booking)
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())

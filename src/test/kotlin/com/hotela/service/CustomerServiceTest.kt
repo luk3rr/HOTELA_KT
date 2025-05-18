@@ -2,7 +2,7 @@ package com.hotela.service
 
 import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
-import com.hotela.repository.CustomerAuthRepository
+import com.hotela.repository.AuthCredentialRepository
 import com.hotela.repository.CustomerRepository
 import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
@@ -19,11 +19,11 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 class CustomerServiceTest :
     BehaviorSpec({
         val customerRepository = mockk<CustomerRepository>()
-        val customerAuthRepository = mockk<CustomerAuthRepository>()
+        val authCredentialRepository = mockk<AuthCredentialRepository>()
         val customerService =
             CustomerService(
                 customerRepository = customerRepository,
-                customerAuthRepository = customerAuthRepository,
+                authCredentialRepository = authCredentialRepository,
             )
 
         val jwtToken = mockk<JwtAuthenticationToken>()
@@ -112,7 +112,7 @@ class CustomerServiceTest :
                         every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to customerAuth.id.toString())
 
                         Then("it should update the customer") {
-                            coEvery { customerAuthRepository.findById(customerAuth.id) } returns customerAuth
+                            coEvery { authCredentialRepository.findById(customerAuth.id) } returns customerAuth
                             coEvery { customerRepository.update(any()) } returns customerUpdated
 
                             val result =
@@ -126,7 +126,7 @@ class CustomerServiceTest :
                     }
 
                     And("customer id is not associated with customer auth id") {
-                        coEvery { customerAuthRepository.findById(customerAuth.id) } returns null
+                        coEvery { authCredentialRepository.findById(customerAuth.id) } returns null
 
                         Then("it should throw an exception") {
                             every { jwtToken.token } returns jwt
@@ -150,7 +150,7 @@ class CustomerServiceTest :
                         every { jwt.claims } returns mapOf("other_claim" to "some_value")
 
                         Then("it should throw an exception") {
-                            coEvery { customerAuthRepository.findById(customerAuth.id) } returns customerAuth
+                            coEvery { authCredentialRepository.findById(customerAuth.id) } returns customerAuth
 
                             coEvery { customerRepository.update(any()) } returns customerUpdated
 
