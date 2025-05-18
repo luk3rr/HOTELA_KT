@@ -4,7 +4,7 @@ import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.repository.CustomerAuthRepository
 import com.hotela.repository.CustomerRepository
-import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.dto.request.UpdateCustomerRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
@@ -31,7 +31,7 @@ class CustomerServiceTest :
 
         Given("a customer service") {
             val customer = CustomerStubs.create()
-            val customerAuth = CustomerAuthStubs.create(customer.id)
+            val customerAuth = AuthCredentialStubs.create(customer.id)
             val updateCustomerRequest = UpdateCustomerRequestStubs.create()
 
             require(

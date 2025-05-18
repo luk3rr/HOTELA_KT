@@ -4,10 +4,10 @@ import com.hotela.model.enum.RoomStatus
 import java.math.BigDecimal
 
 data class UpdateRoomRequest(
-    val number: String?,
+    val roomTypeId: String?,
+    val roomId: String?,
     val floor: Int?,
-    val type: String?,
-    val price: BigDecimal?,
+    val pricePerNight: BigDecimal?,
     val capacity: Int?,
     val status: RoomStatus?,
     val description: String?,

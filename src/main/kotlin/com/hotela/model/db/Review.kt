@@ -1,6 +1,6 @@
 package com.hotela.model.db
 
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 
 data class Review(
@@ -12,8 +12,8 @@ data class Review(
     val title: String? = null,
     val comment: String? = null,
     val isAnonymous: Boolean = false,
-    val reviewedAt: LocalDateTime = LocalDateTime.now(),
-    val updatedAt: LocalDateTime = LocalDateTime.now(),
+    val reviewedAt: Instant = Instant.now(),
+    val updatedAt: Instant? = null,
 ) {
     companion object {
         const val MAX_COMMENT_LENGTH = 500

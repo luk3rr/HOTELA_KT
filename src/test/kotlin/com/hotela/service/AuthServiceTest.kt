@@ -1,7 +1,7 @@
 package com.hotela.service
 
 import com.hotela.error.HotelaException
-import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.db.PartnerAuthStubs
 import com.hotela.stubs.db.PartnerStubs
@@ -44,7 +44,7 @@ class AuthServiceTest :
         val partner = PartnerStubs.create()
 
         val customerAuth =
-            CustomerAuthStubs.create().copy(passwordHash = BCrypt.hashpw(authRequest.password, BCrypt.gensalt()))
+            AuthCredentialStubs.create().copy(passwordHash = BCrypt.hashpw(authRequest.password, BCrypt.gensalt()))
         val customerAuthWithInvalidPassword = customerAuth.copy(passwordHash = "invalid_password")
         val customerRegisterRequest = CustomerRegisterRequestStubs.create()
         val customer = CustomerStubs.create()

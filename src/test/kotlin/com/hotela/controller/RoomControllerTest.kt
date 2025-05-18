@@ -7,7 +7,7 @@ import com.hotela.model.db.Room
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.RoomService
-import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.db.PartnerAuthStubs
 import com.hotela.stubs.db.PartnerStubs
@@ -42,7 +42,7 @@ class RoomControllerTest(
         val room = RoomStubs.create()
         val partner = PartnerStubs.create()
         val customer = CustomerStubs.create()
-        val customerAuth = CustomerAuthStubs.create(customerId = customer.id)
+        val customerAuth = AuthCredentialStubs.create(customerId = customer.id)
         val partnerAuth = PartnerAuthStubs.create(partnerId = partner.id)
 
         context("POST /room/create") {

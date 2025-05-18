@@ -1,7 +1,7 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.db.CustomerAuth
-import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.AuthCredentialStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -22,7 +22,7 @@ class CustomerAuthRepositoryImplTest :
         val databaseClient = mockk<DatabaseClient>()
         val customerAuthRepositoryImpl = CustomerAuthRepositoryImpl(databaseClient)
 
-        val customerAuth = CustomerAuthStubs.create()
+        val customerAuth = AuthCredentialStubs.create()
         val genericDatabaseSpec = mockk<DatabaseClient.GenericExecuteSpec>()
         val mockRow = mockk<Row>()
         val rowsFetchSpec = mockk<RowsFetchSpec<CustomerAuth>>()

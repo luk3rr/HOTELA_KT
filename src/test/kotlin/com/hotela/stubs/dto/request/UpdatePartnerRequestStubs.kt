@@ -1,20 +1,36 @@
 package com.hotela.stubs.dto.request
 
+import com.hotela.model.domain.ContactInfo
+import com.hotela.model.domain.DocumentId
+import com.hotela.model.domain.Email
+import com.hotela.model.domain.PhoneNumber
 import com.hotela.model.dto.request.UpdatePartnerRequest
+import com.hotela.model.enum.DocumentIdType
 import com.hotela.model.enum.PartnerStatus
 
 object UpdatePartnerRequestStubs {
-    fun create(): UpdatePartnerRequest =
+    fun create(
+        companyName: String? = "John F Doe Ltda",
+        legalName: String? = "John F Doe Tecnologia e Serviços LTDA",
+        contactInfo: ContactInfo? = ContactInfo(
+            email = Email("janeF@doe.com"),
+            phone = PhoneNumber("+0987654321")
+        ),
+        documentId: DocumentId? = DocumentId(
+            type = DocumentIdType.CNPJ,
+            value = "12345678000190"
+        ),
+        contractSignedAt: String? = "2023-01-15T00:00:00Z",
+        status: PartnerStatus? = PartnerStatus.INACTIVE,
+        notes: String? = "This is a test note"
+    ): UpdatePartnerRequest =
         UpdatePartnerRequest(
-            name = "John F Doe",
-            cnpj = "12.345.678/0001-90",
-            phone = "+1234567890",
-            address = "345 Elm St, Springfield, USA",
-            contactName = "Jane F Doe",
-            contactPhone = "+0987654321",
-            contactEmail = "janeF@doe.com",
-            contractSigned = false,
-            status = PartnerStatus.INACTIVE,
-            notes = "This is a test note",
+            companyName = companyName,
+            legalName = legalName,
+            contactInfo = contactInfo,
+            documentId = documentId,
+            contractSignedAt = contractSignedAt,
+            status = status,
+            notes = notes
         )
 }

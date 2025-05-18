@@ -3,8 +3,7 @@ package com.hotela.model.db
 import com.hotela.model.domain.ContactInfo
 import com.hotela.model.domain.DocumentId
 import org.springframework.data.relational.core.mapping.Embedded
-import java.time.LocalDate
-import java.util.Date
+import java.time.Instant
 import java.util.UUID
 
 data class Customer(
@@ -16,7 +15,7 @@ data class Customer(
     val contactInfo: ContactInfo,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "document_id_")
     val documentId: DocumentId,
-    val birthDate: Date,
+    val birthDate: Instant?,
 ) {
     init {
         require(name.isNotBlank()) { "Customer name cannot be blank" }

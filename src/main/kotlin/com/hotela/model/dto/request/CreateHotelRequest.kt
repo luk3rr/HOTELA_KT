@@ -1,17 +1,15 @@
 package com.hotela.model.dto.request
 
-import java.math.BigDecimal
+import com.hotela.model.db.Address
+import com.hotela.model.domain.ContactInfo
+import org.springframework.data.relational.core.mapping.Embedded
 
 data class CreateHotelRequest(
     val name: String,
-    val address: String,
-    val city: String,
-    val state: String,
-    val zipCode: String,
-    val phone: String,
-    val rating: BigDecimal,
-    val description: String? = null,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val address: Address,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val contactInfo: ContactInfo,
     val website: String? = null,
-    val latitude: BigDecimal,
-    val longitude: BigDecimal,
+    val description: String? = null,
 )

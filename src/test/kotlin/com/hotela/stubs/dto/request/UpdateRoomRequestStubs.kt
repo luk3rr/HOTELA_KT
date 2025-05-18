@@ -6,16 +6,21 @@ import java.math.BigDecimal
 
 object UpdateRoomRequestStubs {
     fun create(
-        number: String = "501",
-        floor: Int = 5,
+        roomTypeId: String? = "suite-id-123",
+        roomId: String? = "room-id-501",
+        floor: Int? = 5,
+        pricePerNight: BigDecimal? = BigDecimal("900.00"),
+        capacity: Int? = 3,
+        status: RoomStatus? = RoomStatus.BOOKED,
+        description: String? = "A spacious suite with a king-size bed and a balcony",
     ): UpdateRoomRequest =
         UpdateRoomRequest(
-            number = number,
+            roomTypeId = roomTypeId,
+            roomId = roomId,
             floor = floor,
-            type = "Suite",
-            price = BigDecimal(900.00),
-            capacity = 3,
-            status = RoomStatus.BOOKED,
-            description = "A spacious suite with a king-size bed and a balcony",
+            pricePerNight = pricePerNight,
+            capacity = capacity,
+            status = status,
+            description = description
         )
 }

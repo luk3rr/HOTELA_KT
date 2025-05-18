@@ -8,7 +8,7 @@ import com.hotela.error.HotelaException
 import com.hotela.model.db.Customer
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.CustomerService
-import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.dto.request.UpdateCustomerRequestStubs
 import io.kotest.core.spec.style.FunSpec
@@ -37,7 +37,7 @@ class CustomerControllerTest(
 
     init {
         val customer = CustomerStubs.create()
-        val customerAuth = CustomerAuthStubs.create(customer.id)
+        val customerAuth = AuthCredentialStubs.create(customer.id)
         val updateCustomerRequest = UpdateCustomerRequestStubs.create()
 
         require(

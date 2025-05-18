@@ -6,10 +6,10 @@ import java.util.UUID
 
 data class CreateRoomRequest(
     val hotelId: UUID,
+    val roomTypeId: UUID,
     val number: String,
     val floor: Int,
-    val type: String,
-    val price: BigDecimal,
+    val pricePerNight: BigDecimal,
     val capacity: Int,
     val status: RoomStatus,
     val description: String? = null,

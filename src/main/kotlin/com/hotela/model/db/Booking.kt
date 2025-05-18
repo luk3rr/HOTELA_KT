@@ -2,7 +2,8 @@ package com.hotela.model.db
 
 import com.hotela.model.enum.BookingStatus
 import java.time.Instant
-import java.util.*
+import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 data class Booking(
     val id: UUID,
@@ -19,12 +20,11 @@ data class Booking(
     companion object {
         const val MINIMUM_GUESTS = 1
         const val MINIMUM_NIGHTS = 1
-        const val MINIMUM_NIGHTS_IN_SECONDS = 60 * 60 * 24 * MINIMUM_NIGHTS
     }
 
     init {
         require(checkout.isAfter(checkin)) { "Checkout must be after checkin" }
-        require(checkout.isAfter(checkin.plusSeconds(MINIMUM_NIGHTS_IN_SECONDS.toLong()))) {
+        require(checkout.isAfter(checkin.plus(MINIMUM_NIGHTS.toLong(), ChronoUnit.DAYS))) {
             "Checkout must be at least $MINIMUM_NIGHTS nights after checkin"
         }
         require(numberOfGuests >= MINIMUM_GUESTS) { "Number of guests must be at least $MINIMUM_GUESTS" }

@@ -1,11 +1,18 @@
 package com.hotela.model.dto.request
 
-import java.time.LocalDate
+import com.hotela.model.db.Address
+import com.hotela.model.domain.ContactInfo
+import com.hotela.model.domain.DocumentId
+import org.springframework.data.relational.core.mapping.Embedded
+import java.time.Instant
 
 data class UpdateCustomerRequest(
     val name: String?,
-    val phone: String?,
-    val idDocument: String?,
-    val birthDate: LocalDate?,
-    val address: String?,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val contactInfo: ContactInfo?,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val documentId: DocumentId?,
+    val birthDate: Instant?,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val address: Address? = null,
 )

@@ -6,7 +6,7 @@ import com.hotela.model.db.Review
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.ReviewService
-import com.hotela.stubs.db.CustomerAuthStubs
+import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.db.ReviewStubs
 import com.hotela.stubs.dto.request.CreateReviewRequestStubs
@@ -38,7 +38,7 @@ class ReviewControllerTest(
     init {
         val review = ReviewStubs.create()
         val customer = CustomerStubs.create()
-        val customerAuth = CustomerAuthStubs.create()
+        val customerAuth = AuthCredentialStubs.create()
 
         context("POST /review/create") {
             context("when the request is valid") {

@@ -1,6 +1,8 @@
 package com.hotela.model.dto.request
 
+import com.hotela.model.domain.Email
+
 data class AuthRequest(
-    val email: String,
+    val email: Email,
     val password: String,
 )

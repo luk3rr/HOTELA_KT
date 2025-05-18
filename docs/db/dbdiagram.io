@@ -112,7 +112,7 @@ Table room {
   id uuid [pk, default: `gen_random_uuid()`]
   hotel_id uuid [not null, ref: > hotel.id]
   room_type_id uuid [not null, ref: > room_type.id]
-  room_id varchar(32) [not null, note: 'Número ou identificador do quarto no hotel (ex: 101, 203A, "Suíte Lagoa")']
+  number varchar(32) [not null, note: 'Número ou identificador do quarto no hotel (ex: 101, 203A, "Suíte Lagoa")']
   floor int [note: 'Andar onde o quarto está localizado, se aplicável']
   price_per_night decimal(10,2) [not null, note: 'Preço base da diária para este quarto']
   capacity int [not null, note: 'Capacidade máxima de hóspedes para este quarto específico']
