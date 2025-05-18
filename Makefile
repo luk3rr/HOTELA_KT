@@ -5,7 +5,7 @@ DATABASE_NAME = postgres
 NAMESPACE = default
 TMP_MANIFEST = k8s/deployment.tmp.yml
 
-deploy: deploy-db build create-secrets
+deploy: create-secrets deploy-db build
 	sed "s|image: $(APP_NAME):.*|image: $(IMAGE_NAME)|" k8s/deployment.yml > $(TMP_MANIFEST)
 	kubectl apply -f $(TMP_MANIFEST)
 	kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE)
@@ -62,6 +62,13 @@ start:
 
 start-db:
 	kubectl scale deployment/postgres --replicas=1 -n default
+
+port-forward-db:
+	@if ! grep -q "postgres-service" /etc/hosts; then \
+		echo "127.0.0.1 postgres-service" | sudo tee -a /etc/hosts; \
+	fi
+	@echo "Iniciando port-forward de postgres-service:5432 -> localhost:15432..."
+	kubectl port-forward service/postgres-service 15432:5432
 
 start-all: start-db start
 
