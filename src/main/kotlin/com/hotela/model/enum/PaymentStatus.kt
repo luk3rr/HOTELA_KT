@@ -2,7 +2,9 @@ package com.hotela.model.enum
 
 enum class PaymentStatus {
     PENDING,
-    COMPLETED,
-    REFUNDED,
+    CONFIRMED,
     FAILED,
+    REFUNDED,
+    PARTIALLY_REFUNDED,
+    CANCELLED,
 }

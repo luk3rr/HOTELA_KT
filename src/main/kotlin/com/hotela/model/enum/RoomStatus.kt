@@ -4,4 +4,5 @@ enum class RoomStatus {
     AVAILABLE,
     BOOKED,
     MAINTENANCE,
+    UNAVAILABLE,
 }

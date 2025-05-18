@@ -1,26 +1,22 @@
 package com.hotela.model.db
 
+import com.hotela.model.domain.ContactInfo
+import org.springframework.data.relational.core.mapping.Embedded
 import java.math.BigDecimal
 import java.util.UUID
 
 data class Hotel(
     val id: UUID,
     val partnerId: UUID,
+    val addressId: UUID,
     val name: String,
-    val address: String,
-    val city: String,
-    val state: String,
-    val zipCode: String,
-    val phone: String,
-    val rating: BigDecimal,
-    val description: String? = null,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val contactInfo: ContactInfo,
     val website: String? = null,
-    val latitude: BigDecimal,
-    val longitude: BigDecimal,
+    val description: String? = null,
+    val starRating: BigDecimal? = null,
 ) {
     companion object {
-        val LATITUDE_INTERVAL = -90.0..90.0
-        val LONGITUDE_INTERVAL = -180.0..180.0
         val RATING_INTERVAL = BigDecimal.ZERO..BigDecimal("5.0")
         const val RATING_DECIMAL_PLACES = 1
         const val MAX_DESCRIPTION_LENGTH = 500
@@ -28,14 +24,12 @@ data class Hotel(
 
     init {
         require(name.isNotBlank()) { "Hotel name cannot be blank" }
-        require(address.isNotBlank()) { "Hotel address cannot be blank" }
-        require(city.isNotBlank()) { "Hotel city cannot be blank" }
-        require(state.isNotBlank()) { "Hotel state cannot be blank" }
-        require(zipCode.isNotBlank()) { "Hotel zip code cannot be blank" }
-        require(phone.isNotBlank()) { "Hotel phone cannot be blank" }
-        require(rating in RATING_INTERVAL) { "Hotel rating must be between $RATING_INTERVAL" }
-        require(rating.scale() == RATING_DECIMAL_PLACES) {
-            "Hotel rating must have $RATING_DECIMAL_PLACES decimal places"
+        starRating?.let {
+            require(it.scale() == RATING_DECIMAL_PLACES) {
+                "Hotel rating must have $RATING_DECIMAL_PLACES decimal places"
+            }
+
+            require(it in RATING_INTERVAL) { "Hotel rating must be between $RATING_INTERVAL" }
         }
         description?.let {
             require(it.length <= MAX_DESCRIPTION_LENGTH) {
@@ -43,7 +37,5 @@ data class Hotel(
             }
         }
         website?.let { require(it.isNotBlank()) { "Hotel website cannot be blank" } }
-        require(latitude.toDouble() in LATITUDE_INTERVAL) { "Hotel latitude must be between $LATITUDE_INTERVAL" }
-        require(longitude.toDouble() in LONGITUDE_INTERVAL) { "Hotel longitude must be between $LONGITUDE_INTERVAL" }
     }
 }

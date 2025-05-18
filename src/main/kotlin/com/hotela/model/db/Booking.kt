@@ -1,32 +1,33 @@
 package com.hotela.model.db
 
 import com.hotela.model.enum.BookingStatus
-import java.time.LocalDateTime
-import java.util.UUID
+import java.time.Instant
+import java.util.*
 
 data class Booking(
     val id: UUID,
     val customerId: UUID,
     val hotelId: UUID,
     val roomId: UUID,
-    val bookedAt: LocalDateTime = LocalDateTime.now(),
-    val checkin: LocalDateTime,
-    val checkout: LocalDateTime,
-    val guests: Int,
-    val status: BookingStatus = BookingStatus.CONFIRMED,
-    val notes: String? = null,
+    val bookedAt: Instant = Instant.now(),
+    val checkin: Instant,
+    val checkout: Instant,
+    val numberOfGuests: Int,
+    val status: BookingStatus = BookingStatus.PENDING_CONFIRMATION,
+    val specialRequests: String? = null,
 ) {
     companion object {
         const val MINIMUM_GUESTS = 1
         const val MINIMUM_NIGHTS = 1
+        const val MINIMUM_NIGHTS_IN_SECONDS = 60 * 60 * 24 * MINIMUM_NIGHTS
     }
 
     init {
         require(checkout.isAfter(checkin)) { "Checkout must be after checkin" }
-        require(checkout.isAfter(checkin.plusDays(1))) {
+        require(checkout.isAfter(checkin.plusSeconds(MINIMUM_NIGHTS_IN_SECONDS.toLong()))) {
             "Checkout must be at least $MINIMUM_NIGHTS nights after checkin"
         }
-        require(guests >= MINIMUM_GUESTS) { "Number of guests must be at least $MINIMUM_GUESTS" }
-        notes?.let { require(it.isNotBlank()) { "Booking notes cannot be blank" } }
+        require(numberOfGuests >= MINIMUM_GUESTS) { "Number of guests must be at least $MINIMUM_GUESTS" }
+        specialRequests?.let { require(it.isNotBlank()) { "Special requests cannot be blank" } }
     }
 }

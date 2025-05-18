@@ -5,12 +5,12 @@ CREATE TABLE auth_credential
 (
     id            UUID PRIMARY KEY,
     login_email   VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255)        NOT NULL,
-    user_type     USER_ROLE           NOT NULL,
+    password      VARCHAR(255)        NOT NULL,
+    role          USER_ROLE           NOT NULL,
     is_active     BOOLEAN             NOT NULL DEFAULT true,
     last_login_at TIMESTAMPTZ,
     created_at    TIMESTAMPTZ         NOT NULL DEFAULT now(),
-    updated_at    TIMESTAMPTZ         NOT NULL DEFAULT now()
+    updated_at    TIMESTAMPTZ         NOT NULL
 );
 
 CREATE TABLE address
@@ -24,8 +24,8 @@ CREATE TABLE address
     state_province VARCHAR(128) NOT NULL,
     postal_code    VARCHAR(32)  NOT NULL,
     country_code   VARCHAR(2)   NOT NULL,
-    latitude       decimal(10, 8),
-    longitude      decimal(11, 8)
+    latitude       DECIMAL(10, 8),
+    longitude      DECIMAL(11, 8)
 );
 
 CREATE TABLE partner
@@ -37,26 +37,26 @@ CREATE TABLE partner
     legal_name         VARCHAR(255)   NOT NULL,
     email              VARCHAR(255) UNIQUE,
     phone              VARCHAR(32)    NOT NULL,
-    tax_id_type        VARCHAR(32),
-    tax_id_value       VARCHAR(64),
-    contract_signed_at date,
-    status             PARTNER_STATUS NOT NULL DEFAULT 'ACTIVE',
+    document_id_type   VARCHAR(32),
+    document_id_value  VARCHAR(64),
+    contract_signed_at TIMESTAMPZ,
+    status             PARTNER_STATUS NOT NULL,
     notes              TEXT,
 
-    UNIQUE (tax_id_type, tax_id_value)
+    UNIQUE (document_id_type, document_id_value)
 );
 
 CREATE TABLE hotel
 (
     id          UUID PRIMARY KEY,
-    partner_id  UUID          NOT NULL REFERENCES partner (id),
-    address_id  UUID          NOT NULL REFERENCES address (id),
-    name        VARCHAR(255)  NOT NULL,
-    phone       VARCHAR(32)   NOT NULL,
+    partner_id  UUID         NOT NULL REFERENCES partner (id),
+    address_id  UUID         NOT NULL REFERENCES address (id),
+    name        VARCHAR(255) NOT NULL,
+    phone       VARCHAR(32)  NOT NULL,
     email       VARCHAR(255),
     website     VARCHAR(255),
     description TEXT,
-    star_rating DECIMAL(2, 1) NOT NULL DEFAULT 0.0
+    star_rating DECIMAL(2, 1)
 );
 
 CREATE TABLE room_type
@@ -87,7 +87,7 @@ CREATE TABLE customer
     auth_credential_id UUID         NOT NULL UNIQUE REFERENCES auth_credential (id),
     name               VARCHAR(255) NOT NULL,
     phone              VARCHAR(18)  NOT NULL,
-    secondary_email    VARCHAR(255) UNIQUE,
+    email              VARCHAR(255) UNIQUE,
     birth_date         DATE         NOT NULL,
     document_id_type   VARCHAR(50),
     document_id_value  VARCHAR(50),
@@ -120,7 +120,7 @@ CREATE TABLE payment
     status                  PAYMENT_STATUS NOT NULL DEFAULT 'PENDING',
     created_at              TIMESTAMPTZ    NOT NULL DEFAULT now(),
     processed_at            TIMESTAMPTZ,
-    payment_details         JSONB
+    metadata                JSONB
 );
 
 CREATE TABLE review

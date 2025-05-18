@@ -6,8 +6,12 @@ import java.util.UUID
 data class Review(
     val id: UUID,
     val bookingId: UUID,
+    val customerId: UUID,
+    val hotelId: UUID,
     val rating: Int,
+    val title: String? = null,
     val comment: String? = null,
+    val isAnonymous: Boolean = false,
     val reviewedAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {

@@ -1,22 +1,24 @@
 package com.hotela.model.db
 
+import com.hotela.model.domain.ContactInfo
+import com.hotela.model.domain.DocumentId
+import org.springframework.data.relational.core.mapping.Embedded
 import java.time.LocalDate
+import java.util.Date
 import java.util.UUID
 
 data class Customer(
     val id: UUID,
+    val authCredentialId: UUID,
+    val addressId: UUID,
     val name: String,
-    val email: String,
-    val phone: String,
-    val idDocument: String,
-    val birthDate: LocalDate,
-    val address: String,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val contactInfo: ContactInfo,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "document_id_")
+    val documentId: DocumentId,
+    val birthDate: Date,
 ) {
     init {
         require(name.isNotBlank()) { "Customer name cannot be blank" }
-        require(email.isNotBlank()) { "Customer email cannot be blank" }
-        require(phone.isNotBlank()) { "Customer phone cannot be blank" }
-        require(idDocument.isNotBlank()) { "Customer ID document cannot be blank" }
-        require(address.isNotBlank()) { "Customer address cannot be blank" }
     }
 }
