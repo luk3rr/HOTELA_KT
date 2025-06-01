@@ -8,6 +8,7 @@ import com.hotela.repository.HotelRepository
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
@@ -47,10 +48,10 @@ class HotelRepositoryImpl(
             .bind("phone", hotel.contactInfo.phone)
             .bind("website", hotel.website)
             .bind("description", hotel.description)
-            .bind("rating", hotel.starRating)
+            .bind("starRating", hotel.starRating)
             .map { row, _ ->
                 mapper(row)
-            }.awaitSingleOrNull()!!
+            }.awaitSingle()
 
     override suspend fun update(hotel: Hotel): Hotel =
         databaseClient
@@ -61,10 +62,10 @@ class HotelRepositoryImpl(
             .bind("phone", hotel.contactInfo.phone)
             .bind("website", hotel.website)
             .bind("description", hotel.description)
-            .bind("rating", hotel.starRating)
+            .bind("starRating", hotel.starRating)
             .map { row, _ ->
                 mapper(row)
-            }.awaitSingleOrNull()!!
+            }.awaitSingle()
 
     private fun mapper(row: Row): Hotel =
         Hotel(
@@ -72,13 +73,14 @@ class HotelRepositoryImpl(
             partnerId = row.get("partner_id", UUID::class.java)!!,
             addressId = row.get("address_id", UUID::class.java)!!,
             name = row.get("name", String::class.java)!!,
-            contactInfo = ContactInfo(
-                email = row.get("email", Email::class.java)!!,
-                phone = row.get("phone", PhoneNumber::class.java)!!
-            ),
+            contactInfo =
+                ContactInfo(
+                    email = row.get("email", Email::class.java)!!,
+                    phone = row.get("phone", PhoneNumber::class.java)!!,
+                ),
             website = row.get("website", String::class.java),
             description = row.get("description", String::class.java),
-            starRating = row.get("rating", BigDecimal::class.java),
+            starRating = row.get("star_rating", BigDecimal::class.java),
         )
 
     companion object {
@@ -92,9 +94,9 @@ class HotelRepositoryImpl(
 
         private const val SAVE = """
             INSERT INTO hotel (
-                id, partner_id, address_id, name, email, phone, website, description, rating
+                id, partner_id, address_id, name, email, phone, website, description, star_rating
             ) VALUES (
-                :id, :partnerId, :addressId, :name, :email, :phone, :website, :description, :rating
+                :id, :partnerId, :addressId, :name, :email, :phone, :website, :description, :starRating
             )
             RETURNING *
         """
@@ -106,7 +108,7 @@ class HotelRepositoryImpl(
                 phone = :phone,
                 website = :website,
                 description = :description,
-                rating = :rating
+                star_rating = :starRating
             WHERE id = :id
             RETURNING *
         """

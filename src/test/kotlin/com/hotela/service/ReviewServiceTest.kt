@@ -10,6 +10,7 @@ import com.hotela.stubs.db.HotelStubs
 import com.hotela.stubs.db.ReviewStubs
 import com.hotela.stubs.dto.request.CreateReviewRequestStubs
 import com.hotela.stubs.dto.request.UpdateReviewRequestStubs
+import com.hotela.util.TimeProvider
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -18,16 +19,19 @@ import io.mockk.every
 import io.mockk.mockk
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import java.time.Instant
 import java.util.UUID
 
 class ReviewServiceTest :
     BehaviorSpec({
         val reviewRepository = mockk<ReviewRepository>()
         val bookingService = mockk<BookingService>()
+        val timeProvider = mockk<TimeProvider<Instant>>()
         val reviewService =
             ReviewService(
                 reviewRepository = reviewRepository,
                 bookingService = bookingService,
+                timeProvider = timeProvider,
             )
 
         val jwtToken = mockk<JwtAuthenticationToken>()
@@ -35,69 +39,116 @@ class ReviewServiceTest :
 
         Given("a review service") {
             val customer = CustomerStubs.create()
-            val anotherCustomerId = UUID.fromString("7a6398d1-4dbb-4e4b-892c-3d0b76756972")
+            val anotherCustomer = CustomerStubs.create(id = UUID.fromString("7a6398d1-4dbb-4e4b-892c-3d0b76756972"))
             val hotel = HotelStubs.create()
-            val bookingInProgress = BookingStubs.create(customerId = customer.id, hotelId = hotel.id, status = BookingStatus.IN_PROGRESS)
-            val bookingCompleted = BookingStubs.create(customerId = customer.id, hotelId = hotel.id, status = BookingStatus.COMPLETED)
+            val bookingInProgress =
+                BookingStubs.create(customerId = customer.id, hotelId = hotel.id, status = BookingStatus.CHECKED_IN)
+            val bookingCompleted =
+                BookingStubs.create(customerId = customer.id, hotelId = hotel.id, status = BookingStatus.CHECKED_OUT)
 
             val review = ReviewStubs.create(bookingId = bookingCompleted.id)
 
             every { jwtToken.token } returns jwt
-            every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to customer.id.toString())
+            every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to customer.id)
+            every { timeProvider.now() } returns Instant.now()
 
-            And("calling findById") {
-                coEvery { reviewRepository.findById(review.id) } returns review
-
-                When("findById is called") {
-                    val result = reviewService.findById(review.id)
+            When("calling findById") {
+                And("review exists") {
+                    coEvery { reviewRepository.findById(review.id) } returns review
 
                     Then("it should return the review") {
+                        val result = reviewService.findById(review.id)
+
                         result shouldBe review
                     }
                 }
-            }
 
-            And("calling findByHotelId") {
-                coEvery { reviewRepository.findByHotelId(hotel.id) } returns listOf(review)
+                And("review does not exist") {
+                    coEvery { reviewRepository.findById(review.id) } returns null
 
-                When("findByHotelId is called") {
-                    val result = reviewService.findByHotelId(hotel.id)
+                    Then("it should return null") {
+                        val result = reviewService.findById(review.id)
 
-                    Then("it should return the reviews") {
-                        result shouldBe listOf(review)
+                        result shouldBe null
                     }
                 }
             }
 
-            And("calling findByBookingId") {
-                coEvery { reviewRepository.findByBookingId(bookingCompleted.id) } returns review
+            When("calling findByHotelId") {
+                And("exists reviews for the hotel") {
+                    coEvery { reviewRepository.findByHotelId(hotel.id) } returns listOf(review)
 
-                When("findByBookingId is called") {
-                    val result = reviewService.findByBookingId(bookingCompleted.id)
+                    Then("it should return the reviews") {
+                        val result = reviewService.findByHotelId(hotel.id)
+
+                        result shouldBe listOf(review)
+                    }
+                }
+
+                And("no reviews for the hotel") {
+                    coEvery { reviewRepository.findByHotelId(hotel.id) } returns emptyList()
+
+                    Then("it should return an empty list") {
+                        val result = reviewService.findByHotelId(hotel.id)
+
+                        result shouldBe emptyList()
+                    }
+                }
+            }
+
+            When("calling findByBookingId") {
+                And("exists review for the booking") {
+                    coEvery { reviewRepository.findByBookingId(bookingCompleted.id) } returns review
 
                     Then("it should return the review") {
+                        val result = reviewService.findByBookingId(bookingCompleted.id)
+
                         result shouldBe review
                     }
                 }
-            }
 
-            And("calling findByCustomerId") {
-                coEvery { reviewRepository.findByCustomerId(customer.id) } returns listOf(review)
+                And("no review for the booking") {
+                    coEvery { reviewRepository.findByBookingId(bookingInProgress.id) } returns null
 
-                When("findByCustomerId is called") {
-                    val result = reviewService.findByCustomerId(customer.id)
+                    Then("it should return null") {
+                        val result = reviewService.findByBookingId(bookingInProgress.id)
 
-                    Then("it should return the reviews") {
-                        result shouldBe listOf(review)
+                        result shouldBe null
                     }
                 }
             }
 
-            And("calling createReview") {
+            When("calling findByCustomerId") {
+                And("exists reviews for the customer") {
+                    coEvery { reviewRepository.findByCustomerId(customer.id) } returns listOf(review)
+
+                    Then("it should return the reviews") {
+                        val result = reviewService.findByCustomerId(customer.id)
+
+                        result shouldBe listOf(review)
+                    }
+                }
+
+                And("no reviews for the customer") {
+                    coEvery { reviewRepository.findByCustomerId(customer.id) } returns emptyList()
+
+                    Then("it should return an empty list") {
+                        val result = reviewService.findByCustomerId(customer.id)
+
+                        result shouldBe emptyList()
+                    }
+                }
+            }
+
+            When("calling createReview") {
                 val createReviewRequest =
-                    CreateReviewRequestStubs.create(bookingId = bookingCompleted.id, rating = 5, comment = "Great stay!")
+                    CreateReviewRequestStubs.create(
+                        bookingId = bookingCompleted.id,
+                        rating = 5,
+                        comment = "Great stay!",
+                    )
 
-                When("the request is valid") {
+                And("the request is valid") {
                     coEvery { bookingService.findById(createReviewRequest.bookingId) } returns bookingCompleted
                     coEvery { reviewRepository.findByBookingId(bookingCompleted.id) } returns null
                     coEvery { reviewRepository.create(any()) } returns review
@@ -113,7 +164,7 @@ class ReviewServiceTest :
                     }
                 }
 
-                When("booking not found") {
+                And("booking not found") {
                     coEvery { bookingService.findById(createReviewRequest.bookingId) } returns null
 
                     Then("it should throw BookingNotFoundException") {
@@ -130,45 +181,7 @@ class ReviewServiceTest :
                     }
                 }
 
-                When("the requester customer is not the owner of the booking") {
-                    coEvery { bookingService.findById(createReviewRequest.bookingId) } returns bookingCompleted
-                    coEvery { reviewRepository.findByBookingId(bookingCompleted.id) } returns null
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherCustomerId.toString())
-
-                    Then("it should throw InvalidCredentialsException") {
-                        val exception =
-                            shouldThrow<HotelaException.InvalidCredentialsException> {
-                                reviewService.createReview(
-                                    payload = createReviewRequest,
-                                    token = jwtToken,
-                                )
-                            }
-
-                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
-                        exception.message shouldBe "Invalid credentials"
-                    }
-                }
-
-                When("booking not already completed") {
-                    coEvery { bookingService.findById(createReviewRequest.bookingId) } returns bookingInProgress
-                    coEvery { reviewRepository.findByBookingId(bookingInProgress.id) } returns null
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to customer.id.toString())
-
-                    Then("it should throw BookingNotCompletedException") {
-                        val exception =
-                            shouldThrow<HotelaException.InvalidDataException> {
-                                reviewService.createReview(
-                                    payload = createReviewRequest,
-                                    token = jwtToken,
-                                )
-                            }
-
-                        exception.code shouldBe HotelaException.INVALID_DATA
-                        exception.message shouldBe "Booking is not completed"
-                    }
-                }
-
-                When("booking already reviewed") {
+                And("booking already reviewed") {
                     coEvery { bookingService.findById(createReviewRequest.bookingId) } returns bookingCompleted
                     coEvery { reviewRepository.findByBookingId(createReviewRequest.bookingId) } returns review
 
@@ -185,13 +198,51 @@ class ReviewServiceTest :
                         exception.message shouldBe "Booking already reviewed"
                     }
                 }
+
+                And("the requester is not the owner of the booking") {
+                    coEvery { bookingService.findById(createReviewRequest.bookingId) } returns bookingCompleted
+                    coEvery { reviewRepository.findByBookingId(bookingCompleted.id) } returns null
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherCustomer.id)
+
+                    Then("it should throw InvalidCredentialsException") {
+                        val exception =
+                            shouldThrow<HotelaException.InvalidCredentialsException> {
+                                reviewService.createReview(
+                                    payload = createReviewRequest,
+                                    token = jwtToken,
+                                )
+                            }
+
+                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
+                        exception.message shouldBe "Invalid credentials"
+                    }
+                }
+
+                And("booking not already completed") {
+                    coEvery { bookingService.findById(createReviewRequest.bookingId) } returns bookingInProgress
+                    coEvery { reviewRepository.findByBookingId(bookingInProgress.id) } returns null
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to customer.id)
+
+                    Then("it should throw BookingNotCompletedException") {
+                        val exception =
+                            shouldThrow<HotelaException.InvalidDataException> {
+                                reviewService.createReview(
+                                    payload = createReviewRequest,
+                                    token = jwtToken,
+                                )
+                            }
+
+                        exception.code shouldBe HotelaException.INVALID_DATA
+                        exception.message shouldBe "Booking is not completed"
+                    }
+                }
             }
 
-            And("calling updateReview") {
+            When("calling updateReview") {
                 val updateReviewRequest =
                     UpdateReviewRequestStubs.create(rating = 1, comment = "Bad stay!")
 
-                When("the request is valid") {
+                And("the request is valid") {
                     coEvery { reviewRepository.findById(review.id) } returns review
                     coEvery { bookingService.findById(review.bookingId) } returns bookingCompleted
                     coEvery { reviewRepository.update(any()) } returns review
@@ -208,7 +259,7 @@ class ReviewServiceTest :
                     }
                 }
 
-                When("review not found") {
+                And("review not found") {
                     coEvery { reviewRepository.findById(review.id) } returns null
 
                     Then("it should throw ReviewNotFoundException") {
@@ -226,10 +277,29 @@ class ReviewServiceTest :
                     }
                 }
 
-                When("the requester customer is not the owner of the booking") {
+                And("booking not found") {
+                    coEvery { reviewRepository.findById(review.id) } returns review
+                    coEvery { bookingService.findById(review.bookingId) } returns null
+
+                    Then("it should throw BookingNotFoundException") {
+                        val exception =
+                            shouldThrow<HotelaException.BookingNotFoundException> {
+                                reviewService.updateReview(
+                                    id = review.id,
+                                    payload = updateReviewRequest,
+                                    token = jwtToken,
+                                )
+                            }
+
+                        exception.code shouldBe HotelaException.BOOKING_NOT_FOUND
+                        exception.message shouldBe "Booking with id ${review.bookingId} not found"
+                    }
+                }
+
+                And("the requester is not the owner of the booking") {
                     coEvery { reviewRepository.findById(review.id) } returns review
                     coEvery { bookingService.findById(review.bookingId) } returns bookingCompleted
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherCustomerId.toString())
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherCustomer.id)
 
                     Then("it should throw InvalidCredentialsException") {
                         val exception =

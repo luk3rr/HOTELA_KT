@@ -30,7 +30,7 @@ class RoomServiceTest :
 
         Given("a room service") {
             val partner = PartnerStubs.create()
-            val anotherPartnerUserId = UUID.fromString("d97cd785-88c1-46b3-a172-22f697e9bea4")
+            val anotherPartner = PartnerStubs.create(id = UUID.fromString("d97cd785-88c1-46b3-a172-22f697e9bea4"))
             val hotel = HotelStubs.create(partnerId = partner.id)
             val room = RoomStubs.create(hotelId = hotel.id)
             val anotherRoomWithSameNumber =
@@ -42,35 +42,49 @@ class RoomServiceTest :
 
             every { jwtToken.token } returns jwt
 
-            When("calling findById") {
-                val roomId = room.id
+            And("calling findById") {
+                When("the room exists") {
+                    coEvery { roomRepository.findById(room.id) } returns room
 
-                Then("it should return the room") {
-                    coEvery { roomRepository.findById(roomId) } returns room
+                    Then("it should return the room") {
+                        val result = roomService.findById(room.id)
 
-                    val result = roomService.findById(roomId)
-
-                    result shouldBe room
+                        result shouldBe room
+                    }
                 }
             }
 
-            When("calling findByHotelId") {
-                val hotelId = hotel.id
+            And("calling findByHotelId") {
+                When("the room exists") {
+                    val hotelId = hotel.id
 
-                Then("it should return the rooms for the hotel") {
-                    coEvery { roomRepository.findByHotelId(hotelId) } returns listOf(room)
+                    Then("it should return the rooms for the hotel") {
+                        coEvery { roomRepository.findByHotelId(hotelId) } returns listOf(room)
 
-                    val result = roomService.findByHotelId(hotelId)
+                        val result = roomService.findByHotelId(hotelId)
 
-                    result shouldBe listOf(room)
+                        result shouldBe listOf(room)
+                    }
+                }
+
+                When("the room does not exist") {
+                    val hotelId = hotel.id
+
+                    Then("it should return an empty list") {
+                        coEvery { roomRepository.findByHotelId(hotelId) } returns emptyList()
+
+                        val result = roomService.findByHotelId(hotelId)
+
+                        result shouldBe emptyList()
+                    }
                 }
             }
 
-            When("calling createRoom") {
+            And("calling createRoom") {
                 val createRoomRequest = CreateRoomRequestStubs.create(hotelId = hotel.id)
 
-                And("requester has permissions") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to partner.id.toString())
+                When("requester has permissions") {
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to partner.id)
 
                     And("not already exists a room with the same number") {
                         Then("it should create a room") {
@@ -81,6 +95,24 @@ class RoomServiceTest :
                             val result = roomService.createRoom(createRoomRequest, jwtToken)
 
                             result shouldBe room
+                        }
+                    }
+
+                    And("requester does not have permissions") {
+                        every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherPartner.id)
+
+                        Then("it should throw an exception") {
+                            coEvery { hotelService.findById(hotel.id) } returns hotel
+
+                            val exception =
+                                shouldThrow<HotelaException.InvalidCredentialsException> {
+                                    roomService.createRoom(createRoomRequest, jwtToken)
+                                }
+
+                            coVerify(exactly = 0) { roomRepository.create(any()) }
+
+                            exception.code shouldBe HotelaException.INVALID_CREDENTIALS
+                            exception.message shouldBe "Invalid credentials"
                         }
                     }
 
@@ -108,29 +140,11 @@ class RoomServiceTest :
                         }
                     }
                 }
-
-                And("requester does not have permissions") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherPartnerUserId.toString())
-
-                    Then("it should throw an exception") {
-                        coEvery { hotelService.findById(hotel.id) } returns hotel
-
-                        val exception =
-                            shouldThrow<HotelaException.InvalidCredentialsException> {
-                                roomService.createRoom(createRoomRequest, jwtToken)
-                            }
-
-                        coVerify(exactly = 0) { roomRepository.create(any()) }
-
-                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
-                        exception.message shouldBe "Invalid credentials"
-                    }
-                }
             }
 
             When("calling updateRoom") {
                 And("requester has permissions") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to partner.id.toString())
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to partner.id)
                     coEvery { roomRepository.findById(any()) } returns room
                     coEvery { hotelService.findById(any()) } returns hotel
 
@@ -149,10 +163,13 @@ class RoomServiceTest :
                             )
 
                         Then("it should throw an exception") {
-
                             val exception =
                                 shouldThrow<HotelaException.RoomAlreadyExistsException> {
-                                    roomService.updateRoom(anotherRoomWithSameNumber.id, updateRoomRequestWithSameNumber, jwtToken)
+                                    roomService.updateRoom(
+                                        anotherRoomWithSameNumber.id,
+                                        updateRoomRequestWithSameNumber,
+                                        jwtToken,
+                                    )
                                 }
 
                             coVerify(exactly = 0) { roomRepository.update(any()) }
@@ -177,7 +194,7 @@ class RoomServiceTest :
                 }
 
                 And("requester does not have permissions") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherPartnerUserId.toString())
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherPartner.id)
                     val updateRoomRequest = UpdateRoomRequestStubs.create()
 
                     Then("it should throw an exception") {
@@ -190,57 +207,6 @@ class RoomServiceTest :
                             }
 
                         coVerify(exactly = 0) { roomRepository.update(any()) }
-
-                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
-                        exception.message shouldBe "Invalid credentials"
-                    }
-                }
-            }
-
-            When("calling deleteRoom") {
-                And("requester has permissions") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to partner.id.toString())
-                    coEvery { roomRepository.findById(room.id) } returns room
-                    coEvery { hotelService.findById(hotel.id) } returns hotel
-
-                    And("room exists") {
-                        coEvery { roomRepository.findById(room.id) } returns room
-
-                        Then("it should delete the room") {
-                            coEvery { roomRepository.delete(room.id) } returns true
-
-                            val result = roomService.deleteRoom(room.id, jwtToken)
-
-                            result shouldBe true
-                        }
-                    }
-
-                    And("room does not exist") {
-                        Then("it should throw an exception") {
-                            coEvery { roomRepository.findById(room.id) } returns null
-
-                            val exception =
-                                shouldThrow<HotelaException.RoomNotFoundException> {
-                                    roomService.deleteRoom(room.id, jwtToken)
-                                }
-
-                            exception.code shouldBe HotelaException.ROOM_NOT_FOUND
-                            exception.message shouldBe "Room with id ${room.id} not found"
-                        }
-                    }
-                }
-
-                And("requester does not have permissions") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to anotherPartnerUserId.toString())
-
-                    Then("it should throw an exception") {
-                        coEvery { hotelService.findById(hotel.id) } returns hotel
-                        coEvery { roomRepository.findById(room.id) } returns room
-
-                        val exception =
-                            shouldThrow<HotelaException.InvalidCredentialsException> {
-                                roomService.deleteRoom(room.id, jwtToken)
-                            }
 
                         exception.code shouldBe HotelaException.INVALID_CREDENTIALS
                         exception.message shouldBe "Invalid credentials"

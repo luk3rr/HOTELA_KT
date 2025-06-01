@@ -9,13 +9,13 @@ object CreateReviewRequestStubs {
         rating: Int = 5,
         title: String? = "Amazing stay!",
         comment: String? = "Great experience!",
-        isAnonymous: Boolean = false
+        isAnonymous: Boolean = false,
     ): CreateReviewRequest =
         CreateReviewRequest(
             bookingId = bookingId,
             rating = rating,
             title = title,
             comment = comment,
-            isAnonymous = isAnonymous
+            isAnonymous = isAnonymous,
         )
 }

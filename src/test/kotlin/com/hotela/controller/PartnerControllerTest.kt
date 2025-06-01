@@ -8,7 +8,7 @@ import com.hotela.error.HotelaException
 import com.hotela.model.db.Partner
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.PartnerService
-import com.hotela.stubs.db.PartnerAuthStubs
+import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.PartnerStubs
 import com.hotela.stubs.dto.request.UpdatePartnerRequestStubs
 import io.kotest.core.spec.style.FunSpec
@@ -37,23 +37,8 @@ class PartnerControllerTest(
 
     init {
         val partner = PartnerStubs.create()
-        val partnerAuth = PartnerAuthStubs.create(partner.id)
+        val partnerAuth = AuthCredentialStubs.create(partner.id)
         val updatePartnerRequest = UpdatePartnerRequestStubs.create()
-
-        require(
-            partner.name != updatePartnerRequest.name &&
-                partner.cnpj != updatePartnerRequest.cnpj &&
-                partner.phone != updatePartnerRequest.phone &&
-                partner.address != updatePartnerRequest.address &&
-                partner.contactName != updatePartnerRequest.contactName &&
-                partner.contactPhone != updatePartnerRequest.contactPhone &&
-                partner.contactEmail != updatePartnerRequest.contactEmail &&
-                partner.contractSigned != updatePartnerRequest.contractSigned &&
-                partner.status != updatePartnerRequest.status &&
-                partner.notes != updatePartnerRequest.notes,
-        ) {
-            "Partner and UpdatePartnerRequest should have different values"
-        }
 
         context("GET /partner/{id}") {
             context("when the partner exists") {
@@ -107,16 +92,11 @@ class PartnerControllerTest(
         context("PUT /partner/update/{id}") {
             val partnerUpdated =
                 partner.copy(
-                    name = updatePartnerRequest.name ?: partner.name,
-                    cnpj = updatePartnerRequest.cnpj ?: partner.cnpj,
-                    phone = updatePartnerRequest.phone ?: partner.phone,
-                    address = updatePartnerRequest.address ?: partner.address,
-                    contactName = updatePartnerRequest.contactName ?: partner.contactName,
-                    contactPhone = updatePartnerRequest.contactPhone ?: partner.contactPhone,
-                    contactEmail = updatePartnerRequest.contactEmail ?: partner.contactEmail,
-                    contractSigned =
-                        updatePartnerRequest.contractSigned
-                            ?: partner.contractSigned,
+                    companyName = updatePartnerRequest.companyName ?: partner.companyName,
+                    legalName = updatePartnerRequest.legalName ?: partner.legalName,
+                    contactInfo = updatePartnerRequest.contactInfo ?: partner.contactInfo,
+                    documentId = updatePartnerRequest.documentId ?: partner.documentId,
+                    contractSignedAt = updatePartnerRequest.contractSignedAt ?: partner.contractSignedAt,
                     status = updatePartnerRequest.status ?: partner.status,
                     notes = updatePartnerRequest.notes ?: partner.notes,
                 )

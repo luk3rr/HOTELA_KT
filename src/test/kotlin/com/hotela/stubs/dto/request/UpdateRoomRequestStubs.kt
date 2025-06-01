@@ -3,11 +3,12 @@ package com.hotela.stubs.dto.request
 import com.hotela.model.dto.request.UpdateRoomRequest
 import com.hotela.model.enum.RoomStatus
 import java.math.BigDecimal
+import java.util.UUID
 
 object UpdateRoomRequestStubs {
     fun create(
-        roomTypeId: String? = "suite-id-123",
-        roomId: String? = "room-id-501",
+        roomTypeId: UUID? = UUID.fromString("decb09b1-bd71-4976-8292-f95f367ef5c7"),
+        number: String? = "room-id-501",
         floor: Int? = 5,
         pricePerNight: BigDecimal? = BigDecimal("900.00"),
         capacity: Int? = 3,
@@ -16,11 +17,11 @@ object UpdateRoomRequestStubs {
     ): UpdateRoomRequest =
         UpdateRoomRequest(
             roomTypeId = roomTypeId,
-            roomId = roomId,
+            number = number,
             floor = floor,
             pricePerNight = pricePerNight,
             capacity = capacity,
             status = status,
-            description = description
+            description = description,
         )
 }

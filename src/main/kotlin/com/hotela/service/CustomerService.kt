@@ -2,6 +2,7 @@ package com.hotela.service
 
 import com.hotela.error.HotelaException
 import com.hotela.model.db.Customer
+import com.hotela.model.domain.Email
 import com.hotela.model.dto.request.UpdateCustomerRequest
 import com.hotela.repository.CustomerRepository
 import com.hotela.util.getUserId
@@ -14,6 +15,20 @@ class CustomerService(
     private val customerRepository: CustomerRepository,
 ) {
     suspend fun findById(id: UUID): Customer? = customerRepository.findById(id)
+
+    suspend fun findByAuthId(authId: UUID): Customer? = customerRepository.findByAuthId(authId)
+
+    suspend fun findByEmail(email: Email): Customer? = customerRepository.findByEmail(email)
+
+    suspend fun existsByEmail(email: Email): Boolean = customerRepository.existsByEmail(email)
+
+    suspend fun create(customer: Customer): Customer {
+        if (customerRepository.existsByEmail(customer.contactInfo.email)) {
+            throw HotelaException.EmailAlreadyRegisteredException()
+        }
+
+        return customerRepository.create(customer)
+    }
 
     suspend fun updateCustomer(
         payload: UpdateCustomerRequest,
@@ -28,12 +43,15 @@ class CustomerService(
         val updatedCustomer =
             existingCustomer.copy(
                 name = payload.name ?: existingCustomer.name,
-                contactInfo = payload.contactInfo
-                    ?: existingCustomer.contactInfo,
-                documentId = payload.documentId
-                    ?: existingCustomer.documentId,
-                birthDate = payload.birthDate
-                    ?: existingCustomer.birthDate,
+                contactInfo =
+                    payload.contactInfo
+                        ?: existingCustomer.contactInfo,
+                documentId =
+                    payload.documentId
+                        ?: existingCustomer.documentId,
+                birthDate =
+                    payload.birthDate
+                        ?: existingCustomer.birthDate,
             )
 
         return customerRepository.update(updatedCustomer)

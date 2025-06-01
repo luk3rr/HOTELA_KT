@@ -2,9 +2,8 @@ package com.hotela.service
 
 import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
-import com.hotela.repository.PartnerAuthRepository
 import com.hotela.repository.PartnerRepository
-import com.hotela.stubs.db.PartnerAuthStubs
+import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.db.PartnerStubs
 import com.hotela.stubs.dto.request.UpdatePartnerRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
@@ -19,11 +18,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 class PartnerServiceTest :
     BehaviorSpec({
         val partnerRepository = mockk<PartnerRepository>()
-        val partnerAuthRepository = mockk<PartnerAuthRepository>()
         val partnerService =
             PartnerService(
                 partnerRepository = partnerRepository,
-                partnerAuthRepository = partnerAuthRepository,
             )
 
         val jwtToken = mockk<JwtAuthenticationToken>()
@@ -31,42 +28,26 @@ class PartnerServiceTest :
 
         Given("a partner service") {
             val partner = PartnerStubs.create()
-            val partnerAuth = PartnerAuthStubs.create(partnerId = partner.id)
+            val customer = CustomerStubs.create()
             val updatePartnerRequest = UpdatePartnerRequestStubs.create()
 
-            require(
-                partner.name != updatePartnerRequest.name &&
-                    partner.cnpj != updatePartnerRequest.cnpj &&
-                    partner.phone != updatePartnerRequest.phone &&
-                    partner.address != updatePartnerRequest.address &&
-                    partner.contactName != updatePartnerRequest.contactName &&
-                    partner.contactPhone != updatePartnerRequest.contactPhone &&
-                    partner.contactEmail != updatePartnerRequest.contactEmail &&
-                    partner.contractSigned != updatePartnerRequest.contractSigned &&
-                    partner.status != updatePartnerRequest.status &&
-                    partner.notes != updatePartnerRequest.notes,
-            ) {
-                "Partner and UpdatePartnerRequest should have different values"
-            }
+            every { jwtToken.token } returns jwt
 
             val partnerUpdated =
                 partner.copy(
-                    name = updatePartnerRequest.name ?: partner.name,
-                    cnpj = updatePartnerRequest.cnpj ?: partner.cnpj,
-                    phone = updatePartnerRequest.phone ?: partner.phone,
-                    address = updatePartnerRequest.address ?: partner.address,
-                    contactName = updatePartnerRequest.contactName ?: partner.contactName,
-                    contactPhone = updatePartnerRequest.contactPhone ?: partner.contactPhone,
-                    contactEmail = updatePartnerRequest.contactEmail ?: partner.contactEmail,
-                    contractSigned =
-                        updatePartnerRequest.contractSigned
-                            ?: partner.contractSigned,
+                    companyName = updatePartnerRequest.companyName ?: partner.companyName,
+                    legalName = updatePartnerRequest.legalName ?: partner.legalName,
+                    contactInfo = updatePartnerRequest.contactInfo ?: partner.contactInfo,
+                    documentId = updatePartnerRequest.documentId ?: partner.documentId,
+                    contractSignedAt =
+                        updatePartnerRequest.contractSignedAt
+                            ?: partner.contractSignedAt,
                     status = updatePartnerRequest.status ?: partner.status,
                     notes = updatePartnerRequest.notes ?: partner.notes,
                 )
 
-            And("calling findById") {
-                When("the partner exists") {
+            When("calling findById") {
+                And("the partner exists") {
                     Then("it should return the partner") {
                         coEvery { partnerRepository.findById(partner.id) } returns partner
 
@@ -76,7 +57,7 @@ class PartnerServiceTest :
                     }
                 }
 
-                When("the partner does not exist") {
+                And("the partner does not exist") {
                     Then("it should return null") {
                         coEvery { partnerRepository.findById(partner.id) } returns null
 
@@ -87,34 +68,34 @@ class PartnerServiceTest :
                 }
             }
 
-            And("calling findByEmail") {
-                When("the partner exists") {
+            When("calling findByEmail") {
+                And("the partner exists") {
                     Then("it should return the partner") {
-                        coEvery { partnerRepository.findByEmail(partner.email) } returns partner
+                        coEvery { partnerRepository.findByEmail(partner.contactInfo.email) } returns partner
 
-                        val result = partnerService.findByEmail(partner.email)
+                        val result = partnerService.findByEmail(partner.contactInfo.email)
 
                         result shouldBe partner
                     }
                 }
 
-                When("the partner does not exist") {
+                And("the partner does not exist") {
                     Then("it should return null") {
-                        coEvery { partnerRepository.findByEmail(partner.email) } returns null
+                        coEvery { partnerRepository.findByEmail(partner.contactInfo.email) } returns null
 
-                        val result = partnerService.findByEmail(partner.email)
+                        val result = partnerService.findByEmail(partner.contactInfo.email)
 
                         result shouldBe null
                     }
                 }
             }
 
-            And("calling existsByEmail") {
-                When("the partner exists") {
+            When("calling existsByEmail") {
+                And("the partner exists") {
                     Then("it should return true") {
-                        coEvery { partnerRepository.existsByEmail(partner.email) } returns true
+                        coEvery { partnerRepository.existsByEmail(partner.contactInfo.email) } returns true
 
-                        val result = partnerService.existsByEmail(partner.email)
+                        val result = partnerService.existsByEmail(partner.contactInfo.email)
 
                         result shouldBe true
                     }
@@ -122,35 +103,35 @@ class PartnerServiceTest :
 
                 When("the partner does not exist") {
                     Then("it should return false") {
-                        coEvery { partnerRepository.existsByEmail(partner.email) } returns false
+                        coEvery { partnerRepository.existsByEmail(partner.contactInfo.email) } returns false
 
-                        val result = partnerService.existsByEmail(partner.email)
+                        val result = partnerService.existsByEmail(partner.contactInfo.email)
 
                         result shouldBe false
                     }
                 }
             }
 
-            And("calling createPartner") {
-                When("the partner does not exist") {
-                    coEvery { partnerRepository.existsByEmail(partner.email) } returns false
+            When("calling createPartner") {
+                And("the partner does not exist") {
+                    coEvery { partnerRepository.existsByEmail(partner.contactInfo.email) } returns false
 
                     Then("it should create the partner") {
                         coEvery { partnerRepository.create(partner) } returns partner
 
-                        val result = partnerService.createPartner(partner)
+                        val result = partnerService.create(partner)
 
                         result shouldBe partner
                     }
                 }
 
-                When("the partner already exists") {
-                    coEvery { partnerRepository.existsByEmail(partner.email) } returns true
+                And("the partner already exists") {
+                    coEvery { partnerRepository.existsByEmail(partner.contactInfo.email) } returns true
 
                     Then("it should throw an exception") {
                         val exception =
                             shouldThrow<HotelaException.EmailAlreadyRegisteredException> {
-                                partnerService.createPartner(partner)
+                                partnerService.create(partner)
                             }
 
                         exception.code shouldBe HotelaException.EMAIL_ALREADY_REGISTERED
@@ -159,63 +140,44 @@ class PartnerServiceTest :
                 }
             }
 
-            And("calling updatePartner") {
-                When("the partner exists") {
+            When("calling updatePartner") {
+                And("the partner exists") {
                     coEvery { partnerRepository.findById(partner.id) } returns partner
 
-                    And("requester is the same as partner") {
-                        every { jwtToken.token } returns jwt
-                        every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to partnerAuth.id.toString())
-                        coEvery { partnerAuthRepository.findById(partnerAuth.id) } returns partnerAuth
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to partner.id)
 
-                        Then("it should update the partner") {
-                            coEvery { partnerRepository.update(any()) } returns partnerUpdated
+                    Then("it should update the partner") {
+                        coEvery { partnerRepository.update(any()) } returns partnerUpdated
 
-                            val result =
+                        val result =
+                            partnerService.updatePartner(
+                                payload = updatePartnerRequest,
+                                token = jwtToken,
+                            )
+
+                        result shouldBe partnerUpdated
+                    }
+                }
+
+                And("the partner does not exist") {
+                    every { jwt.claims } returns
+                        mapOf(
+                            AuthClaimKey.USERID.key to customer.id,
+                        )
+
+                    coEvery { partnerRepository.findById(customer.id) } returns null
+
+                    Then("it should throw an exception") {
+                        val exception =
+                            shouldThrow<HotelaException.PartnerNotFoundException> {
                                 partnerService.updatePartner(
                                     payload = updatePartnerRequest,
                                     token = jwtToken,
                                 )
+                            }
 
-                            result shouldBe partnerUpdated
-                        }
-                    }
-
-                    And("partner id is not associated with partner auth id") {
-                        every { jwtToken.token } returns jwt
-                        every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to partnerAuth.id.toString())
-                        coEvery { partnerAuthRepository.findById(partnerAuth.id) } returns null
-
-                        Then("it should throw an exception") {
-                            val exception =
-                                shouldThrow<HotelaException.PartnerAuthNotFoundException> {
-                                    partnerService.updatePartner(
-                                        payload = updatePartnerRequest,
-                                        token = jwtToken,
-                                    )
-                                }
-
-                            exception.code shouldBe HotelaException.PARTNER_AUTH_NOT_FOUND
-                            exception.message shouldBe "Partner auth with id ${partnerAuth.id} not found"
-                        }
-                    }
-
-                    And("requester is not a partner") {
-                        every { jwtToken.token } returns jwt
-                        every { jwt.claims } returns mapOf("other_claim" to "some_value")
-
-                        Then("it should throw an exception") {
-                            val exception =
-                                shouldThrow<HotelaException.InvalidCredentialsException> {
-                                    partnerService.updatePartner(
-                                        payload = updatePartnerRequest,
-                                        token = jwtToken,
-                                    )
-                                }
-
-                            exception.code shouldBe HotelaException.INVALID_CREDENTIALS
-                            exception.message shouldBe "Invalid credentials"
-                        }
+                        exception.code shouldBe HotelaException.PARTNER_NOT_FOUND
+                        exception.message shouldBe "Partner with id ${customer.id} not found"
                     }
                 }
             }

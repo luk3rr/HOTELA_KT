@@ -1,7 +1,7 @@
 package com.hotela.model.domain
 
 data class Email(
-    val value: String
+    val value: String,
 ) {
     companion object {
         val REGEX_EMAIL = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$")
@@ -12,7 +12,5 @@ data class Email(
         require(isValidEmail(value)) { "Email format is invalid" }
     }
 
-    private fun isValidEmail(email: String): Boolean {
-        return REGEX_EMAIL.matches(email)
-    }
+    private fun isValidEmail(email: String): Boolean = REGEX_EMAIL.matches(email)
 }

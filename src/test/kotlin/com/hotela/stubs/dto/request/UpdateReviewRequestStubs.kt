@@ -7,12 +7,12 @@ object UpdateReviewRequestStubs {
         rating: Int = 5,
         title: String? = "Amazing stay!",
         comment: String? = "Updated great experience!",
-        isAnonymous: Boolean? = false
+        isAnonymous: Boolean? = false,
     ): UpdateReviewRequest =
         UpdateReviewRequest(
             rating = rating,
             title = title,
             comment = comment,
-            isAnonymous = isAnonymous
+            isAnonymous = isAnonymous,
         )
 }

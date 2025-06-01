@@ -2,9 +2,13 @@ package com.hotela.service
 
 import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
+import com.hotela.model.enum.Role
+import com.hotela.repository.AddressRepository
 import com.hotela.repository.HotelRepository
+import com.hotela.stubs.db.AddressStubs
+import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.db.HotelStubs
-import com.hotela.stubs.db.PartnerAuthStubs
+import com.hotela.stubs.db.PartnerStubs
 import com.hotela.stubs.dto.request.CreateHotelRequestStubs
 import com.hotela.stubs.dto.request.UpdateHotelRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
@@ -19,26 +23,25 @@ import java.util.UUID
 
 class HotelServiceTest :
     BehaviorSpec({
-        val partnerAuthService = mockk<PartnerAuthService>()
         val hotelRepository = mockk<HotelRepository>()
-        val hotelService = HotelService(partnerAuthService, hotelRepository)
+        val addressRepository = mockk<AddressRepository>()
+        val hotelService = HotelService(hotelRepository, addressRepository)
 
         val jwtToken = mockk<JwtAuthenticationToken>()
         val jwt = mockk<Jwt>()
 
         Given("a hotel service") {
-            val hotel = HotelStubs.create()
+            val partner = PartnerStubs.create()
+            val anotherPartner =
+                PartnerStubs.create(
+                    id = UUID.fromString("f40ccfb1-d579-4916-aa38-646cd897a799"),
+                )
+            val customer = CustomerStubs.create()
+
+            val address = AddressStubs.create()
+            val hotel = HotelStubs.create(partnerId = partner.id, addressId = address.id)
             val createHotelRequest = CreateHotelRequestStubs.create()
             val updateHotelRequest = UpdateHotelRequestStubs.create()
-            val partnerAuth =
-                PartnerAuthStubs.create(
-                    partnerId = hotel.partnerId,
-                )
-            val anotherPartnerAuth =
-                PartnerAuthStubs.create(
-                    id = UUID.fromString("48bdb90b-9481-4278-b352-128c19d4e840"),
-                    partnerId = UUID.fromString("a4e183ba-6c2d-416e-936e-20172e8fc219"),
-                )
 
             every { jwtToken.token } returns jwt
 
@@ -55,51 +58,62 @@ class HotelServiceTest :
                     }
                 }
 
-                When("calling updateHotel with a valid partner auth id") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to partnerAuth.id.toString())
+                When("calling updateHotel") {
+                    And("partner that matches the hotel") {
+                        every { jwt.claims } returns
+                            mapOf(
+                                AuthClaimKey.ROLE.key to Role.PARTNER,
+                                AuthClaimKey.USERID.key to partner.id,
+                            )
 
-                    Then("it should update the hotel") {
-                        coEvery { hotelRepository.findById(hotel.id) } returns hotel
-                        coEvery { partnerAuthService.findById(partnerAuth.id) } returns partnerAuth
-                        coEvery { hotelRepository.update(any()) } returns hotel
+                        Then("it should update the hotel") {
+                            coEvery { hotelRepository.findById(hotel.id) } returns hotel
+                            coEvery { hotelRepository.update(any()) } returns hotel
 
-                        val result = hotelService.updateHotel(hotel.id, updateHotelRequest, jwtToken)
+                            val result = hotelService.updateHotel(hotel.id, updateHotelRequest, jwtToken)
 
-                        result shouldBe hotel
+                            result shouldBe hotel
+                        }
                     }
-                }
 
-                When("calling updateHotel with an invalid partner auth id") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to anotherPartnerAuth.id)
+                    And("partner that does not match the hotel") {
+                        every { jwt.claims } returns
+                            mapOf(
+                                AuthClaimKey.ROLE.key to Role.PARTNER,
+                                AuthClaimKey.USERID.key to anotherPartner.id,
+                            )
 
-                    Then("it should throw an exception") {
-                        coEvery { hotelRepository.findById(hotel.id) } returns hotel
-                        coEvery { partnerAuthService.findById(any()) } returns null
+                        Then("it should throw an exception") {
+                            coEvery { hotelRepository.findById(hotel.id) } returns hotel
 
-                        val exception =
-                            shouldThrow<HotelaException.InvalidCredentialsException> {
-                                hotelService.updateHotel(hotel.id, updateHotelRequest, jwtToken)
-                            }
+                            val exception =
+                                shouldThrow<HotelaException.AccessDeniedException> {
+                                    hotelService.updateHotel(hotel.id, updateHotelRequest, jwtToken)
+                                }
 
-                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
-                        exception.message shouldBe "Invalid credentials"
+                            exception.code shouldBe HotelaException.ACCESS_DENIED
+                            exception.message shouldBe "Access denied"
+                        }
                     }
-                }
 
-                When("calling updateHotel with a partner auth id that does not match the partner auth id in the hotel") {
-                    every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to anotherPartnerAuth.id)
+                    And("token with customer role ") {
+                        every { jwt.claims } returns
+                            mapOf(
+                                AuthClaimKey.ROLE.key to Role.CUSTOMER,
+                                AuthClaimKey.USERID.key to customer.id,
+                            )
 
-                    Then("it should throw an exception") {
-                        coEvery { hotelRepository.findById(hotel.id) } returns hotel
-                        coEvery { partnerAuthService.findById(anotherPartnerAuth.id) } returns anotherPartnerAuth
+                        Then("it should throw an exception") {
+                            coEvery { hotelRepository.findById(hotel.id) } returns hotel
 
-                        val exception =
-                            shouldThrow<HotelaException.AccessDeniedException> {
-                                hotelService.updateHotel(hotel.id, updateHotelRequest, jwtToken)
-                            }
+                            val exception =
+                                shouldThrow<HotelaException.AccessDeniedException> {
+                                    hotelService.updateHotel(hotel.id, updateHotelRequest, jwtToken)
+                                }
 
-                        exception.code shouldBe HotelaException.ACCESS_DENIED
-                        exception.message shouldBe "Access denied"
+                            exception.code shouldBe HotelaException.ACCESS_DENIED
+                            exception.message shouldBe "Access denied"
+                        }
                     }
                 }
             }
@@ -114,51 +128,52 @@ class HotelServiceTest :
                         hotelService.findById(hotelId) shouldBe null
                     }
                 }
+
+                When("calling updateHotel") {
+                    every { jwt.claims } returns
+                        mapOf(
+                            AuthClaimKey.ROLE.key to Role.PARTNER,
+                            AuthClaimKey.USERID.key to partner.id,
+                        )
+
+                    Then("it should throw an exception") {
+                        coEvery { hotelRepository.findById(hotel.id) } returns null
+
+                        val exception =
+                            shouldThrow<HotelaException.HotelNotFoundException> {
+                                hotelService.updateHotel(hotel.id, updateHotelRequest, jwtToken)
+                            }
+                        exception.code shouldBe HotelaException.HOTEL_NOT_FOUND
+                        exception.message shouldBe "Hotel with id ${hotel.id} not found"
+                    }
+                }
             }
 
-            And("a valid partner id") {
+            And("a valid partner token") {
                 When("calling findByPartnerId") {
-                    val partnerId = hotel.partnerId
-
                     Then("it should return a list of hotels") {
-                        coEvery { hotelRepository.findByPartnerId(partnerId) } returns listOf(hotel)
+                        coEvery { hotelRepository.findByPartnerId(partner.id) } returns listOf(hotel)
 
-                        val result = hotelService.findByPartnerId(partnerId)
+                        val result = hotelService.findByPartnerId(partner.id)
 
                         result.first() shouldBe hotel
                     }
                 }
-            }
-
-            And("a valid partner auth id") {
-                every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to partnerAuth.id)
 
                 When("calling createHotel") {
+                    every { jwt.claims } returns
+                        mapOf(
+                            AuthClaimKey.ROLE.key to Role.PARTNER,
+                            AuthClaimKey.USERID.key to partner.id,
+                        )
+
                     Then("it should create a new hotel") {
-                        coEvery { partnerAuthService.findById(partnerAuth.id) } returns partnerAuth
                         coEvery { hotelRepository.create(any()) } returns hotel
+                        coEvery { addressRepository.create(any()) } returns address
 
                         val result = hotelService.createHotel(createHotelRequest, jwtToken)
 
                         result shouldBe hotel
-                    }
-                }
-            }
-
-            And("an invalid partner auth id") {
-                every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to anotherPartnerAuth.id)
-
-                When("calling createHotel") {
-                    Then("it should throw an exception") {
-                        coEvery { partnerAuthService.findById(any()) } returns null
-
-                        val exception =
-                            shouldThrow<HotelaException.InvalidCredentialsException> {
-                                hotelService.createHotel(createHotelRequest, jwtToken)
-                            }
-
-                        exception.code shouldBe HotelaException.INVALID_CREDENTIALS
-                        exception.message shouldBe "Invalid credentials"
                     }
                 }
             }

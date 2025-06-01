@@ -118,9 +118,9 @@ class BookingRepositoryImpl(
             bookedAt = row.get("booked_at", Instant::class.java)!!,
             checkin = row.get("checkin", Instant::class.java)!!,
             checkout = row.get("checkout", Instant::class.java)!!,
-            numberOfGuests = row.get("numberOfGuests", Int::class.java)!!,
+            numberOfGuests = row.get("number_of_guests", Int::class.java)!!,
             status = row.get("status", BookingStatus::class.java)!!,
-            specialRequests = row.get("specialRequests", String::class.java),
+            specialRequests = row.get("special_requests", String::class.java),
         )
 
     companion object {

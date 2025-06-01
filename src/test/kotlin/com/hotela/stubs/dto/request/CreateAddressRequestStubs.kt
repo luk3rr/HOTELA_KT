@@ -1,12 +1,10 @@
-package com.hotela.stubs.db
+package com.hotela.stubs.dto.request
 
-import com.hotela.model.db.Address
+import com.hotela.model.dto.request.CreateAddressRequest
 import java.math.BigDecimal
-import java.util.UUID
 
-object AddressStubs {
+object CreateAddressRequestStubs {
     fun create(
-        id: UUID = UUID.fromString("f7f52963-8e4f-4b86-aea9-90b6b95ac775"),
         streetAddress: String = "123 Main St",
         number: String? = "100",
         complement: String? = "Apt 202",
@@ -17,9 +15,8 @@ object AddressStubs {
         countryCode: String = "BR",
         latitude: BigDecimal? = BigDecimal("-23.55052"),
         longitude: BigDecimal? = BigDecimal("-46.633308"),
-    ): Address =
-        Address(
-            id = id,
+    ): CreateAddressRequest =
+        CreateAddressRequest(
             streetAddress = streetAddress,
             number = number,
             complement = complement,

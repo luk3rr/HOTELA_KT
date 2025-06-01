@@ -1,6 +1,9 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.db.Partner
+import com.hotela.model.domain.Email
+import com.hotela.model.domain.PhoneNumber
+import com.hotela.model.enum.DocumentIdType
 import com.hotela.model.enum.PartnerStatus
 import com.hotela.stubs.db.PartnerStubs
 import io.kotest.core.spec.style.ShouldSpec
@@ -15,7 +18,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.RowsFetchSpec
 import org.springframework.r2dbc.core.bind
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 import java.util.function.BiFunction
 
@@ -46,17 +49,15 @@ class PartnerRepositoryImplTest :
             }
 
             every { mockRow.get("id", UUID::class.java) } returns partner.id
-            every { mockRow.get("name", String::class.java) } returns partner.name
-            every { mockRow.get("cnpj", String::class.java) } returns partner.cnpj
-            every { mockRow.get("email", String::class.java) } returns partner.email
-            every { mockRow.get("phone", String::class.java) } returns partner.phone
-            every { mockRow.get("address", String::class.java) } returns partner.address
-            every { mockRow.get("contact_name", String::class.java) } returns partner.contactName
-            every { mockRow.get("contact_email", String::class.java) } returns partner.contactEmail
-            every { mockRow.get("contact_phone", String::class.java) } returns partner.contactPhone
-            every { mockRow.get("contract_signed", Boolean::class.java) } returns partner.contractSigned
+            every { mockRow.get("auth_credential_id", UUID::class.java) } returns partner.authCredentialId
+            every { mockRow.get("company_name", String::class.java) } returns partner.companyName
+            every { mockRow.get("legal_name", String::class.java) } returns partner.legalName
+            every { mockRow.get("email", Email::class.java) } returns partner.contactInfo.email
+            every { mockRow.get("phone", PhoneNumber::class.java) } returns partner.contactInfo.phone
+            every { mockRow.get("document_id_type", DocumentIdType::class.java) } returns partner.documentId.type
+            every { mockRow.get("document_id_value", String::class.java) } returns partner.documentId.value
+            every { mockRow.get("contract_signed_at", Instant::class.java) } returns partner.contractSignedAt
             every { mockRow.get("status", PartnerStatus::class.java) } returns partner.status
-            every { mockRow.get("created_at", LocalDateTime::class.java) } returns partner.createdAt
             every { mockRow.get("notes", String::class.java) } returns partner.notes
         }
 
@@ -68,7 +69,10 @@ class PartnerRepositoryImplTest :
         afterTest { clearAllMocks() }
 
         should("successfully find a partner by id") {
-            partnerRepositoryImpl.findById(partner.id) shouldBe partner
+            val result = partnerRepositoryImpl.findById(partner.id)
+
+            result?.id shouldBe partner.id
+            result?.authCredentialId shouldBe partner.authCredentialId
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
@@ -79,11 +83,15 @@ class PartnerRepositoryImplTest :
         }
 
         should("successfully find a partner by email") {
-            partnerRepositoryImpl.findByEmail(partner.email) shouldBe partner
+            val result = partnerRepositoryImpl.findByEmail(partner.contactInfo.email)
+
+            result?.id shouldBe partner.id
+            result?.authCredentialId shouldBe partner.authCredentialId
+            result?.contactInfo?.email shouldBe partner.contactInfo.email
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("email", partner.email)
+                genericDatabaseSpec.bind("email", partner.contactInfo.email)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Partner>>())
                 rowsFetchSpec.first()
             }
@@ -92,32 +100,34 @@ class PartnerRepositoryImplTest :
         should("successfully check if a partner exists by email") {
             every { mockRow.get("exists", Boolean::class.java) } returns true
 
-            partnerRepositoryImpl.existsByEmail(partner.email) shouldBe true
+            partnerRepositoryImpl.existsByEmail(partner.contactInfo.email) shouldBe true
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("email", partner.email)
+                genericDatabaseSpec.bind("email", partner.contactInfo.email)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Boolean>>())
             }
         }
 
         should("successfully create a partner") {
-            partnerRepositoryImpl.create(partner) shouldBe partner
+            val result = partnerRepositoryImpl.create(partner)
+
+            result.id shouldBe partner.id
+            result.authCredentialId shouldBe partner.authCredentialId
+            result.companyName shouldBe partner.companyName
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", partner.id)
-                genericDatabaseSpec.bind("name", partner.name)
-                genericDatabaseSpec.bind("cnpj", partner.cnpj)
-                genericDatabaseSpec.bind("email", partner.email)
-                genericDatabaseSpec.bind("phone", partner.phone)
-                genericDatabaseSpec.bind("address", partner.address)
-                genericDatabaseSpec.bind("contactName", partner.contactName)
-                genericDatabaseSpec.bind("contactEmail", partner.contactEmail)
-                genericDatabaseSpec.bind("contactPhone", partner.contactPhone)
-                genericDatabaseSpec.bind("contractSigned", partner.contractSigned)
+                genericDatabaseSpec.bind("authCredentialId", partner.authCredentialId)
+                genericDatabaseSpec.bind("companyName", partner.companyName)
+                genericDatabaseSpec.bind("legalName", partner.legalName)
+                genericDatabaseSpec.bind("email", partner.contactInfo.email)
+                genericDatabaseSpec.bind("phone", partner.contactInfo.phone)
+                genericDatabaseSpec.bind("documentIdType", partner.documentId.type)
+                genericDatabaseSpec.bind("documentIdValue", partner.documentId.value)
+                genericDatabaseSpec.bind("contractSignedAt", partner.contractSignedAt)
                 genericDatabaseSpec.bind("status", partner.status)
-                genericDatabaseSpec.bind("createdAt", partner.createdAt)
                 genericDatabaseSpec.bind("notes", partner.notes)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Partner>>())
                 rowsFetchSpec.first()
@@ -125,22 +135,22 @@ class PartnerRepositoryImplTest :
         }
 
         should("successfully update a partner") {
-            partnerRepositoryImpl.update(partner) shouldBe partner
+            val result = partnerRepositoryImpl.update(partner)
+
+            result.id shouldBe partner.id
+            result.authCredentialId shouldBe partner.authCredentialId
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", partner.id)
-                genericDatabaseSpec.bind("name", partner.name)
-                genericDatabaseSpec.bind("cnpj", partner.cnpj)
-                genericDatabaseSpec.bind("email", partner.email)
-                genericDatabaseSpec.bind("phone", partner.phone)
-                genericDatabaseSpec.bind("address", partner.address)
-                genericDatabaseSpec.bind("contactName", partner.contactName)
-                genericDatabaseSpec.bind("contactEmail", partner.contactEmail)
-                genericDatabaseSpec.bind("contactPhone", partner.contactPhone)
-                genericDatabaseSpec.bind("contractSigned", partner.contractSigned)
+                genericDatabaseSpec.bind("companyName", partner.companyName)
+                genericDatabaseSpec.bind("legalName", partner.legalName)
+                genericDatabaseSpec.bind("email", partner.contactInfo.email)
+                genericDatabaseSpec.bind("phone", partner.contactInfo.phone)
+                genericDatabaseSpec.bind("documentIdType", partner.documentId.type)
+                genericDatabaseSpec.bind("documentIdValue", partner.documentId.value)
+                genericDatabaseSpec.bind("contractSignedAt", partner.contractSignedAt)
                 genericDatabaseSpec.bind("status", partner.status)
-                genericDatabaseSpec.bind("createdAt", partner.createdAt)
                 genericDatabaseSpec.bind("notes", partner.notes)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Partner>>())
                 rowsFetchSpec.first()

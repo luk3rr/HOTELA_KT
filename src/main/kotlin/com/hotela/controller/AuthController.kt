@@ -21,7 +21,7 @@ class AuthController(
     @ResponseStatus(HttpStatus.OK)
     suspend fun partnerLogin(
         @RequestBody payload: AuthRequest,
-    ): AuthResponse = authCredentialService.partnerLogin(payload)
+    ): AuthResponse = authCredentialService.login(payload)
 
     @PostMapping("/partner/register")
     @ResponseStatus(HttpStatus.CREATED)

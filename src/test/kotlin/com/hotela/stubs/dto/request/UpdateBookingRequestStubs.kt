@@ -12,7 +12,7 @@ object UpdateBookingRequestStubs {
         checkout: Instant? = Instant.parse("2025-01-04T10:00:00Z"),
         numberOfGuests: Int? = 1,
         status: BookingStatus? = BookingStatus.CONFIRMED,
-        specialRequests: String? = "This is a test note"
+        specialRequests: String? = "This is a test note",
     ): UpdateBookingRequest =
         UpdateBookingRequest(
             roomId = roomId,
@@ -20,6 +20,6 @@ object UpdateBookingRequestStubs {
             checkout = checkout,
             numberOfGuests = numberOfGuests,
             status = status,
-            specialRequests = specialRequests
+            specialRequests = specialRequests,
         )
 }

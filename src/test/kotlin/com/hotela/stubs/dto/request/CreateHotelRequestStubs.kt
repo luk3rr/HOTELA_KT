@@ -15,17 +15,18 @@ object CreateHotelRequestStubs {
         email: Email = Email("contact@hotelcalifornia.com"),
         phone: PhoneNumber = PhoneNumber("+1-800-555-0199"),
         website: String? = "https://www.hotelcalifornia.com",
-        description: String? = "A lovely place to stay."
+        description: String? = "A lovely place to stay.",
     ): CreateHotelRequest =
         CreateHotelRequest(
             name = name,
             address = address,
-            contactInfo = ContactInfo(
-                email = email,
-                phone = phone
-            ),
+            contactInfo =
+                ContactInfo(
+                    email = email,
+                    phone = phone,
+                ),
             website = website,
-            description = description
+            description = description,
         )
 
     fun create(hotel: Hotel): CreateHotelRequest =

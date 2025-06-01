@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: hotela
-          image: hotela:latest
+          image: ${IMAGE_NAME}:${IMAGE_TAG}
           imagePullPolicy: Never
           envFrom:
             - secretRef:

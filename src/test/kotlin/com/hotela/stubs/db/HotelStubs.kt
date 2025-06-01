@@ -13,13 +13,14 @@ object HotelStubs {
         partnerId: UUID = UUID.fromString("99f9f48d-7956-4638-9b1a-891f19d28b58"),
         addressId: UUID = UUID.fromString("35e9f4d8-90ea-4a91-bd9b-c5df9d888264"),
         name: String = "Hotel Test",
-        contactInfo: ContactInfo = ContactInfo(
-            email = Email("contact@testhotel.com"),
-            phone = PhoneNumber("+55 11 91234-5678")
-        ),
+        contactInfo: ContactInfo =
+            ContactInfo(
+                email = Email("contact@testhotel.com"),
+                phone = PhoneNumber("+55 11 91234-5678"),
+            ),
         website: String = "https://testhotel.com",
         description: String = "A test hotel with modern amenities and excellent service.",
-        starRating: BigDecimal = BigDecimal("4.7")
+        starRating: BigDecimal = BigDecimal("4.7"),
     ): Hotel =
         Hotel(
             id = id,
@@ -29,6 +30,6 @@ object HotelStubs {
             contactInfo = contactInfo,
             website = website,
             description = description,
-            starRating = starRating
+            starRating = starRating,
         )
 }

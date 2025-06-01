@@ -13,8 +13,9 @@ import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.RowsFetchSpec
+import org.springframework.r2dbc.core.bind
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 import java.util.function.BiFunction
 
@@ -48,12 +49,12 @@ class BookingRepositoryImplTest :
             every { mockRow.get("customer_id", UUID::class.java) } returns booking.customerId
             every { mockRow.get("hotel_id", UUID::class.java) } returns booking.hotelId
             every { mockRow.get("room_id", UUID::class.java) } returns booking.roomId
-            every { mockRow.get("booked_at", LocalDateTime::class.java) } returns booking.bookedAt
-            every { mockRow.get("checkin", LocalDateTime::class.java) } returns booking.checkin
-            every { mockRow.get("checkout", LocalDateTime::class.java) } returns booking.checkout
-            every { mockRow.get("guests", Int::class.java) } returns booking.guests
+            every { mockRow.get("booked_at", Instant::class.java) } returns booking.bookedAt
+            every { mockRow.get("checkin", Instant::class.java) } returns booking.checkin
+            every { mockRow.get("checkout", Instant::class.java) } returns booking.checkout
+            every { mockRow.get("number_of_guests", Int::class.java) } returns booking.numberOfGuests
             every { mockRow.get("status", BookingStatus::class.java) } returns booking.status
-            every { mockRow.get("notes", String::class.java) } returns booking.notes
+            every { mockRow.get("special_requests", String::class.java) } returns booking.specialRequests
         }
 
         beforeTest {
@@ -74,9 +75,9 @@ class BookingRepositoryImplTest :
                 genericDatabaseSpec.bind("roomId", booking.roomId)
                 genericDatabaseSpec.bind("checkin", booking.checkin)
                 genericDatabaseSpec.bind("checkout", booking.checkout)
-                genericDatabaseSpec.bind("guests", booking.guests)
+                genericDatabaseSpec.bind("numberOfGuests", booking.numberOfGuests)
                 genericDatabaseSpec.bind("status", booking.status)
-                genericDatabaseSpec.bind("notes", booking.notes)
+                genericDatabaseSpec.bind("specialRequests", booking.specialRequests)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Booking>>())
                 rowsFetchSpec.first()
             }
@@ -88,14 +89,12 @@ class BookingRepositoryImplTest :
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", booking.id)
-                genericDatabaseSpec.bind("customerId", booking.customerId)
-                genericDatabaseSpec.bind("hotelId", booking.hotelId)
                 genericDatabaseSpec.bind("roomId", booking.roomId)
                 genericDatabaseSpec.bind("checkin", booking.checkin)
                 genericDatabaseSpec.bind("checkout", booking.checkout)
-                genericDatabaseSpec.bind("guests", booking.guests)
+                genericDatabaseSpec.bind("numberOfGuests", booking.numberOfGuests)
                 genericDatabaseSpec.bind("status", booking.status)
-                genericDatabaseSpec.bind("notes", booking.notes)
+                genericDatabaseSpec.bind("specialRequests", booking.specialRequests)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Booking>>())
                 rowsFetchSpec.first()
             }
@@ -134,13 +133,13 @@ class BookingRepositoryImplTest :
             }
         }
 
-        should("successfully find in-progress bookings by hotel id") {
+        should("successfully find checked-in bookings by hotel id") {
             bookingRepositoryImpl.findCheckedInBookingsByHotelId(booking.hotelId) shouldBe listOf(booking)
 
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("hotelId", booking.hotelId)
-                genericDatabaseSpec.bind("status", listOf(BookingStatus.IN_PROGRESS))
+                genericDatabaseSpec.bind("status", setOf(BookingStatus.CHECKED_IN))
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Booking>>())
                 rowsFetchSpec.all().collectList()
             }
@@ -152,7 +151,7 @@ class BookingRepositoryImplTest :
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("hotelId", booking.hotelId)
-                genericDatabaseSpec.bind("status", listOf(BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS))
+                genericDatabaseSpec.bind("status", Booking.RUNNING_BOOKINGS_STATUS)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Booking>>())
                 rowsFetchSpec.all().collectList()
             }
@@ -164,7 +163,7 @@ class BookingRepositoryImplTest :
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("hotelId", booking.hotelId)
-                genericDatabaseSpec.bind("status", listOf(BookingStatus.CANCELLED, BookingStatus.COMPLETED))
+                genericDatabaseSpec.bind("status", Booking.FINISHED_BOOKINGS_STATUS)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Booking>>())
                 rowsFetchSpec.all().collectList()
             }

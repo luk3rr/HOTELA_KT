@@ -47,10 +47,10 @@ class RoomRepositoryImplTest :
 
             every { mockRow.get("id", UUID::class.java) } returns room.id
             every { mockRow.get("hotel_id", UUID::class.java) } returns room.hotelId
+            every { mockRow.get("room_type_id", UUID::class.java) } returns room.roomTypeId
             every { mockRow.get("number", String::class.java) } returns room.number
             every { mockRow.get("floor", Int::class.java) } returns room.floor
-            every { mockRow.get("type", String::class.java) } returns room.type
-            every { mockRow.get("price", BigDecimal::class.java) } returns room.price
+            every { mockRow.get("price_per_night", BigDecimal::class.java) } returns room.pricePerNight
             every { mockRow.get("capacity", Int::class.java) } returns room.capacity
             every { mockRow.get("status", RoomStatus::class.java) } returns room.status
             every { mockRow.get("description", String::class.java) } returns room.description
@@ -72,10 +72,10 @@ class RoomRepositoryImplTest :
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", room.id)
                 genericDatabaseSpec.bind("hotelId", room.hotelId)
+                genericDatabaseSpec.bind("roomTypeId", room.roomTypeId)
                 genericDatabaseSpec.bind("number", room.number)
                 genericDatabaseSpec.bind("floor", room.floor)
-                genericDatabaseSpec.bind("type", room.type)
-                genericDatabaseSpec.bind("price", room.price)
+                genericDatabaseSpec.bind("pricePerNight", room.pricePerNight)
                 genericDatabaseSpec.bind("capacity", room.capacity)
                 genericDatabaseSpec.bind("status", room.status)
                 genericDatabaseSpec.bind("description", room.description)
@@ -90,26 +90,14 @@ class RoomRepositoryImplTest :
             verify(exactly = 1) {
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", room.id)
+                genericDatabaseSpec.bind("roomTypeId", room.roomTypeId)
                 genericDatabaseSpec.bind("number", room.number)
                 genericDatabaseSpec.bind("floor", room.floor)
-                genericDatabaseSpec.bind("type", room.type)
-                genericDatabaseSpec.bind("price", room.price)
+                genericDatabaseSpec.bind("pricePerNight", room.pricePerNight)
                 genericDatabaseSpec.bind("capacity", room.capacity)
                 genericDatabaseSpec.bind("status", room.status)
                 genericDatabaseSpec.bind("description", room.description)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Room>>())
-                rowsFetchSpec.first()
-            }
-        }
-
-        should("successfully delete a room") {
-            every { mockRow.get("deleted", Boolean::class.java) } returns true
-            roomRepositoryImpl.delete(room.id) shouldBe true
-
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", room.id)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Boolean>>())
                 rowsFetchSpec.first()
             }
         }

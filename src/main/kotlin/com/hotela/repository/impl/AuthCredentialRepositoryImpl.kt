@@ -66,8 +66,8 @@ class AuthCredentialRepositoryImpl(
     private fun mapper(row: Row): AuthCredential =
         AuthCredential(
             id = row.get("id", UUID::class.java)!!,
-            loginEmail = row.get("email", Email::class.java)!!,
-            password = row.get("password_hash", String::class.java)!!,
+            loginEmail = row.get("login_email", Email::class.java)!!,
+            password = row.get("password", String::class.java)!!,
             role = row.get("role", Role::class.java)!!,
             isActive = row.get("is_active", Boolean::class.java)!!,
             lastLoginAt = row.get("last_login_at", Instant::class.java),

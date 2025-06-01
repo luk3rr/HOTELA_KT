@@ -3,15 +3,15 @@ package com.hotela.model.enum
 enum class DocumentIdType {
     CNPJ,
     CPF,
-    OTHER;
+    OTHER,
+    ;
 
     companion object {
-        fun fromString(value: String): DocumentIdType {
-            return when (value.uppercase()) {
+        fun fromString(value: String): DocumentIdType =
+            when (value.uppercase()) {
                 "CNPJ" -> CNPJ
                 "CPF" -> CPF
                 else -> OTHER
             }
-        }
     }
 }

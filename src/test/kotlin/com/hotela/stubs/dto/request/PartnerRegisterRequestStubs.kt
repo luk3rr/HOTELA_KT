@@ -11,21 +11,23 @@ import java.time.Instant
 
 object PartnerRegisterRequestStubs {
     fun create(
-        loginEmail: String = "john@doe.com",
+        loginEmail: Email = Email("john@doe.com"),
         password: String = "password",
         companyName: String = "John Doe Tech Ltda",
         legalName: String = "John Doe Tecnologia e Serviços LTDA",
-        contactInfo: ContactInfo = ContactInfo(
-            email = Email("john@doe.com"),
-            phone = PhoneNumber("+55 11 91234-5678")
-        ),
-        documentId: DocumentId = DocumentId(
-            type = DocumentIdType.CNPJ,
-            value = "12345678000190"
-        ),
+        contactInfo: ContactInfo =
+            ContactInfo(
+                email = Email("john@doe.com"),
+                phone = PhoneNumber("+55 11 91234-5678"),
+            ),
+        documentId: DocumentId =
+            DocumentId(
+                type = DocumentIdType.CNPJ,
+                value = "12345678000190",
+            ),
         contractSignedAt: Instant = Instant.parse("2019-05-05T05:05:00Z"),
         status: PartnerStatus = PartnerStatus.ACTIVE,
-        notes: String? = "Test partner"
+        notes: String? = "Test partner",
     ): PartnerRegisterRequest =
         PartnerRegisterRequest(
             loginEmail = loginEmail,
@@ -36,6 +38,6 @@ object PartnerRegisterRequestStubs {
             documentId = documentId,
             contractSignedAt = contractSignedAt,
             status = status,
-            notes = notes
+            notes = notes,
         )
 }
