@@ -1,0 +1,30 @@
+include:
+  - project: 'personal/projects/infrastructure-lives'
+    file: '/template/pipeline.yml'
+    ref: main
+
+variables:
+  SERVICE_NAME: "hotela"
+  DEPLOY_MANIFEST_PATH: "k8s/deployment.yml"
+
+stages:
+  - build
+  - test
+  - deploy
+
+build_image:
+  extends: .build_image
+
+test:
+  stage: test
+  image: gradle:8-jdk17
+  script:
+    - gradle test
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+
+deploy_k3s:
+  extends: .deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+      when: manual
