@@ -12,9 +12,6 @@ stages:
   - test
   - deploy
 
-build_image:
-  extends: .build_image
-
 test:
   stage: test
   image: gradle:8-jdk17
@@ -22,9 +19,3 @@ test:
     - gradle test
   rules:
     - if: '$CI_COMMIT_BRANCH'
-
-deploy_k3s:
-  extends: .deploy
-  rules:
-    - if: '$CI_COMMIT_BRANCH'
-      when: manual
