@@ -17,7 +17,7 @@ build_image:
 
 test:
   stage: test
-  image: gradle:8-jdk17
+  image: gradle:8-jdk21
   script:
     - gradle test
   rules:
