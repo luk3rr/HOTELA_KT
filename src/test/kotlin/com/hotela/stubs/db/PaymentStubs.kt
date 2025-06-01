@@ -16,7 +16,7 @@ object PaymentStubs {
         paymentMethod: PaymentMethod = PaymentMethod.PIX,
         status: PaymentStatus = PaymentStatus.CONFIRMED,
         processedAt: Instant? = Instant.parse("2021-10-01T14:00:00Z"),
-        metadata: String? = null
+        metadata: String? = null,
     ): Payment =
         Payment(
             id = id,
@@ -26,6 +26,6 @@ object PaymentStubs {
             paymentMethod = paymentMethod,
             status = status,
             processedAt = processedAt,
-            metadata = metadata
+            metadata = metadata,
         )
 }

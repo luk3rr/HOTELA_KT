@@ -15,9 +15,10 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.RowsFetchSpec
 import org.springframework.r2dbc.core.bind
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 import java.util.function.BiFunction
+import kotlin.jvm.java
 
 class ReviewRepositoryImplTest :
     ShouldSpec({
@@ -41,17 +42,22 @@ class ReviewRepositoryImplTest :
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Review>>())
             } answers {
                 val function = args[0] as BiFunction<Row, RowMetadata, Review>
-                every { rowsFetchSpec.first() } returns Mono.just(function.apply(mockRow, mockk()))
-                every { rowsFetchSpec.all().collectList() } returns Mono.just(listOf(function.apply(mockRow, mockk())))
+                val mapped = function.apply(mockRow, mockk())
+                every { rowsFetchSpec.first() } returns Mono.just(mapped)
+                every { rowsFetchSpec.all().collectList() } returns Mono.just(listOf(mapped))
                 rowsFetchSpec
             }
 
             every { mockRow.get("id", UUID::class.java) } returns review.id
             every { mockRow.get("booking_id", UUID::class.java) } returns review.bookingId
+            every { mockRow.get("customer_id", UUID::class.java) } returns review.customerId
+            every { mockRow.get("hotel_id", UUID::class.java) } returns review.hotelId
             every { mockRow.get("rating", Int::class.java) } returns review.rating
+            every { mockRow.get("title", String::class.java) } returns review.title
             every { mockRow.get("comment", String::class.java) } returns review.comment
-            every { mockRow.get("reviewed_at", LocalDateTime::class.java) } returns review.reviewedAt
-            every { mockRow.get("updated_at", LocalDateTime::class.java) } returns review.updatedAt
+            every { mockRow.get("is_anonymous", Boolean::class.java) } returns review.isAnonymous
+            every { mockRow.get("reviewed_at", Instant::class.java) } returns review.reviewedAt
+            every { mockRow.get("updated_at", Instant::class.java) } returns review.updatedAt
         }
 
         beforeTest {
@@ -68,8 +74,12 @@ class ReviewRepositoryImplTest :
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", review.id)
                 genericDatabaseSpec.bind("bookingId", review.bookingId)
+                genericDatabaseSpec.bind("customerId", review.customerId)
+                genericDatabaseSpec.bind("hotelId", review.hotelId)
                 genericDatabaseSpec.bind("rating", review.rating)
+                genericDatabaseSpec.bind("title", review.title)
                 genericDatabaseSpec.bind("comment", review.comment)
+                genericDatabaseSpec.bind("isAnonymous", review.isAnonymous)
                 genericDatabaseSpec.bind("reviewedAt", review.reviewedAt)
                 genericDatabaseSpec.bind("updatedAt", review.updatedAt)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Review>>())
@@ -84,7 +94,10 @@ class ReviewRepositoryImplTest :
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", review.id)
                 genericDatabaseSpec.bind("rating", review.rating)
+                genericDatabaseSpec.bind("title", review.title)
                 genericDatabaseSpec.bind("comment", review.comment)
+                genericDatabaseSpec.bind("isAnonymous", review.isAnonymous)
+                genericDatabaseSpec.bind("reviewedAt", review.reviewedAt)
                 genericDatabaseSpec.bind("updatedAt", review.updatedAt)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Review>>())
                 rowsFetchSpec.first()

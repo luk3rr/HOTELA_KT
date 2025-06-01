@@ -11,18 +11,19 @@ object UpdateHotelRequestStubs {
     fun create(
         name: String? = "John Smith",
         address: Address? = AddressStubs.create(),
-        contactInfo: ContactInfo? = ContactInfo(
-            email = Email("contact@hotel.com"),
-            phone = PhoneNumber("+1-555-1234")
-        ),
+        contactInfo: ContactInfo? =
+            ContactInfo(
+                email = Email("contact@hotel.com"),
+                phone = PhoneNumber("+1-555-1234"),
+            ),
         website: String? = "https://example.com",
-        description: String? = "Lorem ipsum dolor sit amet."
+        description: String? = "Lorem ipsum dolor sit amet.",
     ): UpdateHotelRequest =
         UpdateHotelRequest(
             name = name,
             address = address,
             contactInfo = contactInfo,
             website = website,
-            description = description
+            description = description,
         )
 }

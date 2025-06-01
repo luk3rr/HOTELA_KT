@@ -14,7 +14,7 @@ import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Component
 class CustomerRepositoryImpl(
@@ -24,6 +24,14 @@ class CustomerRepositoryImpl(
         databaseClient
             .sql(FIND_BY_ID)
             .bind("id", id)
+            .map { row, _ ->
+                mapper(row)
+            }.awaitSingleOrNull()
+
+    override suspend fun findByAuthId(authId: UUID): Customer? =
+        databaseClient
+            .sql(FIND_BY_AUTH_ID)
+            .bind("authId", authId)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()
@@ -80,20 +88,26 @@ class CustomerRepositoryImpl(
             authCredentialId = row.get("auth_credential_id", UUID::class.java)!!,
             addressId = row.get("address_id", UUID::class.java)!!,
             name = row.get("name", String::class.java)!!,
-            contactInfo = ContactInfo(
-                email = row.get("email", Email::class.java)!!,
-                phone = row.get("phone", PhoneNumber::class.java)!!
-            ),
-            documentId = DocumentId(
-                type = row.get("document_id_type", DocumentIdType::class.java)!!,
-                value = row.get("document_id_value", String::class.java)!!
-            ),
-            birthDate = row.get("birth_date", Instant::class.java)
+            contactInfo =
+                ContactInfo(
+                    email = row.get("email", Email::class.java)!!,
+                    phone = row.get("phone", PhoneNumber::class.java)!!,
+                ),
+            documentId =
+                DocumentId(
+                    type = row.get("document_id_type", DocumentIdType::class.java)!!,
+                    value = row.get("document_id_value", String::class.java)!!,
+                ),
+            birthDate = row.get("birth_date", Instant::class.java),
         )
 
     companion object {
         private const val FIND_BY_ID = """
         SELECT * FROM customer WHERE id = :id
+        """
+
+        private const val FIND_BY_AUTH_ID = """
+        SELECT * FROM customer WHERE auth_credential_id = :authId
         """
 
         private const val FIND_BY_EMAIL = """

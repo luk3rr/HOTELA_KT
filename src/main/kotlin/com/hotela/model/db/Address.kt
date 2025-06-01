@@ -1,7 +1,8 @@
 package com.hotela.model.db
 
 import java.math.BigDecimal
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 
 data class Address(
     val id: UUID,
@@ -40,7 +41,6 @@ data class Address(
         }
     }
 
-    override fun toString(): String {
-        return "$streetAddress${if (!number.isNullOrBlank()) ", $number" else ""}, $city - $stateProvince, $postalCode, $countryCode"
-    }
+    override fun toString(): String =
+        "$streetAddress${if (!number.isNullOrBlank()) ", $number" else ""}, $city - $stateProvince, $postalCode, $countryCode"
 }

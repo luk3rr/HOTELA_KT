@@ -95,18 +95,24 @@ class CustomerControllerTest(
             val customerUpdated =
                 customer.copy(
                     name = updateCustomerRequest.name ?: customer.name,
-                    contactInfo = ContactInfo(
-                        email = updateCustomerRequest.contactInfo?.email
-                            ?: customer.contactInfo.email,
-                        phone = updateCustomerRequest.contactInfo?.phone
-                            ?: customer.contactInfo.phone,
-                    ),
-                    documentId = DocumentId(
-                        type = updateCustomerRequest.documentId?.type
-                            ?: customer.documentId.type,
-                        value = updateCustomerRequest.documentId?.value
-                            ?: customer.documentId.value,
-                    ),
+                    contactInfo =
+                        ContactInfo(
+                            email =
+                                updateCustomerRequest.contactInfo?.email
+                                    ?: customer.contactInfo.email,
+                            phone =
+                                updateCustomerRequest.contactInfo?.phone
+                                    ?: customer.contactInfo.phone,
+                        ),
+                    documentId =
+                        DocumentId(
+                            type =
+                                updateCustomerRequest.documentId?.type
+                                    ?: customer.documentId.type,
+                            value =
+                                updateCustomerRequest.documentId?.value
+                                    ?: customer.documentId.value,
+                        ),
                     birthDate = updateCustomerRequest.birthDate ?: customer.birthDate,
                 )
 

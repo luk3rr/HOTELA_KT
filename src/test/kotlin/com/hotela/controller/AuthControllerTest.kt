@@ -69,7 +69,7 @@ class AuthControllerTest(
             context("when the request is valid") {
                 test("should return 200 OK") {
                     coEvery {
-                        authCredentialService.partnerLogin(any())
+                        authCredentialService.login(any())
                     } returns authResponse
 
                     val requestBody = AuthRequestStubs.create()

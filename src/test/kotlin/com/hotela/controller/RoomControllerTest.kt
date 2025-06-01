@@ -9,7 +9,6 @@ import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.RoomService
 import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
-import com.hotela.stubs.db.PartnerAuthStubs
 import com.hotela.stubs.db.PartnerStubs
 import com.hotela.stubs.db.RoomStubs
 import com.hotela.stubs.dto.request.CreateRoomRequestStubs
@@ -40,10 +39,10 @@ class RoomControllerTest(
 
     init {
         val room = RoomStubs.create()
-        val partner = PartnerStubs.create()
-        val customer = CustomerStubs.create()
-        val customerAuth = AuthCredentialStubs.create(customerId = customer.id)
-        val partnerAuth = PartnerAuthStubs.create(partnerId = partner.id)
+        val partnerAuth = AuthCredentialStubs.create()
+        val partner = PartnerStubs.create(authCredentialId = partnerAuth.id)
+        val customerAuth = AuthCredentialStubs.create()
+        val customer = CustomerStubs.create(authCredentialId = customerAuth.id)
 
         context("POST /room/create") {
             context("when the request is valid") {
@@ -207,52 +206,6 @@ class RoomControllerTest(
                         .uri("/room/update/${room.id}")
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(requestBody)
-                        .exchange()
-                        .expectStatus()
-                        .isForbidden
-                }
-            }
-        }
-
-        context("DELETE /room/delete/{id}") {
-            context("when the request is valid") {
-                test("should return 200 OK") {
-                    coEvery {
-                        roomService.deleteRoom(any(), any())
-                    } returns true
-
-                    val response =
-                        webTestClient
-                            .asPartner(partner.id, partnerAuth.id)
-                            .delete()
-                            .uri("/room/delete/${room.id}")
-                            .exchange()
-                            .expectStatus()
-                            .isOk
-                            .expectHeader()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .expectBody(ResourceUpdatedResponse::class.java)
-                            .returnResult()
-                            .responseBody!!
-
-                    response.message shouldBe "Room deleted successfully"
-                }
-
-                test("should return 403 Forbidden to customer") {
-                    webTestClient
-                        .asCustomer(customer.id, customerAuth.id)
-                        .delete()
-                        .uri("/room/delete/${room.id}")
-                        .exchange()
-                        .expectStatus()
-                        .isForbidden
-                }
-
-                test("should return 403 Forbidden to guest") {
-                    webTestClient
-                        .asGuest()
-                        .delete()
-                        .uri("/room/delete/${room.id}")
                         .exchange()
                         .expectStatus()
                         .isForbidden

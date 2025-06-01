@@ -2,9 +2,7 @@ package com.hotela.service
 
 import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
-import com.hotela.repository.AuthCredentialRepository
 import com.hotela.repository.CustomerRepository
-import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.dto.request.UpdateCustomerRequestStubs
 import io.kotest.assertions.throwables.shouldThrow
@@ -19,11 +17,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 class CustomerServiceTest :
     BehaviorSpec({
         val customerRepository = mockk<CustomerRepository>()
-        val authCredentialRepository = mockk<AuthCredentialRepository>()
         val customerService =
             CustomerService(
                 customerRepository = customerRepository,
-                authCredentialRepository = authCredentialRepository,
             )
 
         val jwtToken = mockk<JwtAuthenticationToken>()
@@ -31,26 +27,14 @@ class CustomerServiceTest :
 
         Given("a customer service") {
             val customer = CustomerStubs.create()
-            val customerAuth = AuthCredentialStubs.create(customer.id)
             val updateCustomerRequest = UpdateCustomerRequestStubs.create()
-
-            require(
-                customer.name != updateCustomerRequest.name &&
-                    customer.phone != updateCustomerRequest.phone &&
-                    customer.idDocument != updateCustomerRequest.idDocument &&
-                    customer.birthDate != updateCustomerRequest.birthDate &&
-                    customer.address != updateCustomerRequest.address,
-            ) {
-                "Customer and UpdateCustomerRequest should have different values"
-            }
 
             val customerUpdated =
                 customer.copy(
                     name = updateCustomerRequest.name ?: customer.name,
-                    phone = updateCustomerRequest.phone ?: customer.phone,
-                    idDocument = updateCustomerRequest.idDocument ?: customer.idDocument,
+                    contactInfo = updateCustomerRequest.contactInfo ?: customer.contactInfo,
+                    documentId = updateCustomerRequest.documentId ?: customer.documentId,
                     birthDate = updateCustomerRequest.birthDate ?: customer.birthDate,
-                    address = updateCustomerRequest.address ?: customer.address,
                 )
 
             And("calling findById") {
@@ -77,28 +61,28 @@ class CustomerServiceTest :
 
             And("calling createCustomer") {
                 When("the customer does not exist") {
-                    coEvery { customerRepository.findById(customer.id) } returns null
+                    coEvery { customerRepository.existsByEmail(customer.contactInfo.email) } returns false
 
                     Then("it should create the customer") {
                         coEvery { customerRepository.create(customer) } returns customer
 
-                        val result = customerService.createCustomer(customer)
+                        val result = customerService.create(customer)
 
                         result shouldBe customer
                     }
                 }
 
                 When("the customer already exists") {
-                    coEvery { customerRepository.findById(customer.id) } returns customer
+                    coEvery { customerRepository.existsByEmail(customer.contactInfo.email) } returns true
 
                     Then("it should throw an exception") {
                         val exception =
-                            shouldThrow<HotelaException.CustomerAlreadyExistsException> {
-                                customerService.createCustomer(customer)
+                            shouldThrow<HotelaException.EmailAlreadyRegisteredException> {
+                                customerService.create(customer)
                             }
 
-                        exception.code shouldBe HotelaException.CUSTOMER_ALREADY_EXISTS
-                        exception.message shouldBe "Customer with id ${customer.id} already exists"
+                        exception.code shouldBe HotelaException.EMAIL_ALREADY_REGISTERED
+                        exception.message shouldBe "Email already registered"
                     }
                 }
             }
@@ -109,10 +93,9 @@ class CustomerServiceTest :
 
                     And("requester is the same as customer") {
                         every { jwtToken.token } returns jwt
-                        every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to customerAuth.id.toString())
+                        every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to customer.id.toString())
 
                         Then("it should update the customer") {
-                            coEvery { authCredentialRepository.findById(customerAuth.id) } returns customerAuth
                             coEvery { customerRepository.update(any()) } returns customerUpdated
 
                             val result =
@@ -124,47 +107,24 @@ class CustomerServiceTest :
                             result shouldBe customerUpdated
                         }
                     }
+                }
 
-                    And("customer id is not associated with customer auth id") {
-                        coEvery { authCredentialRepository.findById(customerAuth.id) } returns null
+                When("the customer does not exist") {
+                    coEvery { customerRepository.findById(customer.id) } returns null
+                    every { jwtToken.token } returns jwt
+                    every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to customer.id.toString())
 
-                        Then("it should throw an exception") {
-                            every { jwtToken.token } returns jwt
-                            every { jwt.claims } returns mapOf(AuthClaimKey.AUTHID.key to customerAuth.id.toString())
+                    Then("it should throw an exception") {
+                        val exception =
+                            shouldThrow<HotelaException.CustomerNotFoundException> {
+                                customerService.updateCustomer(
+                                    payload = updateCustomerRequest,
+                                    token = jwtToken,
+                                )
+                            }
 
-                            val exception =
-                                shouldThrow<HotelaException.CustomerAuthNotFoundException> {
-                                    customerService.updateCustomer(
-                                        payload = updateCustomerRequest,
-                                        token = jwtToken,
-                                    )
-                                }
-
-                            exception.code shouldBe HotelaException.CUSTOMER_AUTH_NOT_FOUND
-                            exception.message shouldBe "Customer auth with id ${customerAuth.id} not found"
-                        }
-                    }
-
-                    And("requester is not a customer") {
-                        every { jwtToken.token } returns jwt
-                        every { jwt.claims } returns mapOf("other_claim" to "some_value")
-
-                        Then("it should throw an exception") {
-                            coEvery { authCredentialRepository.findById(customerAuth.id) } returns customerAuth
-
-                            coEvery { customerRepository.update(any()) } returns customerUpdated
-
-                            val exception =
-                                shouldThrow<HotelaException.InvalidCredentialsException> {
-                                    customerService.updateCustomer(
-                                        payload = updateCustomerRequest,
-                                        token = jwtToken,
-                                    )
-                                }
-
-                            exception.code shouldBe HotelaException.INVALID_CREDENTIALS
-                            exception.message shouldBe "Invalid credentials"
-                        }
+                        exception.code shouldBe HotelaException.CUSTOMER_NOT_FOUND
+                        exception.message shouldBe "Customer with id ${customer.id} not found"
                     }
                 }
             }

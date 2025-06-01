@@ -9,12 +9,11 @@ import com.hotela.model.dto.request.AuthRequest
 import com.hotela.model.dto.request.CustomerRegisterRequest
 import com.hotela.model.dto.request.PartnerRegisterRequest
 import com.hotela.model.dto.response.AuthResponse
-import com.hotela.repository.AuthCredentialRepository
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.model.enum.Role
 import com.hotela.repository.AddressRepository
-import com.hotela.repository.CustomerRepository
-import com.hotela.repository.PartnerRepository
+import com.hotela.repository.AuthCredentialRepository
+import com.hotela.util.TimeProvider
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
@@ -32,9 +31,11 @@ class AuthCredentialService(
     private val jwtEncoder: JwtEncoder,
     private val jwtDecoder: NimbusReactiveJwtDecoder,
     private val authCredentialRepository: AuthCredentialRepository,
-    private val customerRepository: CustomerRepository,
-    private val partnerRepository: PartnerRepository,
-    private val addressRepository: AddressRepository
+    private val customerService: CustomerService,
+    private val partnerService: PartnerService,
+    // TODO: Refactor to use AddressService
+    private val addressRepository: AddressRepository,
+    private val timeProvider: TimeProvider<Instant>,
 ) {
     companion object {
         private val JWS_HEADER = JwsHeader.with { "HS256" }.build()
@@ -42,20 +43,6 @@ class AuthCredentialService(
         private const val EXPIRATION_DURATION = 60L
         private val EXPIRATION_DURATION_UNIT = ChronoUnit.MINUTES
         private const val SALT_ROUNDS = 10
-    }
-
-    suspend fun partnerLogin(payload: AuthRequest): AuthResponse {
-        val partnerAuth =
-            authCredentialRepository.findByLoginEmail(payload.email)
-                ?: throw HotelaException.InvalidCredentialsException()
-
-        if (!matchPassword(payload.password, partnerAuth.password)) {
-            throw HotelaException.InvalidCredentialsException()
-        }
-
-        return AuthResponse(
-            token = createToken(partnerAuth),
-        )
     }
 
     @Transactional
@@ -71,7 +58,7 @@ class AuthCredentialService(
                 password = hashPassword(payload.password),
                 role = Role.PARTNER,
                 isActive = true,
-                lastLoginAt = Instant.now()
+                lastLoginAt = timeProvider.now(),
             )
 
         val partner =
@@ -88,7 +75,7 @@ class AuthCredentialService(
             )
 
         val savedPartnerAuth = authCredentialRepository.create(partnerAuth)
-        partnerRepository.create(partner)
+        partnerService.create(partner)
 
         return AuthResponse(
             token = createToken(savedPartnerAuth),
@@ -107,10 +94,11 @@ class AuthCredentialService(
                 password = hashPassword(payload.password),
                 role = Role.CUSTOMER,
                 isActive = true,
-                lastLoginAt = Instant.now()
+                lastLoginAt = timeProvider.now(),
             )
 
-        val address = Address(
+        val address =
+            Address(
                 id = UUID.randomUUID(),
                 streetAddress = payload.address.streetAddress,
                 number = payload.address.number,
@@ -137,7 +125,7 @@ class AuthCredentialService(
 
         val savedCustomerAuth = authCredentialRepository.create(customerAuth)
         addressRepository.create(address)
-        customerRepository.create(customer)
+        customerService.create(customer)
 
         return AuthResponse(
             token = createToken(savedCustomerAuth),
@@ -154,20 +142,19 @@ class AuthCredentialService(
         }
 
         return AuthResponse(
-            token = createToken(userAuth)
+            token = createToken(userAuth),
         )
     }
 
-    private suspend fun createToken(
-        authCredential: AuthCredential,
-    ): String {
-        val userId = authCredential.role.let {
-            when (it) {
-                Role.CUSTOMER -> customerRepository.findById(authCredential.id)?.id
-                Role.PARTNER -> partnerRepository.findById(authCredential.id)?.id
+    private suspend fun createToken(authCredential: AuthCredential): String {
+        val userId =
+            authCredential.role.let {
+                when (it) {
+                    Role.CUSTOMER -> customerService.findByAuthId(authCredential.id)?.id
+                    Role.PARTNER -> partnerService.findByAuthId(authCredential.id)?.id
+                }
             }
-        }
-        val now = Instant.now()
+        val now = timeProvider.now()
         val claims =
             JwtClaimsSet
                 .builder()

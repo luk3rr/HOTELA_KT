@@ -1,6 +1,8 @@
 package com.hotela.repository.impl
 
 import com.hotela.model.db.Hotel
+import com.hotela.model.domain.Email
+import com.hotela.model.domain.PhoneNumber
 import com.hotela.stubs.db.HotelStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
@@ -46,17 +48,13 @@ class HotelRepositoryImplTest :
 
             every { mockRow.get("id", UUID::class.java) } returns hotel.id
             every { mockRow.get("partner_id", UUID::class.java) } returns hotel.partnerId
+            every { mockRow.get("address_id", UUID::class.java) } returns hotel.addressId
             every { mockRow.get("name", String::class.java) } returns hotel.name
-            every { mockRow.get("address", String::class.java) } returns hotel.address
-            every { mockRow.get("city", String::class.java) } returns hotel.city
-            every { mockRow.get("state", String::class.java) } returns hotel.state
-            every { mockRow.get("zip_code", String::class.java) } returns hotel.zipCode
-            every { mockRow.get("phone", String::class.java) } returns hotel.phone
-            every { mockRow.get("rating", BigDecimal::class.java) } returns hotel.rating
-            every { mockRow.get("description", String::class.java) } returns hotel.description
+            every { mockRow.get("phone", PhoneNumber::class.java) } returns hotel.contactInfo.phone
+            every { mockRow.get("email", Email::class.java) } returns hotel.contactInfo.email
             every { mockRow.get("website", String::class.java) } returns hotel.website
-            every { mockRow.get("latitude", BigDecimal::class.java) } returns hotel.latitude
-            every { mockRow.get("longitude", BigDecimal::class.java) } returns hotel.longitude
+            every { mockRow.get("description", String::class.java) } returns hotel.description
+            every { mockRow.get("star_rating", BigDecimal::class.java) } returns hotel.starRating
         }
 
         beforeTest {
@@ -73,17 +71,13 @@ class HotelRepositoryImplTest :
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", hotel.id)
                 genericDatabaseSpec.bind("partnerId", hotel.partnerId)
+                genericDatabaseSpec.bind("addressId", hotel.addressId)
                 genericDatabaseSpec.bind("name", hotel.name)
-                genericDatabaseSpec.bind("address", hotel.address)
-                genericDatabaseSpec.bind("city", hotel.city)
-                genericDatabaseSpec.bind("state", hotel.state)
-                genericDatabaseSpec.bind("zipCode", hotel.zipCode)
-                genericDatabaseSpec.bind("phone", hotel.phone)
-                genericDatabaseSpec.bind("rating", hotel.rating)
-                genericDatabaseSpec.bind("description", hotel.description)
+                genericDatabaseSpec.bind("email", hotel.contactInfo.email)
+                genericDatabaseSpec.bind("phone", hotel.contactInfo.phone)
                 genericDatabaseSpec.bind("website", hotel.website)
-                genericDatabaseSpec.bind("latitude", hotel.latitude)
-                genericDatabaseSpec.bind("longitude", hotel.longitude)
+                genericDatabaseSpec.bind("description", hotel.description)
+                genericDatabaseSpec.bind("starRating", hotel.starRating)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Hotel>>())
                 rowsFetchSpec.first()
             }
@@ -96,16 +90,11 @@ class HotelRepositoryImplTest :
                 databaseClient.sql(any<String>())
                 genericDatabaseSpec.bind("id", hotel.id)
                 genericDatabaseSpec.bind("name", hotel.name)
-                genericDatabaseSpec.bind("address", hotel.address)
-                genericDatabaseSpec.bind("city", hotel.city)
-                genericDatabaseSpec.bind("state", hotel.state)
-                genericDatabaseSpec.bind("zipCode", hotel.zipCode)
-                genericDatabaseSpec.bind("phone", hotel.phone)
-                genericDatabaseSpec.bind("rating", hotel.rating)
-                genericDatabaseSpec.bind("description", hotel.description)
+                genericDatabaseSpec.bind("email", hotel.contactInfo.email)
+                genericDatabaseSpec.bind("phone", hotel.contactInfo.phone)
                 genericDatabaseSpec.bind("website", hotel.website)
-                genericDatabaseSpec.bind("latitude", hotel.latitude)
-                genericDatabaseSpec.bind("longitude", hotel.longitude)
+                genericDatabaseSpec.bind("description", hotel.description)
+                genericDatabaseSpec.bind("starRating", hotel.starRating)
                 genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Hotel>>())
                 rowsFetchSpec.first()
             }

@@ -8,6 +8,7 @@ import com.hotela.model.dto.request.CreateBookingRequest
 import com.hotela.model.dto.request.UpdateBookingRequest
 import com.hotela.model.enum.BookingStatus
 import com.hotela.repository.BookingRepository
+import com.hotela.util.TimeProvider
 import com.hotela.util.getUserId
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
@@ -20,13 +21,17 @@ class BookingService(
     private val bookingRepository: BookingRepository,
     private val hotelService: HotelService,
     private val roomService: RoomService,
+    private val timeProvider: TimeProvider<Instant>,
 ) {
+    companion object {
+        const val CHECKIN_ALLOWED_TIME_WINDOW_MINUTES = 10L
+    }
+
     suspend fun findById(id: UUID) = bookingRepository.findById(id)
 
     suspend fun findByHotelId(hotelId: UUID) = bookingRepository.findByHotelId(hotelId)
 
-    suspend fun findInProgressBookingsByHotelId(hotelId: UUID) =
-        bookingRepository.findCheckedInBookingsByHotelId(hotelId)
+    suspend fun findInProgressBookingsByHotelId(hotelId: UUID) = bookingRepository.findCheckedInBookingsByHotelId(hotelId)
 
     suspend fun findRunningBookingsByHotelId(hotelId: UUID) = bookingRepository.findRunningBookingsByHotelId(hotelId)
 
@@ -57,7 +62,7 @@ class BookingService(
                 checkin = payload.checkin,
                 checkout = payload.checkout,
                 numberOfGuests = payload.numberOfGuests,
-                specialRequests = payload.specialRequests
+                specialRequests = payload.specialRequests,
             )
 
         validateBooking(hotel, room, booking)
@@ -192,9 +197,9 @@ class BookingService(
         checkout: Instant,
     ): Boolean =
         checkin.isBefore(checkout) &&
-                checkin.isAfter(
-                    Instant.now().minus(CHECKIN_ALLOWED_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES),
-                )
+            checkin.isAfter(
+                timeProvider.now().minus(CHECKIN_ALLOWED_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES),
+            )
 
     private suspend fun isRoomAvailability(
         hotel: Hotel,
@@ -230,12 +235,8 @@ class BookingService(
     }
 
     private fun isWithinAllowedCheckInWindow(booking: Booking): Boolean {
-        val now = Instant.now()
+        val now = timeProvider.now()
         val checkinTimeWindow = booking.checkin.minus(CHECKIN_ALLOWED_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES)
         return now.isAfter(checkinTimeWindow) && now.isBefore(booking.checkout)
-    }
-
-    companion object {
-        const val CHECKIN_ALLOWED_TIME_WINDOW_MINUTES = 10L
     }
 }

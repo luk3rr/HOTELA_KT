@@ -1,7 +1,7 @@
 package com.hotela.model.domain
 
 data class PhoneNumber(
-    val value: String
+    val value: String,
 ) {
     companion object {
         val REGEX_PHONE = Regex("^[+\\d\\s\\-\\(\\)]+$")
@@ -17,7 +17,5 @@ data class PhoneNumber(
         require(digitsCount >= MIN_DIGITS) { "Phone number must have at least $MIN_DIGITS digits" }
     }
 
-    private fun isValidPhoneNumber(phoneNumber: String): Boolean {
-        return REGEX_PHONE.matches(phoneNumber)
-    }
+    private fun isValidPhoneNumber(phoneNumber: String): Boolean = REGEX_PHONE.matches(phoneNumber)
 }

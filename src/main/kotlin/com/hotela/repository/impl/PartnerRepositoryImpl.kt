@@ -29,6 +29,14 @@ class PartnerRepositoryImpl(
                 mapper(row)
             }.awaitSingleOrNull()
 
+    override suspend fun findByAuthId(authId: UUID): Partner? =
+        databaseClient
+            .sql(FIND_BY_AUTH_ID)
+            .bind("authId", authId)
+            .map { row, _ ->
+                mapper(row)
+            }.awaitSingleOrNull()
+
     override suspend fun findByEmail(email: Email): Partner? =
         databaseClient
             .sql(FIND_BY_EMAIL)
@@ -84,14 +92,16 @@ class PartnerRepositoryImpl(
             authCredentialId = row.get("auth_credential_id", UUID::class.java)!!,
             companyName = row.get("company_name", String::class.java)!!,
             legalName = row.get("legal_name", String::class.java)!!,
-            contactInfo = ContactInfo(
-                email = row.get("email", Email::class.java)!!,
-                phone = row.get("phone", PhoneNumber::class.java)!!
-            ),
-            documentId = DocumentId(
-                type = row.get("document_id_type", DocumentIdType::class.java)!!,
-                value = row.get("document_id_value", String::class.java)!!
-            ),
+            contactInfo =
+                ContactInfo(
+                    email = row.get("email", Email::class.java)!!,
+                    phone = row.get("phone", PhoneNumber::class.java)!!,
+                ),
+            documentId =
+                DocumentId(
+                    type = row.get("document_id_type", DocumentIdType::class.java)!!,
+                    value = row.get("document_id_value", String::class.java)!!,
+                ),
             contractSignedAt = row.get("contract_signed_at", Instant::class.java)!!,
             status = row.get("status", PartnerStatus::class.java)!!,
             notes = row.get("notes", String::class.java),
@@ -100,6 +110,10 @@ class PartnerRepositoryImpl(
     companion object {
         private const val FIND_BY_ID = """
             SELECT * FROM partner WHERE id = :id
+        """
+
+        private const val FIND_BY_AUTH_ID = """
+            SELECT * FROM partner WHERE auth_credential_id = :authId
         """
 
         private const val FIND_BY_EMAIL = """

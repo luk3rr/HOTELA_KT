@@ -16,9 +16,19 @@ class PartnerService(
 ) {
     suspend fun findById(id: UUID): Partner? = partnerRepository.findById(id)
 
+    suspend fun findByAuthId(authId: UUID): Partner? = partnerRepository.findByAuthId(authId)
+
     suspend fun findByEmail(email: Email): Partner? = partnerRepository.findByEmail(email)
 
     suspend fun existsByEmail(email: Email): Boolean = partnerRepository.existsByEmail(email)
+
+    suspend fun create(partner: Partner): Partner {
+        if (partnerRepository.existsByEmail(partner.contactInfo.email)) {
+            throw HotelaException.EmailAlreadyRegisteredException()
+        }
+
+        return partnerRepository.create(partner)
+    }
 
     suspend fun updatePartner(
         payload: UpdatePartnerRequest,
@@ -36,8 +46,9 @@ class PartnerService(
                 legalName = payload.legalName ?: existingPartner.legalName,
                 contactInfo = payload.contactInfo ?: existingPartner.contactInfo,
                 documentId = payload.documentId ?: existingPartner.documentId,
-                contractSignedAt = payload.contractSignedAt
-                    ?: existingPartner.contractSignedAt,
+                contractSignedAt =
+                    payload.contractSignedAt
+                        ?: existingPartner.contractSignedAt,
                 status = payload.status ?: existingPartner.status,
                 notes = payload.notes ?: existingPartner.notes,
             )

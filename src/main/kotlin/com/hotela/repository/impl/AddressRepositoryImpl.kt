@@ -14,17 +14,16 @@ import java.util.UUID
 class AddressRepositoryImpl(
     private val databaseClient: DatabaseClient,
 ) : AddressRepository {
-    override suspend fun findById(id: UUID): Address? {
-        return databaseClient
+    override suspend fun findById(id: UUID): Address? =
+        databaseClient
             .sql(FIND_BY_ID)
             .bind("id", id)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()
-    }
 
-    override suspend fun create(address: Address): Address {
-        return databaseClient
+    override suspend fun create(address: Address): Address =
+        databaseClient
             .sql(SAVE)
             .bind("id", address.id)
             .bind("streetAddress", address.streetAddress)
@@ -40,10 +39,9 @@ class AddressRepositoryImpl(
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()!!
-    }
 
-    private fun mapper(row: Row): Address {
-        return Address(
+    private fun mapper(row: Row): Address =
+        Address(
             id = row.get("id", UUID::class.java)!!,
             streetAddress = row.get("street_address", String::class.java)!!,
             number = row.get("number", String::class.java)!!,
@@ -56,7 +54,6 @@ class AddressRepositoryImpl(
             latitude = row.get("latitude", BigDecimal::class.java),
             longitude = row.get("longitude", BigDecimal::class.java),
         )
-    }
 
     companion object {
         private const val FIND_BY_ID = """

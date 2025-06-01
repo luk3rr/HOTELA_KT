@@ -5,11 +5,11 @@ import com.hotela.repository.ReviewRepository
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.time.LocalDateTime
 import java.util.UUID
 
 @Component
@@ -67,7 +67,7 @@ class ReviewRepositoryImpl(
             .bind("updatedAt", review.updatedAt)
             .map { row, _ ->
                 mapper(row)
-            }.awaitSingleOrNull()!!
+            }.awaitSingle()
 
     override suspend fun update(review: Review): Review =
         databaseClient
@@ -81,7 +81,7 @@ class ReviewRepositoryImpl(
             .bind("updatedAt", review.updatedAt)
             .map { row, _ ->
                 mapper(row)
-            }.awaitSingleOrNull()!!
+            }.awaitSingle()
 
     private fun mapper(row: Row): Review =
         Review(
@@ -90,11 +90,11 @@ class ReviewRepositoryImpl(
             customerId = row.get("customer_id", UUID::class.java)!!,
             hotelId = row.get("hotel_id", UUID::class.java)!!,
             rating = row.get("rating", Int::class.java)!!,
-            title = row.get("title", String::class.java)!!,
-            comment = row.get("comment", String::class.java)!!,
+            title = row.get("title", String::class.java),
+            comment = row.get("comment", String::class.java),
             isAnonymous = row.get("is_anonymous", Boolean::class.java)!!,
             reviewedAt = row.get("reviewed_at", Instant::class.java)!!,
-            updatedAt = row.get("updated_at", Instant::class.java)!!,
+            updatedAt = row.get("updated_at", Instant::class.java),
         )
 
     companion object {

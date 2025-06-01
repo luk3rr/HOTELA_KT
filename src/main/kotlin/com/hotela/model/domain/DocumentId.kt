@@ -16,11 +16,10 @@ class DocumentId(
         require(isValidDocumentId(value)) { "Document ID format is invalid" }
     }
 
-    private fun isValidDocumentId(documentId: String): Boolean {
-        return when (type) {
+    private fun isValidDocumentId(documentId: String): Boolean =
+        when (type) {
             DocumentIdType.CNPJ -> CNPJ_REGEX.matches(documentId)
             DocumentIdType.CPF -> CPF_REGEX.matches(documentId)
             DocumentIdType.OTHER -> true
         }
-    }
 }

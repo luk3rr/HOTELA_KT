@@ -7,6 +7,7 @@ import com.hotela.model.dto.request.CreateReviewRequest
 import com.hotela.model.dto.request.UpdateReviewRequest
 import com.hotela.model.enum.BookingStatus
 import com.hotela.repository.ReviewRepository
+import com.hotela.util.TimeProvider
 import com.hotela.util.getUserId
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
@@ -17,6 +18,7 @@ import java.util.UUID
 class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val bookingService: BookingService,
+    private val timeProvider: TimeProvider<Instant>,
 ) {
     suspend fun findById(id: UUID): Review? = reviewRepository.findById(id)
 
@@ -73,7 +75,7 @@ class ReviewService(
                 rating = payload.rating ?: review.rating,
                 title = payload.title ?: review.title,
                 comment = payload.comment ?: review.comment,
-                updatedAt = Instant.now(),
+                updatedAt = timeProvider.now(),
                 isAnonymous = payload.isAnonymous ?: review.isAnonymous,
             )
 

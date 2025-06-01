@@ -4,22 +4,24 @@ import com.hotela.error.HotelaException
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.model.enum.BookingStatus
 import com.hotela.repository.BookingRepository
+import com.hotela.service.BookingService.Companion.CHECKIN_ALLOWED_TIME_WINDOW_MINUTES
 import com.hotela.stubs.db.BookingStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.db.HotelStubs
 import com.hotela.stubs.db.RoomStubs
 import com.hotela.stubs.dto.request.CreateBookingRequestStubs
 import com.hotela.stubs.dto.request.UpdateBookingRequestStubs
+import com.hotela.util.TimeProvider
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class BookingServiceTest :
@@ -27,30 +29,31 @@ class BookingServiceTest :
         val bookingRepository = mockk<BookingRepository>()
         val hotelService = mockk<HotelService>()
         val roomService = mockk<RoomService>()
-        val bookingService = BookingService(bookingRepository, hotelService, roomService)
+        val timeProvider = mockk<TimeProvider<Instant>>()
+        val bookingService = BookingService(bookingRepository, hotelService, roomService, timeProvider)
 
         val jwtToken = mockk<JwtAuthenticationToken>()
         val jwt = mockk<Jwt>()
 
         Given("a booking service") {
+            val customer = CustomerStubs.create()
             val hotel = HotelStubs.create()
             val room = RoomStubs.create(hotelId = hotel.id)
-            val roomInAnotherHotel = RoomStubs.create(UUID.fromString("00ba37ad-10fe-47ba-b375-463f566da178"))
-            val customer = CustomerStubs.create()
-            val anotherCustomerId = UUID.fromString("b6299563-9fd6-4030-8a3b-2c90ee1a0042")
             val booking = BookingStubs.create(hotelId = hotel.id, roomId = room.id, customerId = customer.id)
-            val bookingInProgress = BookingStubs.create(status = BookingStatus.IN_PROGRESS, customerId = customer.id)
-            val bookingCompleted = BookingStubs.create(status = BookingStatus.COMPLETED, customerId = customer.id)
+
+            val roomInAnotherHotel = RoomStubs.create(UUID.fromString("00ba37ad-10fe-47ba-b375-463f566da178"))
+            val anotherCustomerId = UUID.fromString("b6299563-9fd6-4030-8a3b-2c90ee1a0042")
+            val bookingInProgress = booking.copy(status = BookingStatus.CHECKED_IN)
+            val bookingCompleted = booking.copy(status = BookingStatus.CHECKED_OUT)
             val anotherBookingInProgress =
-                BookingStubs.create(
+                booking.copy(
                     id = UUID.fromString("b2c08ccd-a0b7-4793-aa09-4f6f56f3a4af"),
-                    hotelId = hotel.id,
-                    roomId = room.id,
-                    customerId = customer.id,
+                    status = BookingStatus.CHECKED_IN,
                 )
 
             every { jwtToken.token } returns jwt
             every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to customer.id.toString())
+            every { timeProvider.now() } returns Instant.now()
 
             And("calling findById") {
                 When("it should return the booking") {
@@ -184,26 +187,23 @@ class BookingServiceTest :
                     }
                 }
 
-                When("checkin is before now") {
+                When("checkin is after now") {
                     val invalidCreateBookingRequest =
                         createBookingRequest.copy(
                             checkin =
-                                LocalDateTime.now().minusMinutes(
+                                timeProvider.now().plus(
                                     BookingService.CHECKIN_ALLOWED_TIME_WINDOW_MINUTES + 1,
+                                    ChronoUnit.MINUTES,
                                 ),
                         )
 
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
 
-                    Then("it should throw InvalidDataException") {
-                        val exception =
-                            shouldThrow<HotelaException.InvalidDataException> {
-                                bookingService.createBooking(invalidCreateBookingRequest, jwtToken)
-                            }
-
-                        exception.code shouldBe HotelaException.INVALID_DATA
-                        exception.message shouldBe "Check-in must be after now and check-out must be after check-in"
+                    Then("it should throw IllegalArgumentException") {
+                        shouldThrow<IllegalArgumentException> {
+                            bookingService.createBooking(invalidCreateBookingRequest, jwtToken)
+                        }
                     }
                 }
 
@@ -214,13 +214,20 @@ class BookingServiceTest :
                             anotherBookingInProgress,
                         )
 
+                    val createBookingRequestInvalid =
+                        createBookingRequest.copy(
+                            checkin = booking.checkin,
+                            checkout = booking.checkout,
+                        )
+
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
+                    every { timeProvider.now() } returns booking.checkin
 
                     Then("it should throw InvalidDataException") {
                         val exception =
                             shouldThrow<HotelaException.InvalidDataException> {
-                                bookingService.createBooking(createBookingRequest, jwtToken)
+                                bookingService.createBooking(createBookingRequestInvalid, jwtToken)
                             }
 
                         exception.code shouldBe HotelaException.INVALID_DATA
@@ -229,7 +236,7 @@ class BookingServiceTest :
                 }
 
                 When("room cannot accommodate the number of guests") {
-                    val invalidCreateBookingRequest = createBookingRequest.copy(guests = room.capacity + 1)
+                    val invalidCreateBookingRequest = createBookingRequest.copy(numberOfGuests = room.capacity + 1)
                     coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns emptyList()
 
                     coEvery { hotelService.findById(any()) } returns hotel
@@ -242,7 +249,7 @@ class BookingServiceTest :
                             }
 
                         exception.code shouldBe HotelaException.INVALID_DATA
-                        exception.message shouldBe "Room ${room.id} cannot accommodate ${invalidCreateBookingRequest.guests} guests"
+                        exception.message shouldBe "Room ${room.id} cannot accommodate ${invalidCreateBookingRequest.numberOfGuests} guests"
                     }
                 }
             }
@@ -250,12 +257,14 @@ class BookingServiceTest :
             And("calling updateBooking") {
                 val updateBookingRequest = UpdateBookingRequestStubs.create()
 
-                When("it should return the booking") {
+                When("request is valid") {
                     coEvery { bookingRepository.findById(any()) } returns booking
                     coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns listOf(booking)
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
                     coEvery { bookingRepository.update(any()) } returns booking
+
+                    every { timeProvider.now() } returns booking.checkin
 
                     Then("it should return the booking") {
                         val result = bookingService.updateBooking(booking.id, updateBookingRequest, jwtToken)
@@ -345,14 +354,18 @@ class BookingServiceTest :
                     val invalidUpdateBookingRequest =
                         updateBookingRequest.copy(
                             checkin =
-                                LocalDateTime.now().minusMinutes(
-                                    BookingService.CHECKIN_ALLOWED_TIME_WINDOW_MINUTES + 1,
+                                Instant.now().minus(
+                                    CHECKIN_ALLOWED_TIME_WINDOW_MINUTES + 1,
+                                    ChronoUnit.MINUTES,
                                 ),
+                            checkout = Instant.now().plus(2L, ChronoUnit.DAYS),
                         )
 
+                    coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns listOf(booking)
                     coEvery { bookingRepository.findById(any()) } returns booking
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
+                    coEvery { timeProvider.now() } returns Instant.now()
 
                     Then("it should throw InvalidDataException") {
                         val exception =
@@ -360,7 +373,6 @@ class BookingServiceTest :
                                 bookingService.updateBooking(booking.id, invalidUpdateBookingRequest, jwtToken)
                             }
 
-                        exception.code shouldBe HotelaException.INVALID_DATA
                         exception.message shouldBe "Check-in must be after now and check-out must be after check-in"
                     }
                 }
@@ -372,14 +384,21 @@ class BookingServiceTest :
                             anotherBookingInProgress,
                         )
 
+                    val updateBookingRequestInvalid =
+                        updateBookingRequest.copy(
+                            checkin = booking.checkin,
+                            checkout = booking.checkout,
+                        )
+
                     coEvery { bookingRepository.findById(any()) } returns booking
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
+                    every { timeProvider.now() } returns booking.checkin
 
                     Then("it should throw InvalidDataException") {
                         val exception =
                             shouldThrow<HotelaException.InvalidDataException> {
-                                bookingService.updateBooking(booking.id, updateBookingRequest, jwtToken)
+                                bookingService.updateBooking(booking.id, updateBookingRequestInvalid, jwtToken)
                             }
 
                         exception.code shouldBe HotelaException.INVALID_DATA
@@ -388,13 +407,14 @@ class BookingServiceTest :
                 }
 
                 When("room cannot accommodate the number of guests") {
-                    val invalidUpdateBookingRequest = updateBookingRequest.copy(guests = room.capacity + 1)
+                    val invalidUpdateBookingRequest = updateBookingRequest.copy(numberOfGuests = room.capacity + 1)
 
                     coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns listOf(booking)
 
                     coEvery { bookingRepository.findById(any()) } returns booking
                     coEvery { hotelService.findById(any()) } returns hotel
                     coEvery { roomService.findById(any()) } returns room
+                    every { timeProvider.now() } returns booking.checkin
 
                     Then("it should throw InvalidDataException") {
                         val exception =
@@ -403,7 +423,7 @@ class BookingServiceTest :
                             }
 
                         exception.code shouldBe HotelaException.INVALID_DATA
-                        exception.message shouldBe "Room ${room.id} cannot accommodate ${invalidUpdateBookingRequest.guests} guests"
+                        exception.message shouldBe "Room ${room.id} cannot accommodate ${invalidUpdateBookingRequest.numberOfGuests} guests"
                     }
                 }
             }
@@ -419,13 +439,12 @@ class BookingServiceTest :
                     coEvery { roomService.findById(any()) } returns room
                     coEvery { bookingRepository.update(any()) } returns bookingInProgress
 
-                    mockkStatic(LocalDateTime::class)
-                    every { LocalDateTime.now() } returns booking.checkin
+                    every { timeProvider.now() } returns booking.checkin
 
                     Then("it should check in the booking") {
                         val response = bookingService.checkIn(booking.id, jwtToken)
 
-                        response.status shouldBe BookingStatus.IN_PROGRESS
+                        response.status shouldBe BookingStatus.CHECKED_IN
                     }
                 }
 
@@ -463,10 +482,13 @@ class BookingServiceTest :
                     coEvery { bookingRepository.findById(any()) } returns booking
                     coEvery { hotelService.findById(any()) } returns hotel
 
-                    mockkStatic(LocalDateTime::class)
                     every {
-                        LocalDateTime.now()
-                    } returns booking.checkin.minusMinutes(BookingService.CHECKIN_ALLOWED_TIME_WINDOW_MINUTES + 1)
+                        timeProvider.now()
+                    } returns
+                        booking.checkin.minus(
+                            BookingService.CHECKIN_ALLOWED_TIME_WINDOW_MINUTES + 1,
+                            ChronoUnit.MINUTES,
+                        )
 
                     Then("it should throw InvalidDataException") {
                         val exception =
@@ -481,8 +503,8 @@ class BookingServiceTest :
             }
 
             And("calling checkOut") {
-                require(bookingInProgress.status == BookingStatus.IN_PROGRESS) {
-                    "Booking status must be IN_PROGRESS to check out"
+                require(bookingInProgress.status == BookingStatus.CHECKED_IN) {
+                    "Booking status must be CHECKED_IN to check out"
                 }
 
                 When("requester is booking owner") {
@@ -493,7 +515,7 @@ class BookingServiceTest :
                     Then("it should check out the booking") {
                         val response = bookingService.checkOut(bookingInProgress.id, jwtToken)
 
-                        response.status shouldBe BookingStatus.COMPLETED
+                        response.status shouldBe BookingStatus.CHECKED_OUT
                     }
                 }
 

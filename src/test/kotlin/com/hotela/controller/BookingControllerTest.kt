@@ -6,8 +6,8 @@ import com.hotela.model.db.Booking
 import com.hotela.model.dto.response.ResourceCreatedResponse
 import com.hotela.model.dto.response.ResourceUpdatedResponse
 import com.hotela.service.BookingService
-import com.hotela.stubs.db.BookingStubs
 import com.hotela.stubs.db.AuthCredentialStubs
+import com.hotela.stubs.db.BookingStubs
 import com.hotela.stubs.db.CustomerStubs
 import com.hotela.stubs.db.HotelStubs
 import com.hotela.stubs.db.RoomStubs

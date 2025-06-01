@@ -30,13 +30,12 @@ class RoomTypeRepositoryImpl(
             .collectList()
             .awaitSingleOrNull() ?: emptyList()
 
-    private fun mapper(row: Row): RoomType {
-        return RoomType(
+    private fun mapper(row: Row): RoomType =
+        RoomType(
             id = row.get("id", UUID::class.java)!!,
             name = row.get("name", String::class.java)!!,
             description = row.get("description", String::class.java)!!,
         )
-    }
 
     companion object {
         private const val FIND_BY_ID = """

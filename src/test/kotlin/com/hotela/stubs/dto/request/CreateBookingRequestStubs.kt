@@ -13,7 +13,7 @@ object CreateBookingRequestStubs {
         checkin: Instant = Instant.now(),
         checkout: Instant = Instant.now().plus(1L, ChronoUnit.DAYS),
         numberOfGuests: Int = 2,
-        specialRequests: String? = "This is a test note"
+        specialRequests: String? = "This is a test note",
     ): CreateBookingRequest =
         CreateBookingRequest(
             customerId = customerId,
@@ -22,6 +22,6 @@ object CreateBookingRequestStubs {
             checkin = checkin,
             checkout = checkout,
             numberOfGuests = numberOfGuests,
-            specialRequests = specialRequests
+            specialRequests = specialRequests,
         )
 }

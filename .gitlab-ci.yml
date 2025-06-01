@@ -6,17 +6,29 @@ include:
 variables:
   SERVICE_NAME: "hotela"
   DEPLOY_MANIFEST_PATH: "k8s/deployment.yml"
+  BUILD_CACHE_PATH: "/cache/.gradle"
+
+cache:
+  paths:
+    - /cache/.gradle/wrapper/
+    - /cache/.gradle/caches/
 
 stages:
   - test
   - build
   - deploy
 
-test:
+unit_test:
   stage: test
   image: gradle:8-jdk21
   script:
-    - gradle test
+    - ./gradlew -g $BUILD_CACHE_PATH --build-cache build jacocoTestReport
+  artifacts:
+    paths:
+      - build
+  cache:
+    paths:
+      - $BUILD_CACHE_PATH
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_MERGE_REQUEST_ID'
       when: always

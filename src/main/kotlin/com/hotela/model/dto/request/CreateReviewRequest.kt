@@ -7,5 +7,5 @@ data class CreateReviewRequest(
     val rating: Int,
     val title: String? = null,
     val comment: String? = null,
-    val isAnonymous: Boolean = false
+    val isAnonymous: Boolean = false,
 )

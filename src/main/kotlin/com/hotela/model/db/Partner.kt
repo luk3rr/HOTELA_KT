@@ -5,7 +5,7 @@ import com.hotela.model.domain.DocumentId
 import com.hotela.model.enum.PartnerStatus
 import org.springframework.data.relational.core.mapping.Embedded
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 data class Partner(
     val id: UUID,

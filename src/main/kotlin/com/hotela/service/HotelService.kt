@@ -8,8 +8,8 @@ import com.hotela.model.dto.request.UpdateHotelRequest
 import com.hotela.model.enum.Role
 import com.hotela.repository.AddressRepository
 import com.hotela.repository.HotelRepository
-import com.hotela.util.getAuthId
 import com.hotela.util.getRole
+import com.hotela.util.getUserId
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -33,24 +33,25 @@ class HotelService(
             throw HotelaException.AccessDeniedException()
         }
 
-        val address = Address(
-            id = UUID.randomUUID(),
-            streetAddress = payload.address.streetAddress,
-            number = payload.address.number,
-            complement = payload.address.complement,
-            neighborhood = payload.address.neighborhood,
-            city = payload.address.city,
-            stateProvince = payload.address.stateProvince,
-            postalCode = payload.address.postalCode,
-            countryCode = payload.address.countryCode,
-            latitude = payload.address.latitude,
-            longitude = payload.address.longitude,
-        )
+        val address =
+            Address(
+                id = UUID.randomUUID(),
+                streetAddress = payload.address.streetAddress,
+                number = payload.address.number,
+                complement = payload.address.complement,
+                neighborhood = payload.address.neighborhood,
+                city = payload.address.city,
+                stateProvince = payload.address.stateProvince,
+                postalCode = payload.address.postalCode,
+                countryCode = payload.address.countryCode,
+                latitude = payload.address.latitude,
+                longitude = payload.address.longitude,
+            )
 
         val hotel =
             Hotel(
                 id = UUID.randomUUID(),
-                partnerId = token.getAuthId(),
+                partnerId = token.getUserId(),
                 addressId = address.id,
                 name = payload.name,
                 contactInfo = payload.contactInfo,
@@ -68,7 +69,7 @@ class HotelService(
         payload: UpdateHotelRequest,
         token: JwtAuthenticationToken,
     ): Hotel {
-        val partnerAuthId = token.getAuthId()
+        val partnerId = token.getUserId()
 
         val userRole = token.getRole()
 
@@ -78,7 +79,7 @@ class HotelService(
 
         val hotel = hotelRepository.findById(id) ?: throw HotelaException.HotelNotFoundException(id)
 
-        if (partnerAuthId != hotel.partnerId) {
+        if (partnerId != hotel.partnerId) {
             throw HotelaException.AccessDeniedException()
         }
 
