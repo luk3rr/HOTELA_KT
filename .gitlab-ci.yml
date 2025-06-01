@@ -8,12 +8,9 @@ variables:
   DEPLOY_MANIFEST_PATH: "k8s/deployment.yml"
 
 stages:
-  - build
   - test
+  - build
   - deploy
-
-build_image:
-  extends: .build_image
 
 test:
   stage: test
@@ -21,10 +18,7 @@ test:
   script:
     - gradle test
   rules:
-    - if: '$CI_COMMIT_BRANCH'
-
-deploy_k3s:
-  extends: .deploy
-  rules:
-    - if: '$CI_COMMIT_BRANCH'
-      when: manual
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_MERGE_REQUEST_ID'
+      when: always
+    - when: never
+      allow_failure: false
