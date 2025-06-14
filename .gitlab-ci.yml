@@ -7,7 +7,8 @@ variables:
   SERVICE_NAME: "hotela"
   SERVICE_GROUP: "personal/projects"
   PROJECT_NAME: "HOTELA_KT"
-  DEPLOY_MANIFEST_PATH: "k8s/deployment.yml"
+  APP_DEPLOY_MANIFEST_PATH: "k8s/deployment.yml"
+  MIGRATION_DEPLOY_MANIFEST_PATH: "k8s/migration.yml"
   BUILD_CACHE_PATH: "/cache/.gradle"
 
 cache:
@@ -36,3 +37,43 @@ unit_test:
       when: always
     - when: never
       allow_failure: false
+
+deploy_postgres:
+  stage: deploy
+  image:
+    name: lachlanevenson/k8s-kubectl:latest
+    entrypoint: [""]
+  before_script:
+    - echo "$KUBECONFIG_DATA" | base64 -d > kubeconfig
+    - export KUBECONFIG=$PWD/kubeconfig
+    - apk add --no-cache curl jq gettext
+  script:
+    - |
+      if ! kubectl get namespace $SERVICE_NAME > /dev/null 2>&1; then
+        echo "Namespace $SERVICE_NAME does not exist. Creating it."
+        kubectl create namespace $SERVICE_NAME
+      fi
+    - kubectl apply -f k8s/postgres.yml -n $SERVICE_NAME
+    - |
+      echo "Waiting for Postgres pod to be ready..."
+      for i in $(seq 1 10); do
+        POD=$(kubectl get pods -n $SERVICE_NAME -l app=postgres -o jsonpath="{.items[0].metadata.name}")
+        if [[ -z "$POD" ]]; then
+          echo "Postgres pod not created yet. Attempt $i"
+          sleep 5
+          continue
+        fi
+        STATUS=$(kubectl get pod "$POD" -n $SERVICE_NAME -o jsonpath="{.status.phase}")
+        READY=$(kubectl get pod "$POD" -n $SERVICE_NAME -o jsonpath="{.status.containerStatuses[0].ready}")
+        if [[ "$STATUS" == "Running" && "$READY" == "true" ]]; then
+          echo "Database pod is ready: $POD"
+          exit 0
+        fi
+        echo "Waiting for Postgres pod to be ready... (attempt $i)"
+        sleep 5
+      done
+      echo "Timeout waiting for Postgres pod to be ready. Scaling down deployment"
+      kubectl scale deployment postgres --replicas=0 -n $SERVICE_NAME
+      exit 1
+  rules:
+    - when: manual

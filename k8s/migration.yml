@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hotela-db-migration
+  namespace: hotela
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/agent-inject-secret-hotela-env: 'kv/data/app/hotela'
+        vault.hashicorp.com/agent-inject-template-hotela-env: |
+          {{- with secret "kv/data/app/hotela" }}
+            export POSTGRES_USER="{{ .Data.data.DB_USER }}"
+            export POSTGRES_PASSWORD="{{ .Data.data.DB_PASSWORD }}"
+          {{- end }}
+      labels:
+        app: hotela-db-migration
+    spec:
+      serviceAccountName: vault-auth
+      restartPolicy: OnFailure
+      volumes:
+        - name: vault-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  expirationSeconds: 3600
+                  audience: vault
+      imagePullSecrets:
+        - name: gitlab-registry-secret
+      containers:
+        - name: liquibase
+          image: "${IMAGE_NAME}:${IMAGE_TAG}"
+          imagePullPolicy: Always
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              source /vault/secrets/hotela-env
+              liquibase \
+                --url=jdbc:postgresql://postgres-service.hotela.svc.cluster.local:5432/hotela \
+                --username=$POSTGRES_USER \
+                --password=$POSTGRES_PASSWORD \
+                --changeLogFile=db/changelog/db.changelog-master.yaml \
+                update
