@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pvc
+  name: hotela
 spec:
   accessModes:
     - ReadWriteOnce
@@ -22,7 +22,17 @@ spec:
     metadata:
       labels:
         app: postgres
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'app-role'
+        vault.hashicorp.com/agent-inject-secret-db-creds: 'kv/data/app/hotela'
+        vault.hashicorp.com/agent-inject-template-db-creds: |
+          {{- with secret "kv/data/app/hotela" -}}
+          export POSTGRES_USER="{{ .Data.data.DB_USER }}"
+          export POSTGRES_PASSWORD="{{ .Data.data.DB_PASSWORD }}"
+          {{- end }}
     spec:
+      serviceAccountName: app-service-account
       containers:
         - name: postgres
           image: postgres:latest
@@ -30,13 +40,13 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: DB_USER
+                  name: vault-env
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: DB_PASSWORD
+                  name: vault-env
+                  key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
               value: hotela
             - name: TZ
@@ -49,7 +59,7 @@ spec:
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
-            claimName: postgres-pvc
+            claimName: hotela
 ---
 apiVersion: v1
 kind: Service
