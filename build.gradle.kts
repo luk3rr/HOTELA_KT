@@ -27,9 +27,12 @@ plugins {
 group = "com.hotela"
 version = "0.0.1-SNAPSHOT"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+val javaVersion = System.getProperty("java.version").substringBefore('.').toInt()
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(javaVersion))
+    }
 }
 
 repositories {
