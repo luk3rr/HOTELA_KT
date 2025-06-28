@@ -39,7 +39,7 @@ CREATE TABLE partner
     phone              VARCHAR(32)    NOT NULL,
     document_id_type   VARCHAR(32),
     document_id_value  VARCHAR(64),
-    contract_signed_at TIMESTAMPZ,
+    contract_signed_at TIMESTAMPTZ,
     status             PARTNER_STATUS NOT NULL,
     notes              TEXT,
 
