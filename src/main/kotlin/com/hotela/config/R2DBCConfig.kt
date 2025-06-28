@@ -1,5 +1,9 @@
 package com.hotela.config
 
+import com.hotela.converter.reader.EmailReadingConverter
+import com.hotela.converter.reader.PhoneNumberReadingConverter
+import com.hotela.converter.writer.EmailWritingConverter
+import com.hotela.converter.writer.PhoneNumberWritingConverter
 import com.hotela.model.enum.BookingStatus
 import com.hotela.model.enum.PartnerStatus
 import com.hotela.model.enum.PaymentMethod
@@ -12,6 +16,8 @@ import io.r2dbc.spi.ConnectionFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.r2dbc.convert.R2dbcCustomConversions
+import org.springframework.data.r2dbc.dialect.PostgresDialect
 import java.net.URI
 
 @Configuration
@@ -46,5 +52,17 @@ class R2DBCConfig(
                         .build(),
                 ).build(),
         )
+    }
+
+    @Bean
+    fun customConverter(): R2dbcCustomConversions {
+        val converters = listOf(
+            EmailWritingConverter(),
+            EmailReadingConverter(),
+            PhoneNumberWritingConverter(),
+            PhoneNumberReadingConverter()
+        )
+
+        return R2dbcCustomConversions.of(PostgresDialect.INSTANCE, converters)
     }
 }

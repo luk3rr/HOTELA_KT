@@ -1,6 +1,11 @@
 package com.hotela.model.domain
 
-data class Email(
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
+
+@JvmInline
+value class Email @JsonCreator constructor(
+    @get: JsonValue
     val value: String,
 ) {
     companion object {

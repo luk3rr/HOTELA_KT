@@ -1,6 +1,11 @@
 package com.hotela.model.domain
 
-data class PhoneNumber(
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
+
+@JvmInline
+value class PhoneNumber @JsonCreator constructor (
+    @get: JsonValue
     val value: String,
 ) {
     companion object {
