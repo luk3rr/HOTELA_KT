@@ -4,41 +4,33 @@ metadata:
   name: vault-auth
   namespace: hotela
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: hotela
+  name: hotela-db-migration
   namespace: hotela
 spec:
-  replicas: 3
-  strategy:
-    type: RollingUpdate
-  selector:
-    matchLabels:
-      app: hotela
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 600
   template:
     metadata:
-      labels:
-        app: hotela
       annotations:
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/exit-on-complete: 'true'
+        vault.hashicorp.com/agent-inject-init-first: 'true'
+        vault.hashicorp.com/agent-pre-populate-only: 'true'
         vault.hashicorp.com/role: 'app-hotela'
-        vault.hashicorp.com/agent-inject-secret-app-env: 'kv/data/app/hotela'
-        vault.hashicorp.com/agent-inject-template-app-env: |
-          {{ with secret "kv/data/app/hotela" }}
-          {{ range $key, $val := .Data.data }}
-            export {{ $key }}="{{ $val }}"
-          {{ end }}
-          {{ end }}
         vault.hashicorp.com/agent-inject-secret-db-creds: 'database/creds/app-hotela'
         vault.hashicorp.com/agent-inject-template-db-creds: |
           {{ with secret "database/creds/app-hotela" }}
             export DB_USERNAME="{{ .Data.username }}"
             export DB_PASSWORD="{{ .Data.password }}"
           {{ end }}
+      labels:
+        app: hotela-db-migration
     spec:
       serviceAccountName: vault-auth
+      restartPolicy: OnFailure
       volumes:
         - name: vault-token
           projected:
@@ -50,11 +42,9 @@ spec:
       imagePullSecrets:
         - name: gitlab-registry-secret
       containers:
-        - name: hotela
+        - name: liquibase
           image: ${IMAGE_NAME}:${IMAGE_TAG}
           imagePullPolicy: Always
-          ports:
-            - containerPort: 8080
           env:
             - name: DB_HOST
               value: "postgres-service.database.svc.cluster.local"
@@ -66,7 +56,7 @@ spec:
               retries=0
               max_retries=30
               
-              while [ ! -f /vault/secrets/app-env ] || [ ! -f /vault/secrets/db-creds ]; do
+              while [ ! -f /vault/secrets/db-creds ]; do
                 if [ $retries -ge $max_retries ]; then
                   echo "ERROR: Timed out waiting for Vault secrets"
                   exit 1
@@ -76,11 +66,17 @@ spec:
                 sleep 2
               done
 
-              echo "Secrets received. Starting application..."
+              echo "Secrets received. Starting migration..."
 
               set -a
-              source /vault/secrets/app-env
               source /vault/secrets/db-creds
               set +a
-
-              java -jar /app/app.jar
+              
+              liquibase \
+                --url=jdbc:postgresql://postgres-service.database.svc.cluster.local:5432/services \
+                --username=$DB_USERNAME \
+                --password=$DB_PASSWORD \
+                --liquibase-schema-name=hotela \
+                --default-schema-name=hotela \
+                --changeLogFile=db/changelog/db.changelog-master.yaml \
+                ${LIQUIBASE_COMMAND}
