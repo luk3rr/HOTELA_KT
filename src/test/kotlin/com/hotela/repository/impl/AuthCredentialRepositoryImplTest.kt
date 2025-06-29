@@ -1,128 +1,110 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.db.AuthCredential
+import com.hotela.clearAllTables
 import com.hotela.model.domain.Email
-import com.hotela.model.enum.Role
+import com.hotela.repository.AuthCredentialRepository
 import com.hotela.stubs.db.AuthCredentialStubs
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import io.r2dbc.spi.Row
-import io.r2dbc.spi.RowMetadata
+import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.reactor.awaitSingle
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
-import org.springframework.r2dbc.core.RowsFetchSpec
-import org.springframework.r2dbc.core.bind
-import reactor.core.publisher.Mono
-import java.time.Instant
 import java.util.UUID
-import java.util.function.BiFunction
 
 class AuthCredentialRepositoryImplTest :
-    ShouldSpec({
-        val databaseClient = mockk<DatabaseClient>()
-        val authRepositoryImpl = AuthCredentialRepositoryImpl(databaseClient)
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
+    @Autowired
+    private lateinit var authCredentialRepository: AuthCredentialRepository
 
+    @Autowired
+    private lateinit var databaseClient: DatabaseClient
+
+    override fun extensions() = listOf(SpringExtension)
+
+    init {
         val authCredential = AuthCredentialStubs.create()
-        val genericDatabaseSpec = mockk<DatabaseClient.GenericExecuteSpec>()
-        val mockRow = mockk<Row>()
-        val rowsFetchSpec = mockk<RowsFetchSpec<AuthCredential>>()
 
-        fun setupMockForDatabaseClient() {
-            every { databaseClient.sql(any<String>()) } returns genericDatabaseSpec
-            every { genericDatabaseSpec.bind(any<String>(), any()) } returns genericDatabaseSpec
-            every { genericDatabaseSpec.bindNull(any<String>(), any()) } returns genericDatabaseSpec
-        }
-
-        fun setupMockRowForAuthCredential() {
-            every {
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, AuthCredential>>())
-            } answers {
-                val function = args[0] as BiFunction<Row, RowMetadata, AuthCredential>
-                every { rowsFetchSpec.first() } returns Mono.just(function.apply(mockRow, mockk()))
-                rowsFetchSpec
-            }
-
-            every { mockRow.get("id", UUID::class.java) } returns authCredential.id
-            every { mockRow.get("login_email", Email::class.java) } returns authCredential.loginEmail
-            every { mockRow.get("password", String::class.java) } returns authCredential.password
-            every { mockRow.get("role", Role::class.java) } returns authCredential.role
-            every { mockRow.get("is_active", Boolean::class.java) } returns authCredential.isActive
-            every { mockRow.get("last_login_at", Instant::class.java) } returns authCredential.lastLoginAt
-            every { mockRow.get("created_at", Instant::class.java) } returns authCredential.createdAt
-            every { mockRow.get("updated_at", Instant::class.java) } returns authCredential.updatedAt
+        beforeSpec {
+            databaseClient.clearAllTables()
         }
 
         beforeTest {
-            setupMockForDatabaseClient()
-            setupMockRowForAuthCredential()
+            databaseClient
+                .sql("DELETE FROM auth_credential")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
-        afterTest { clearAllMocks() }
+        should("successfully create an auth credential") {
+            val saved = authCredentialRepository.create(authCredential)
 
-        should("successfully create a auth") {
-            authRepositoryImpl.create(authCredential) shouldBe authCredential
+            saved.id shouldBe authCredential.id
+            saved.loginEmail shouldBe authCredential.loginEmail
+            saved.password shouldBe authCredential.password
+            saved.role shouldBe authCredential.role
+            saved.isActive shouldBe authCredential.isActive
+            saved.createdAt shouldBe authCredential.createdAt
+            saved.updatedAt shouldBe authCredential.updatedAt
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", authCredential.id)
-                genericDatabaseSpec.bind("loginEmail", authCredential.loginEmail)
-                genericDatabaseSpec.bind("password", authCredential.password)
-                genericDatabaseSpec.bind("role", authCredential.role)
-                genericDatabaseSpec.bind("isActive", authCredential.isActive)
-                genericDatabaseSpec.bind("lastLoginAt", authCredential.lastLoginAt)
-                genericDatabaseSpec.bind("createdAt", authCredential.createdAt)
-                genericDatabaseSpec.bind("updatedAt", authCredential.updatedAt)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, AuthCredential>>())
-                rowsFetchSpec.first()
-            }
+            val found = authCredentialRepository.findById(authCredential.id)
+            found shouldNotBe null
+            found?.id shouldBe authCredential.id
         }
 
-        should("successfully find a auth by email") {
-            authRepositoryImpl.findByLoginEmail(authCredential.loginEmail) shouldBe authCredential
+        should("successfully find by login email") {
+            authCredentialRepository.create(authCredential)
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("loginEmail", authCredential.loginEmail)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, AuthCredential>>())
-                rowsFetchSpec.first()
-            }
+            val result = authCredentialRepository.findByLoginEmail(authCredential.loginEmail)
+
+            result shouldNotBe null
+            result?.id shouldBe authCredential.id
         }
 
-        should("successfully find a auth by id") {
-            authRepositoryImpl.findById(authCredential.id) shouldBe authCredential
-
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", authCredential.id)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, AuthCredential>>())
-                rowsFetchSpec.first()
-            }
+        should("return null when email not found") {
+            val result = authCredentialRepository.findByLoginEmail(Email("unknown@domain.com"))
+            result shouldBe null
         }
 
-        should("successfully check if a auth exists by email") {
-            every { mockRow.get("exists", Boolean::class.java) } returns true
+        should("successfully find by id") {
+            authCredentialRepository.create(authCredential)
 
-            authRepositoryImpl.existsByLoginEmail(authCredential.loginEmail) shouldBe true
+            val result = authCredentialRepository.findById(authCredential.id)
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("loginEmail", authCredential.loginEmail)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Boolean>>())
-            }
+            result shouldNotBe null
+            result?.id shouldBe authCredential.id
         }
 
-        should("successfully check if a auth exists by id") {
-            every { mockRow.get("exists", Boolean::class.java) } returns true
-
-            authRepositoryImpl.existsById(authCredential.id) shouldBe true
-
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", authCredential.id)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Boolean>>())
-            }
+        should("return null when id not found") {
+            val result = authCredentialRepository.findById(UUID.randomUUID())
+            result shouldBe null
         }
-    })
+
+        should("successfully check existence by login email") {
+            authCredentialRepository.create(authCredential)
+
+            val exists = authCredentialRepository.existsByLoginEmail(authCredential.loginEmail)
+            exists shouldBe true
+        }
+
+        should("return false when checking non-existent email") {
+            val exists = authCredentialRepository.existsByLoginEmail(Email("notfound@email.com"))
+            exists shouldBe false
+        }
+
+        should("successfully check existence by id") {
+            authCredentialRepository.create(authCredential)
+
+            val exists = authCredentialRepository.existsById(authCredential.id)
+            exists shouldBe true
+        }
+
+        should("return false when checking non-existent id") {
+            val exists = authCredentialRepository.existsById(UUID.fromString("a8845209-85c7-42a1-93e5-a3c2ddcfb1f5"))
+            exists shouldBe false
+        }
+    }
+}

@@ -1,0 +1,25 @@
+app:
+  datasource:
+    schema: hotela
+    database: hotela
+
+spring:
+  application:
+    name: hotela
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
+logging:
+  level:
+    liquibase: DEBUG
+    org:
+      testcontainers: DEBUG
+
+security:
+  key: 12345678901234567890123456789012

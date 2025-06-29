@@ -52,7 +52,11 @@ class BookingServiceTest :
                 )
 
             every { jwtToken.token } returns jwt
-            every { jwt.claims } returns mapOf(AuthClaimKey.USERID.key to customer.id.toString())
+            every { jwt.claims } returns
+                mapOf(
+                    AuthClaimKey.USERID.key to customer.id.toString(),
+                )
+
             every { timeProvider.now() } returns Instant.now()
 
             And("calling findById") {

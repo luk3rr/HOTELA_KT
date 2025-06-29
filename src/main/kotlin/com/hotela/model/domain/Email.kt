@@ -1,16 +1,23 @@
 package com.hotela.model.domain
 
-data class Email(
-    val value: String,
-) {
-    companion object {
-        val REGEX_EMAIL = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$")
-    }
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 
-    init {
-        require(value.isNotBlank()) { "Email cannot be blank" }
-        require(isValidEmail(value)) { "Email format is invalid" }
-    }
+@JvmInline
+value class Email
+    @JsonCreator
+    constructor(
+        @get:JsonValue
+        val value: String,
+    ) {
+        companion object {
+            val REGEX_EMAIL = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$")
+        }
 
-    private fun isValidEmail(email: String): Boolean = REGEX_EMAIL.matches(email)
-}
+        init {
+            require(value.isNotBlank()) { "Email cannot be blank" }
+            require(isValidEmail(value)) { "Email format is invalid" }
+        }
+
+        private fun isValidEmail(email: String): Boolean = REGEX_EMAIL.matches(email)
+    }

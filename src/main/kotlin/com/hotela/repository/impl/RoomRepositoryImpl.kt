@@ -40,7 +40,7 @@ class RoomRepositoryImpl(
             .bind("id", room.id)
             .bind("hotelId", room.hotelId)
             .bind("roomTypeId", room.roomTypeId)
-            .bind("number", room.number)
+            .bind("roomCode", room.roomCode)
             .bind("floor", room.floor)
             .bind("pricePerNight", room.pricePerNight)
             .bind("capacity", room.capacity)
@@ -55,7 +55,7 @@ class RoomRepositoryImpl(
             .sql(UPDATE)
             .bind("id", room.id)
             .bind("roomTypeId", room.roomTypeId)
-            .bind("number", room.number)
+            .bind("roomCode", room.roomCode)
             .bind("floor", room.floor)
             .bind("pricePerNight", room.pricePerNight)
             .bind("capacity", room.capacity)
@@ -70,7 +70,7 @@ class RoomRepositoryImpl(
             id = row.get("id", UUID::class.java)!!,
             hotelId = row.get("hotel_id", UUID::class.java)!!,
             roomTypeId = row.get("room_type_id", UUID::class.java)!!,
-            number = row.get("number", String::class.java)!!,
+            roomCode = row.get("room_code", String::class.java)!!,
             floor = row.get("floor", Int::class.java)!!,
             pricePerNight = row.get("price_per_night", BigDecimal::class.java)!!,
             capacity = row.get("capacity", Int::class.java)!!,
@@ -88,15 +88,15 @@ class RoomRepositoryImpl(
         """
 
         private const val SAVE = """
-            INSERT INTO room (id, hotel_id, room_type_id, number, floor, price_per_night, capacity, status, description)
-            VALUES (:id, :hotelId, :roomTypeId, :number, :floor, :pricePerNight, :capacity, :status, :description)
+            INSERT INTO room (id, hotel_id, room_type_id, room_code, floor, price_per_night, capacity, status, description)
+            VALUES (:id, :hotelId, :roomTypeId, :roomCode, :floor, :pricePerNight, :capacity, :status, :description)
             RETURNING *
         """
 
         private const val UPDATE = """
             UPDATE room 
             SET room_type_id = :roomTypeId,
-                number = :number,
+                room_code = :roomCode,
                 floor = :floor,
                 price_per_night = :pricePerNight,
                 capacity = :capacity,

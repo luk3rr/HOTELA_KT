@@ -1,6 +1,12 @@
 --liquibase formatted sql
 
+--preconditions onFail:HALT onError:HALT
+
 --changeset lucas.araujo:003-insert-room-types
+
+SET search_path TO hotela, public;
+------------------------------------------------------------------------------------------------------------------------
+
 INSERT INTO room_type (id, name, description)
 VALUES ('50d14717-f2bd-43ea-9f24-600b850734a6', 'Standard Solteiro', 'Quarto padrão com uma cama de solteiro'),
        ('09f600e7-88e6-4fd7-a735-fb054c0e0faa', 'Standard Casal', 'Quarto padrão com uma cama de casal'),

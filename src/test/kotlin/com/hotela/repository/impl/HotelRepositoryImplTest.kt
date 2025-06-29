@@ -1,124 +1,130 @@
 package com.hotela.repository.impl
 
-import com.hotela.model.db.Hotel
-import com.hotela.model.domain.Email
-import com.hotela.model.domain.PhoneNumber
+import com.hotela.clearAllTables
+import com.hotela.repository.AddressRepository
+import com.hotela.repository.AuthCredentialRepository
+import com.hotela.repository.HotelRepository
+import com.hotela.repository.PartnerRepository
+import com.hotela.stubs.db.AddressStubs
+import com.hotela.stubs.db.AuthCredentialStubs
 import com.hotela.stubs.db.HotelStubs
+import com.hotela.stubs.db.PartnerStubs
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import io.r2dbc.spi.Row
-import io.r2dbc.spi.RowMetadata
+import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.reactor.awaitSingle
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
-import org.springframework.r2dbc.core.RowsFetchSpec
-import org.springframework.r2dbc.core.bind
-import reactor.core.publisher.Mono
-import java.math.BigDecimal
 import java.util.UUID
-import java.util.function.BiFunction
 
 class HotelRepositoryImplTest :
-    ShouldSpec({
-        val databaseClient = mockk<DatabaseClient>()
-        val hotelRepositoryImpl = HotelRepositoryImpl(databaseClient)
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
+    @Autowired
+    private lateinit var partnerRepository: PartnerRepository
 
-        val hotel = HotelStubs.create()
+    @Autowired
+    private lateinit var authCredentialRepository: AuthCredentialRepository
 
-        val genericDatabaseSpec = mockk<DatabaseClient.GenericExecuteSpec>()
-        val mockRow = mockk<Row>()
-        val rowsFetchSpec = mockk<RowsFetchSpec<Hotel>>()
+    @Autowired
+    private lateinit var addressRepository: AddressRepository
 
-        fun setupMockForDatabaseClient() {
-            every { databaseClient.sql(any<String>()) } returns genericDatabaseSpec
-            every { genericDatabaseSpec.bind(any<String>(), any()) } returns genericDatabaseSpec
-        }
+    @Autowired
+    private lateinit var hotelRepository: HotelRepository
 
-        fun setupMockRowForHotel() {
-            every {
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Hotel>>())
-            } answers {
-                val function = args[0] as BiFunction<Row, RowMetadata, Hotel>
-                every { rowsFetchSpec.first() } returns Mono.just(function.apply(mockRow, mockk()))
-                every { rowsFetchSpec.all().collectList() } returns Mono.just(listOf(function.apply(mockRow, mockk())))
-                rowsFetchSpec
-            }
+    @Autowired
+    private lateinit var databaseClient: DatabaseClient
 
-            every { mockRow.get("id", UUID::class.java) } returns hotel.id
-            every { mockRow.get("partner_id", UUID::class.java) } returns hotel.partnerId
-            every { mockRow.get("address_id", UUID::class.java) } returns hotel.addressId
-            every { mockRow.get("name", String::class.java) } returns hotel.name
-            every { mockRow.get("phone", PhoneNumber::class.java) } returns hotel.contactInfo.phone
-            every { mockRow.get("email", Email::class.java) } returns hotel.contactInfo.email
-            every { mockRow.get("website", String::class.java) } returns hotel.website
-            every { mockRow.get("description", String::class.java) } returns hotel.description
-            every { mockRow.get("star_rating", BigDecimal::class.java) } returns hotel.starRating
+    override fun extensions() = listOf(SpringExtension)
+
+    init {
+        val address = AddressStubs.create()
+        val partnerAuthCredential = AuthCredentialStubs.create()
+        val partner = PartnerStubs.create(authCredentialId = partnerAuthCredential.id)
+        val hotel = HotelStubs.create(partnerId = partner.id, addressId = address.id)
+        val anotherHotel =
+            HotelStubs.create(
+                id = UUID.fromString("29db6b41-e1c4-4c05-ad4a-e605547fe5a2"),
+                partnerId = partner.id,
+                addressId = address.id,
+            )
+
+        beforeSpec {
+            databaseClient.clearAllTables()
+
+            addressRepository.create(address)
+            authCredentialRepository.create(partnerAuthCredential)
+            partnerRepository.create(partner)
         }
 
         beforeTest {
-            setupMockForDatabaseClient()
-            setupMockRowForHotel()
+            databaseClient
+                .sql("DELETE FROM hotel")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
-        afterTest { clearAllMocks() }
-
         should("successfully create a hotel") {
-            hotelRepositoryImpl.create(hotel) shouldBe hotel
+            val saved = hotelRepository.create(hotel)
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", hotel.id)
-                genericDatabaseSpec.bind("partnerId", hotel.partnerId)
-                genericDatabaseSpec.bind("addressId", hotel.addressId)
-                genericDatabaseSpec.bind("name", hotel.name)
-                genericDatabaseSpec.bind("email", hotel.contactInfo.email)
-                genericDatabaseSpec.bind("phone", hotel.contactInfo.phone)
-                genericDatabaseSpec.bind("website", hotel.website)
-                genericDatabaseSpec.bind("description", hotel.description)
-                genericDatabaseSpec.bind("starRating", hotel.starRating)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Hotel>>())
-                rowsFetchSpec.first()
-            }
+            saved.id shouldBe hotel.id
+            saved.partnerId shouldBe hotel.partnerId
+            saved.addressId shouldBe hotel.addressId
+            saved.name shouldBe hotel.name
+            saved.contactInfo shouldBe hotel.contactInfo
+            saved.website shouldBe hotel.website
+            saved.description shouldBe hotel.description
+            saved.starRating shouldBe hotel.starRating
+
+            val found = hotelRepository.findById(hotel.id)
+            found shouldNotBe null
+            found?.id shouldBe hotel.id
         }
 
         should("successfully update a hotel") {
-            hotelRepositoryImpl.update(hotel) shouldBe hotel
+            hotelRepository.create(hotel)
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", hotel.id)
-                genericDatabaseSpec.bind("name", hotel.name)
-                genericDatabaseSpec.bind("email", hotel.contactInfo.email)
-                genericDatabaseSpec.bind("phone", hotel.contactInfo.phone)
-                genericDatabaseSpec.bind("website", hotel.website)
-                genericDatabaseSpec.bind("description", hotel.description)
-                genericDatabaseSpec.bind("starRating", hotel.starRating)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Hotel>>())
-                rowsFetchSpec.first()
-            }
+            val updatedHotel = hotel.copy(name = "Updated Hotel Name")
+            val updated = hotelRepository.update(updatedHotel)
+
+            updated.id shouldBe hotel.id
+            updated.name shouldBe "Updated Hotel Name"
+
+            val found = hotelRepository.findById(hotel.id)
+            found shouldNotBe null
+            found?.name shouldBe "Updated Hotel Name"
         }
 
-        should("successfully find a hotel by id") {
-            hotelRepositoryImpl.findById(hotel.id) shouldBe hotel
+        should("successfully find hotel by id") {
+            hotelRepository.create(hotel)
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", hotel.id)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Hotel>>())
-                rowsFetchSpec.first()
-            }
+            val found = hotelRepository.findById(hotel.id)
+
+            found shouldNotBe null
+            found?.id shouldBe hotel.id
+        }
+
+        should("return null when hotel id not found") {
+            val found = hotelRepository.findById(UUID.randomUUID())
+            found shouldBe null
         }
 
         should("successfully find hotels by partner id") {
-            hotelRepositoryImpl.findByPartnerId(hotel.partnerId) shouldBe listOf(hotel)
+            hotelRepository.create(hotel)
+            hotelRepository.create(anotherHotel.copy(partnerId = hotel.partnerId))
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("partnerId", hotel.partnerId)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Hotel>>())
-                rowsFetchSpec.all()
-            }
+            val hotels = hotelRepository.findByPartnerId(hotel.partnerId)
+
+            hotels.size shouldBe 2
+            hotels.any { it.id == hotel.id } shouldBe true
+            hotels.any { it.id == anotherHotel.id } shouldBe true
         }
-    })
+
+        should("return empty list when partner has no hotels") {
+            val result = hotelRepository.findByPartnerId(UUID.randomUUID())
+            result shouldBe emptyList()
+        }
+    }
+}

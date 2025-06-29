@@ -120,7 +120,7 @@ class RoomServiceTest :
                         val createRoomRequestWithSameNumber =
                             CreateRoomRequestStubs.create(
                                 hotelId = hotel.id,
-                                number = anotherRoomWithSameNumber.number,
+                                roomCode = anotherRoomWithSameNumber.roomCode,
                                 floor = anotherRoomWithSameNumber.floor,
                             )
 
@@ -136,7 +136,7 @@ class RoomServiceTest :
                             coVerify(exactly = 0) { roomRepository.create(any()) }
 
                             exception.code shouldBe HotelaException.ROOM_ALREADY_EXISTS
-                            exception.message shouldBe "Room with number ${room.number} already exists"
+                            exception.message shouldBe "Room with number ${room.roomCode} already exists"
                         }
                     }
                 }
@@ -158,7 +158,7 @@ class RoomServiceTest :
 
                         val updateRoomRequestWithSameNumber =
                             UpdateRoomRequestStubs.create(
-                                number = anotherRoomWithSameNumber.number,
+                                roomCode = anotherRoomWithSameNumber.roomCode,
                                 floor = anotherRoomWithSameNumber.floor,
                             )
 
@@ -175,7 +175,7 @@ class RoomServiceTest :
                             coVerify(exactly = 0) { roomRepository.update(any()) }
 
                             exception.code shouldBe HotelaException.ROOM_ALREADY_EXISTS
-                            exception.message shouldBe "Room with number ${room.number} already exists"
+                            exception.message shouldBe "Room with number ${room.roomCode} already exists"
                         }
                     }
 

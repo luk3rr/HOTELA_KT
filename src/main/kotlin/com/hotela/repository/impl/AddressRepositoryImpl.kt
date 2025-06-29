@@ -62,7 +62,7 @@ class AddressRepositoryImpl(
 
         private const val SAVE = """
             INSERT INTO address (
-                id, streetAddress, number, complement, neighborhood, city, stateProvince, postalCode, countryCode, latitude, longitude
+                id, street_address, number, complement, neighborhood, city, state_province, postal_code, country_code, latitude, longitude
             )
             VALUES (
                 :id, :streetAddress, :number, :complement, :neighborhood, :city, :stateProvince, :postalCode, :countryCode, :latitude, :longitude

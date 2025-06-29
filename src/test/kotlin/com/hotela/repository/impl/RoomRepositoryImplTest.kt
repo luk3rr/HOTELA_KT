@@ -1,126 +1,139 @@
 package com.hotela.repository.impl
 
+import com.hotela.clearAllTables
 import com.hotela.model.db.Room
 import com.hotela.model.enum.RoomStatus
+import com.hotela.repository.AddressRepository
+import com.hotela.repository.AuthCredentialRepository
+import com.hotela.repository.HotelRepository
+import com.hotela.repository.PartnerRepository
+import com.hotela.repository.RoomRepository
+import com.hotela.stubs.db.AddressStubs
+import com.hotela.stubs.db.AuthCredentialStubs
+import com.hotela.stubs.db.HotelStubs
+import com.hotela.stubs.db.PartnerStubs
 import com.hotela.stubs.db.RoomStubs
+import com.hotela.stubs.db.RoomTypeStubs
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import io.r2dbc.spi.Row
-import io.r2dbc.spi.RowMetadata
+import kotlinx.coroutines.reactor.awaitSingle
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
-import org.springframework.r2dbc.core.RowsFetchSpec
-import org.springframework.r2dbc.core.bind
-import reactor.core.publisher.Mono
 import java.math.BigDecimal
 import java.util.UUID
-import java.util.function.BiFunction
 
 class RoomRepositoryImplTest :
-    ShouldSpec({
-        val databaseClient = mockk<DatabaseClient>()
-        val roomRepositoryImpl = RoomRepositoryImpl(databaseClient)
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
+    @Autowired
+    private lateinit var roomRepository: RoomRepository
 
-        val room = RoomStubs.create()
+    @Autowired
+    private lateinit var hotelRepository: HotelRepository
 
-        val genericDatabaseSpec = mockk<DatabaseClient.GenericExecuteSpec>()
-        val mockRow = mockk<Row>()
-        val rowsFetchSpec = mockk<RowsFetchSpec<Room>>()
+    @Autowired
+    private lateinit var partnerRepository: PartnerRepository
 
-        fun setupMockForDatabaseClient() {
-            every { databaseClient.sql(any<String>()) } returns genericDatabaseSpec
-            every { genericDatabaseSpec.bind(any<String>(), any()) } returns genericDatabaseSpec
-        }
+    @Autowired
+    private lateinit var addressRepository: AddressRepository
 
-        fun setupMockRowForRoom() {
-            every {
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Room>>())
-            } answers {
-                val function = args[0] as BiFunction<Row, RowMetadata, Room>
-                every { rowsFetchSpec.first() } returns Mono.just(function.apply(mockRow, mockk()))
-                every { rowsFetchSpec.all().collectList() } returns Mono.just(listOf(function.apply(mockRow, mockk())))
-                rowsFetchSpec
-            }
+    @Autowired
+    private lateinit var authCredentialRepository: AuthCredentialRepository
 
-            every { mockRow.get("id", UUID::class.java) } returns room.id
-            every { mockRow.get("hotel_id", UUID::class.java) } returns room.hotelId
-            every { mockRow.get("room_type_id", UUID::class.java) } returns room.roomTypeId
-            every { mockRow.get("number", String::class.java) } returns room.number
-            every { mockRow.get("floor", Int::class.java) } returns room.floor
-            every { mockRow.get("price_per_night", BigDecimal::class.java) } returns room.pricePerNight
-            every { mockRow.get("capacity", Int::class.java) } returns room.capacity
-            every { mockRow.get("status", RoomStatus::class.java) } returns room.status
-            every { mockRow.get("description", String::class.java) } returns room.description
-        }
+    @Autowired
+    private lateinit var databaseClient: DatabaseClient
+
+    override fun extensions() = listOf(SpringExtension)
+
+    init {
+        lateinit var room: Room
 
         beforeSpec {
-            setupMockForDatabaseClient()
-            setupMockRowForRoom()
+            databaseClient.clearAllTables()
+
+            val address = addressRepository.create(AddressStubs.create())
+            val credential = authCredentialRepository.create(AuthCredentialStubs.create())
+            val partner = partnerRepository.create(PartnerStubs.create(authCredentialId = credential.id))
+            val hotel = hotelRepository.create(HotelStubs.create(addressId = address.id, partnerId = partner.id))
+            val roomType = RoomTypeStubs.createStandardSolteiro()
+
+            room = RoomStubs.create(hotelId = hotel.id, roomTypeId = roomType.id)
         }
 
-        afterSpec {
-            clearAllMocks()
+        beforeTest {
+            databaseClient
+                .sql("DELETE FROM room")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
-        should("successfully create a room") {
-            roomRepositoryImpl.create(room) shouldBe room
+        should("create room successfully") {
+            val saved = roomRepository.create(room)
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", room.id)
-                genericDatabaseSpec.bind("hotelId", room.hotelId)
-                genericDatabaseSpec.bind("roomTypeId", room.roomTypeId)
-                genericDatabaseSpec.bind("number", room.number)
-                genericDatabaseSpec.bind("floor", room.floor)
-                genericDatabaseSpec.bind("pricePerNight", room.pricePerNight)
-                genericDatabaseSpec.bind("capacity", room.capacity)
-                genericDatabaseSpec.bind("status", room.status)
-                genericDatabaseSpec.bind("description", room.description)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Room>>())
-                rowsFetchSpec.first()
-            }
+            saved.id shouldBe room.id
+            saved.hotelId shouldBe room.hotelId
+            saved.roomTypeId shouldBe room.roomTypeId
+            saved.roomCode shouldBe room.roomCode
+            saved.floor shouldBe room.floor
+            saved.pricePerNight shouldBe room.pricePerNight
+            saved.capacity shouldBe room.capacity
+            saved.status shouldBe room.status
+            saved.description shouldBe room.description
         }
 
-        should("successfully update a room") {
-            roomRepositoryImpl.update(room) shouldBe room
+        should("update room successfully") {
+            roomRepository.create(room)
+            val updatedRoom =
+                room.copy(
+                    roomCode = "A-202",
+                    floor = 2,
+                    pricePerNight = BigDecimal("199.99"),
+                    capacity = 4,
+                    status = RoomStatus.UNAVAILABLE,
+                    description = "Updated room description",
+                )
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", room.id)
-                genericDatabaseSpec.bind("roomTypeId", room.roomTypeId)
-                genericDatabaseSpec.bind("number", room.number)
-                genericDatabaseSpec.bind("floor", room.floor)
-                genericDatabaseSpec.bind("pricePerNight", room.pricePerNight)
-                genericDatabaseSpec.bind("capacity", room.capacity)
-                genericDatabaseSpec.bind("status", room.status)
-                genericDatabaseSpec.bind("description", room.description)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Room>>())
-                rowsFetchSpec.first()
-            }
+            val updated = roomRepository.update(updatedRoom)
+
+            updated.roomCode shouldBe "A-202"
+            updated.floor shouldBe 2
+            updated.pricePerNight shouldBe BigDecimal("199.99")
+            updated.capacity shouldBe 4
+            updated.status shouldBe RoomStatus.UNAVAILABLE
+            updated.description shouldBe "Updated room description"
         }
 
-        should("successfully find room by id") {
-            roomRepositoryImpl.findById(room.id) shouldBe room
+        should("find room by id") {
+            roomRepository.create(room)
 
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("id", room.id)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Room>>())
-                rowsFetchSpec.first()
-            }
+            val found = roomRepository.findById(room.id)
+
+            found.shouldNotBeNull()
+            found.id shouldBe room.id
         }
 
-        should("successfully find a room by hotelId") {
-            roomRepositoryImpl.findByHotelId(room.hotelId) shouldBe listOf(room)
-
-            verify(exactly = 1) {
-                databaseClient.sql(any<String>())
-                genericDatabaseSpec.bind("hotelId", room.hotelId)
-                genericDatabaseSpec.map(any<BiFunction<Row, RowMetadata, Room>>())
-                rowsFetchSpec.all().collectList()
-            }
+        should("return null when id not found") {
+            val found = roomRepository.findById(UUID.randomUUID())
+            found.shouldBeNull()
         }
-    })
+
+        should("find rooms by hotel id") {
+            roomRepository.create(room)
+
+            val found = roomRepository.findByHotelId(room.hotelId)
+
+            found shouldHaveSize 1
+            found.first().id shouldBe room.id
+        }
+
+        should("return empty list when hotel id not found") {
+            val found = roomRepository.findByHotelId(UUID.randomUUID())
+            found shouldBe emptyList()
+        }
+    }
+}

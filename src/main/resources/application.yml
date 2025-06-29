@@ -1,9 +1,13 @@
+app:
+  datasource:
+    schema: hotela
+
 spring:
   application:
     name: hotela
 
   r2dbc:
-    url: r2dbc:postgresql://${DB_HOST}:5432/services?schema=hotela
+    url: r2dbc:postgresql://${DB_HOST}:5432/services
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
@@ -12,7 +16,7 @@ spring:
       ddl-auto: none
 
   liquibase:
-    url: jdbc:postgresql://${DB_HOST}:5432/services?schema=hotela
+    url: jdbc:postgresql://${DB_HOST}:5432/services
     user: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     enabled: false

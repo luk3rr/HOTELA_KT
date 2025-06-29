@@ -39,7 +39,7 @@ class CustomerRepositoryImpl(
     override suspend fun findByEmail(email: Email): Customer? =
         databaseClient
             .sql(FIND_BY_EMAIL)
-            .bind("email", email)
+            .bind("email", email.value)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()
@@ -47,7 +47,7 @@ class CustomerRepositoryImpl(
     override suspend fun existsByEmail(email: Email): Boolean =
         databaseClient
             .sql(EXISTS_BY_EMAIL)
-            .bind("email", email)
+            .bind("email", email.value)
             .map { row, _ ->
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
@@ -57,10 +57,10 @@ class CustomerRepositoryImpl(
             .sql(SAVE)
             .bind("id", customer.id)
             .bind("authCredentialId", customer.authCredentialId)
-            .bind("addressId", customer.addressId)
+            .bind("mainAddressId", customer.addressId)
             .bind("name", customer.name)
-            .bind("email", customer.contactInfo.email)
-            .bind("phone", customer.contactInfo.phone)
+            .bind("email", customer.contactInfo.email.value)
+            .bind("phone", customer.contactInfo.phone.value)
             .bind("documentIdType", customer.documentId.type)
             .bind("documentIdValue", customer.documentId.value)
             .bind("birthDate", customer.birthDate)
@@ -73,8 +73,8 @@ class CustomerRepositoryImpl(
             .sql(UPDATE)
             .bind("id", customer.id)
             .bind("name", customer.name)
-            .bind("email", customer.contactInfo.email)
-            .bind("phone", customer.contactInfo.phone)
+            .bind("email", customer.contactInfo.email.value)
+            .bind("phone", customer.contactInfo.phone.value)
             .bind("documentIdType", customer.documentId.type)
             .bind("documentIdValue", customer.documentId.value)
             .bind("birthDate", customer.birthDate)
@@ -86,16 +86,25 @@ class CustomerRepositoryImpl(
         Customer(
             id = row.get("id", UUID::class.java)!!,
             authCredentialId = row.get("auth_credential_id", UUID::class.java)!!,
-            addressId = row.get("address_id", UUID::class.java)!!,
+            addressId = row.get("main_address_id", UUID::class.java)!!,
             name = row.get("name", String::class.java)!!,
             contactInfo =
                 ContactInfo(
-                    email = row.get("email", Email::class.java)!!,
-                    phone = row.get("phone", PhoneNumber::class.java)!!,
+                    email =
+                        Email(
+                            row.get("email", String::class.java)!!,
+                        ),
+                    phone =
+                        PhoneNumber(
+                            row.get("phone", String::class.java)!!,
+                        ),
                 ),
             documentId =
                 DocumentId(
-                    type = row.get("document_id_type", DocumentIdType::class.java)!!,
+                    type =
+                        DocumentIdType.fromString(
+                            row.get("document_id_type", String::class.java)!!,
+                        ),
                     value = row.get("document_id_value", String::class.java)!!,
                 ),
             birthDate = row.get("birth_date", Instant::class.java),
@@ -120,15 +129,15 @@ class CustomerRepositoryImpl(
 
         private const val SAVE = """
         INSERT INTO customer (
-        id, auth_credential_id, address_id, name, email, phone, document_id_type, document_id_value, birth_date
+        id, auth_credential_id, main_address_id, name, email, phone, document_id_type, document_id_value, birth_date
         )
-        VALUES (:id, :authCredentialId, :addressId, :name, :email, :phone, :documentIdType, :documentIdValue, :birthDate)
+        VALUES (:id, :authCredentialId, :mainAddressId, :name, :email, :phone, :documentIdType, :documentIdValue, :birthDate)
         RETURNING *
         """
 
         private const val UPDATE = """
         UPDATE customer
-        SET name = :name, email = :email, phone = :phone, :documentIdType, :documentIdValue, :birthDate
+        SET name = :name, email = :email, phone = :phone, document_id_type = :documentIdType, document_id_value = :documentIdValue, birth_date = :birthDate
         WHERE id = :id
         RETURNING *
         """
