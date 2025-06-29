@@ -4,7 +4,7 @@
 
 --changeset lucas.araujo:001-create-types
 
-SET search_path TO hotela, public;
+SET search_path TO hotela;
 SET ROLE hotela_admins;
 ------------------------------------------------------------------------------------------------------------------------
 
