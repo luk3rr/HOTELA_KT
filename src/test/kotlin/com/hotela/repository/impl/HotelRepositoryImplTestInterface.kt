@@ -18,9 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
 import java.util.UUID
 
-class HotelRepositoryImplTest :
+class HotelRepositoryImplTestInterface :
     ShouldSpec(),
-    AbstractDatabaseIntegrationTest {
+    DatabaseIntegrationTestInterface {
     @Autowired
     private lateinit var partnerRepository: PartnerRepository
 

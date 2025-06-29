@@ -26,9 +26,9 @@ import org.springframework.r2dbc.core.DatabaseClient
 import java.math.BigDecimal
 import java.util.UUID
 
-class RoomRepositoryImplTest :
+class RoomRepositoryImplTestInterface :
     ShouldSpec(),
-    AbstractDatabaseIntegrationTest {
+    DatabaseIntegrationTestInterface {
     @Autowired
     private lateinit var roomRepository: RoomRepository
 

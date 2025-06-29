@@ -16,9 +16,9 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
 
-class CustomerRepositoryImplTest :
+class CustomerRepositoryImplTestInterface :
     ShouldSpec(),
-    AbstractDatabaseIntegrationTest {
+    DatabaseIntegrationTestInterface {
     @Autowired
     private lateinit var addressRepository: AddressRepository
 

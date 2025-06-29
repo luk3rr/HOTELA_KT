@@ -30,9 +30,9 @@ import org.springframework.r2dbc.core.DatabaseClient
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-class ReviewRepositoryImplTest :
+class ReviewRepositoryImplTestInterface :
     ShouldSpec(),
-    AbstractDatabaseIntegrationTest {
+    DatabaseIntegrationTestInterface {
     @Autowired
     private lateinit var reviewRepository: ReviewRepository
 
