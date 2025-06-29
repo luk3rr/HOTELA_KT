@@ -24,6 +24,7 @@ interface AbstractDatabaseIntegrationTest {
                     withDatabaseName("hotela")
                     withUsername("postgres")
                     withPassword("postgres")
+                    withInitScript("db/test-setup.sql")
                 }.also { it.start() }
 
         @JvmStatic
