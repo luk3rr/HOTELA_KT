@@ -2,7 +2,7 @@ package com.hotela
 
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.model.enum.Role
-import com.hotela.repository.impl.AbstractDatabaseIntegrationTest
+import com.hotela.repository.impl.DatabaseIntegrationTestInterface
 import io.kotest.common.runBlocking
 import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.core.spec.IsolationMode
@@ -72,7 +72,7 @@ fun DatabaseClient.clearAllTables() =
 
         val tableNames =
             this
-                .sql("SELECT tablename FROM pg_tables WHERE schemaname = '${AbstractDatabaseIntegrationTest.DATABASE_SCHEMA}'")
+                .sql("SELECT tablename FROM pg_tables WHERE schemaname = '${DatabaseIntegrationTestInterface.DATABASE_SCHEMA}'")
                 .map { row -> row.get("tablename", String::class.java)!! }
                 .all()
                 .collectList()

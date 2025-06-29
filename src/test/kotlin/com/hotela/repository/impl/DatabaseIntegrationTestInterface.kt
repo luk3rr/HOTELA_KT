@@ -11,7 +11,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-interface AbstractDatabaseIntegrationTest {
+interface DatabaseIntegrationTestInterface {
     companion object {
         const val POSTGRES_VERSION = "15-alpine"
         const val CONTAINER_PORT = 5432
@@ -22,8 +22,9 @@ interface AbstractDatabaseIntegrationTest {
             PostgreSQLContainer("postgres:${POSTGRES_VERSION}")
                 .apply {
                     withDatabaseName("hotela")
-                    withUsername("postgres")
+                    withUsername("hotela_admins")
                     withPassword("postgres")
+                    withInitScript("db/test-setup.sql")
                 }.also { it.start() }
 
         @JvmStatic

@@ -1,16 +1,11 @@
-CREATE SCHEMA IF NOT EXISTS hotela;
+--liquibase formatted sql
 
-GRANT USAGE, CREATE ON SCHEMA hotela TO hotela_admins;
+--preconditions onFail:HALT onError:HALT
 
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA hotela TO hotela_admins;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA hotela TO hotela_admins;
-GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA hotela TO hotela_admins;
+--changeset lucas.araujo:000-setup
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA hotela
-GRANT ALL ON TABLES TO hotela_admins;
+SET search_path TO hotela, public;
+------------------------------------------------------------------------------------------------------------------------
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA hotela
-GRANT ALL ON SEQUENCES TO hotela_admins;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA hotela
-GRANT ALL ON FUNCTIONS TO hotela_admins;
+GRANT ALL ON TABLE databasechangelog TO hotela_admins;
+GRANT ALL ON TABLE databasechangeloglock TO hotela_admins;
