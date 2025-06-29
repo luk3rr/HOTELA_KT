@@ -11,7 +11,7 @@ import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 @Component
 class AuthCredentialRepositoryImpl(
@@ -20,7 +20,7 @@ class AuthCredentialRepositoryImpl(
     override suspend fun findByLoginEmail(email: Email): AuthCredential? =
         databaseClient
             .sql(FIND_BY_LOGIN_EMAIL)
-            .bind("loginEmail", email)
+            .bind("loginEmail", email.value)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()
@@ -36,7 +36,7 @@ class AuthCredentialRepositoryImpl(
     override suspend fun existsByLoginEmail(email: Email): Boolean =
         databaseClient
             .sql(EXISTS_BY_LOGIN_EMAIL)
-            .bind("loginEmail", email)
+            .bind("loginEmail", email.value)
             .map { row, _ ->
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
@@ -53,7 +53,7 @@ class AuthCredentialRepositoryImpl(
         databaseClient
             .sql(SAVE)
             .bind("id", authCredential.id)
-            .bind("loginEmail", authCredential.loginEmail)
+            .bind("loginEmail", authCredential.loginEmail.value)
             .bind("password", authCredential.password)
             .bind("role", authCredential.role)
             .bind("isActive", authCredential.isActive)
@@ -66,7 +66,9 @@ class AuthCredentialRepositoryImpl(
     private fun mapper(row: Row): AuthCredential =
         AuthCredential(
             id = row.get("id", UUID::class.java)!!,
-            loginEmail = row.get("login_email", Email::class.java)!!,
+            loginEmail = Email(
+                row.get("login_email", String::class.java)!!
+            ),
             password = row.get("password", String::class.java)!!,
             role = row.get("role", Role::class.java)!!,
             isActive = row.get("is_active", Boolean::class.java)!!,

@@ -1,6 +1,12 @@
 --liquibase formatted sql
 
+--preconditions onFail:HALT onError:HALT
+
 --changeset lucas.araujo:001-create-types
+
+SET search_path TO hotela, public;
+------------------------------------------------------------------------------------------------------------------------
+
 CREATE TYPE PARTNER_STATUS AS ENUM ('ACTIVE', 'INACTIVE');
 CREATE TYPE ROOM_STATUS AS ENUM ('AVAILABLE', 'BOOKED', 'MAINTENANCE', 'UNAVAILABLE');
 CREATE TYPE PAYMENT_METHOD AS ENUM ('CREDIT_CARD', 'DEBIT_CARD', 'PIX', 'BANK_TRANSFER', 'PAYPAL', 'CASH', 'VOUCHER');

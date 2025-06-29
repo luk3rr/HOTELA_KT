@@ -8,7 +8,7 @@ data class Room(
     val id: UUID,
     val hotelId: UUID,
     val roomTypeId: UUID,
-    val number: String,
+    val roomCode: String,
     val floor: Int,
     val pricePerNight: BigDecimal,
     val capacity: Int,
@@ -22,7 +22,7 @@ data class Room(
     }
 
     init {
-        require(number.isNotBlank()) { "Room identifier cannot be blank" }
+        require(roomCode.isNotBlank()) { "Room identifier cannot be blank" }
         require(pricePerNight >= MINIMUM_PRICE) { "Price must be greater or equal to $MINIMUM_PRICE" }
         require(capacity >= MINIMUM_CAPACITY) { "Capacity must be greater or equal to $MINIMUM_CAPACITY" }
         description?.let {

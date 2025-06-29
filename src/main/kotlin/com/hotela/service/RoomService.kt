@@ -30,7 +30,7 @@ class RoomService(
                 id = UUID.randomUUID(),
                 hotelId = payload.hotelId,
                 roomTypeId = payload.roomTypeId,
-                number = payload.number,
+                roomCode = payload.number,
                 floor = payload.floor,
                 pricePerNight = payload.pricePerNight,
                 capacity = payload.capacity,
@@ -57,7 +57,7 @@ class RoomService(
         val room =
             existingRoom.copy(
                 roomTypeId = payload.roomTypeId ?: existingRoom.roomTypeId,
-                number = payload.number ?: existingRoom.number,
+                roomCode = payload.number ?: existingRoom.roomCode,
                 floor = payload.floor ?: existingRoom.floor,
                 pricePerNight = payload.pricePerNight ?: existingRoom.pricePerNight,
                 capacity = payload.capacity ?: existingRoom.capacity,
@@ -89,7 +89,7 @@ class RoomService(
         if (!isRoomNumberAvailable(room)) {
             throw HotelaException.RoomAlreadyExistsException(
                 id = room.id,
-                msg = "Room with number ${room.number} already exists",
+                msg = "Room with number ${room.roomCode} already exists",
             )
         }
     }
@@ -99,7 +99,7 @@ class RoomService(
 
         return rooms.none {
             val isSameRoom = it.id == room.id
-            val isSameNumber = it.number == room.number
+            val isSameNumber = it.roomCode == room.roomCode
 
             !isSameRoom && isSameNumber
         }

@@ -1,6 +1,12 @@
 --liquibase formatted sql
 
+--preconditions onFail:HALT onError:HALT
+
 --changeset lucas.araujo:002-create-tables
+
+SET search_path TO hotela, public;
+------------------------------------------------------------------------------------------------------------------------
+
 CREATE TABLE auth_credential
 (
     id            UUID PRIMARY KEY,
@@ -10,7 +16,7 @@ CREATE TABLE auth_credential
     is_active     BOOLEAN             NOT NULL DEFAULT true,
     last_login_at TIMESTAMPTZ,
     created_at    TIMESTAMPTZ         NOT NULL DEFAULT now(),
-    updated_at    TIMESTAMPTZ         NOT NULL
+    updated_at    TIMESTAMPTZ
 );
 
 CREATE TABLE address
@@ -71,14 +77,14 @@ CREATE TABLE room
     id              UUID PRIMARY KEY,
     hotel_id        UUID           NOT NULL REFERENCES hotel (id),
     room_type_id    UUID           NOT NULL REFERENCES room_type (id),
-    room_id         VARCHAR(32)    NOT NULL,
+    room_code       VARCHAR(32)    NOT NULL,
     floor           INT,
     price_per_night DECIMAL(10, 2) NOT NULL,
     capacity        INT            NOT NULL,
     status          ROOM_STATUS    NOT NULL DEFAULT 'AVAILABLE',
     description     TEXT,
 
-    UNIQUE (hotel_id, room_id)
+    UNIQUE (hotel_id, room_code)
 );
 
 CREATE TABLE customer
@@ -134,7 +140,7 @@ CREATE TABLE review
     comment      TEXT,
     is_anonymous BOOLEAN     NOT NULL DEFAULT false,
     reviewed_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+    updated_at   TIMESTAMPTZ
 );
 
 --rollback DROP TABLE IF EXISTS review;

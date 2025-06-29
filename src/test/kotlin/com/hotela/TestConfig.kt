@@ -1,18 +1,27 @@
 package com.hotela
 
+import com.hotela.config.R2DBCConfig
 import com.hotela.model.enum.AuthClaimKey
 import com.hotela.model.enum.Role
+import com.hotela.repository.impl.AbstractDatabaseIntegrationTest
+import io.kotest.common.runBlocking
 import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.core.spec.IsolationMode
+import io.r2dbc.postgresql.PostgresqlConnectionFactoryProvider
+import io.r2dbc.spi.ConnectionFactoryOptions
+import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryOptionsBuilderCustomizer
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.data.r2dbc.convert.R2dbcCustomConversions
+import org.springframework.data.r2dbc.dialect.PostgresDialect
+import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.test.web.reactive.server.WebTestClient
-import java.util.UUID
+import java.util.*
 
 /*
 To activate the test configuration, add the following annotation to your test class:
@@ -62,3 +71,24 @@ fun WebTestClient.asPartner(
                     jwt.claim(AuthClaimKey.AUTHID.key, userId.toString())
                 },
         ).mutateWith(csrf())
+
+fun DatabaseClient.clearAllTables() = runBlocking {
+    val excludeTables = setOf("room_type")
+
+    val tableNames = this.sql("SELECT tablename FROM pg_tables WHERE schemaname = '${AbstractDatabaseIntegrationTest.DATABASE_SCHEMA}'")
+        .map { row -> row.get("tablename", String::class.java)!! }
+        .all()
+        .collectList()
+        .block()
+
+    if (tableNames.isNullOrEmpty()) {
+        return@runBlocking
+    }
+
+    val tablesToTruncate = tableNames.filterNot { it in excludeTables }.joinToString(", ") { "\"$it\"" }
+    val sql = """
+        TRUNCATE TABLE $tablesToTruncate RESTART IDENTITY CASCADE;
+    """.trimIndent()
+
+    this.sql(sql).then().block()
+}

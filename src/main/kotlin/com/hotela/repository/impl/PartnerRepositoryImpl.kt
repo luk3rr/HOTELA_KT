@@ -40,7 +40,7 @@ class PartnerRepositoryImpl(
     override suspend fun findByEmail(email: Email): Partner? =
         databaseClient
             .sql(FIND_BY_EMAIL)
-            .bind("email", email)
+            .bind("email", email.value)
             .map { row, _ ->
                 mapper(row)
             }.awaitSingleOrNull()
@@ -48,7 +48,7 @@ class PartnerRepositoryImpl(
     override suspend fun existsByEmail(email: Email): Boolean =
         databaseClient
             .sql(EXISTS_BY_EMAIL)
-            .bind("email", email)
+            .bind("email", email.value)
             .map { row, _ ->
                 row.get("exists", Boolean::class.java)!!
             }.awaitSingle()
@@ -60,8 +60,8 @@ class PartnerRepositoryImpl(
             .bind("authCredentialId", partner.authCredentialId)
             .bind("companyName", partner.companyName)
             .bind("legalName", partner.legalName)
-            .bind("email", partner.contactInfo.email)
-            .bind("phone", partner.contactInfo.phone)
+            .bind("email", partner.contactInfo.email.value)
+            .bind("phone", partner.contactInfo.phone.value)
             .bind("documentIdType", partner.documentId.type)
             .bind("documentIdValue", partner.documentId.value)
             .bind("contractSignedAt", partner.contractSignedAt)
@@ -76,8 +76,8 @@ class PartnerRepositoryImpl(
             .bind("id", partner.id)
             .bind("companyName", partner.companyName)
             .bind("legalName", partner.legalName)
-            .bind("email", partner.contactInfo.email)
-            .bind("phone", partner.contactInfo.phone)
+            .bind("email", partner.contactInfo.email.value)
+            .bind("phone", partner.contactInfo.phone.value)
             .bind("documentIdType", partner.documentId.type)
             .bind("documentIdValue", partner.documentId.value)
             .bind("contractSignedAt", partner.contractSignedAt)
@@ -94,12 +94,18 @@ class PartnerRepositoryImpl(
             legalName = row.get("legal_name", String::class.java)!!,
             contactInfo =
                 ContactInfo(
-                    email = row.get("email", Email::class.java)!!,
-                    phone = row.get("phone", PhoneNumber::class.java)!!,
+                    email = Email(
+                        row.get("email", String::class.java)!!
+                    ),
+                    phone = PhoneNumber(
+                        row.get("phone", String::class.java)!!
+                    ),
                 ),
             documentId =
                 DocumentId(
-                    type = row.get("document_id_type", DocumentIdType::class.java)!!,
+                    type = DocumentIdType.fromString(
+                        row.get("document_id_type", String::class.java)!!
+                    ),
                     value = row.get("document_id_value", String::class.java)!!,
                 ),
             contractSignedAt = row.get("contract_signed_at", Instant::class.java)!!,

@@ -10,7 +10,7 @@ import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 @Component
 class BookingRepositoryImpl(
@@ -85,8 +85,8 @@ class BookingRepositoryImpl(
             .bind("hotelId", booking.hotelId)
             .bind("roomId", booking.roomId)
             .bind("bookedAt", booking.bookedAt)
-            .bind("checkin", booking.checkin)
-            .bind("checkout", booking.checkout)
+            .bind("checkinDate", booking.checkin)
+            .bind("checkoutDate", booking.checkout)
             .bind("numberOfGuests", booking.numberOfGuests)
             .bind("status", booking.status)
             .bind("specialRequests", booking.specialRequests)
@@ -100,8 +100,8 @@ class BookingRepositoryImpl(
             .bind("id", booking.id)
             .bind("roomId", booking.roomId)
             .bind("bookedAt", booking.bookedAt)
-            .bind("checkin", booking.checkin)
-            .bind("checkout", booking.checkout)
+            .bind("checkinDate", booking.checkin)
+            .bind("checkoutDate", booking.checkout)
             .bind("numberOfGuests", booking.numberOfGuests)
             .bind("status", booking.status)
             .bind("specialRequests", booking.specialRequests)
@@ -116,8 +116,8 @@ class BookingRepositoryImpl(
             hotelId = row.get("hotel_id", UUID::class.java)!!,
             roomId = row.get("room_id", UUID::class.java)!!,
             bookedAt = row.get("booked_at", Instant::class.java)!!,
-            checkin = row.get("checkin", Instant::class.java)!!,
-            checkout = row.get("checkout", Instant::class.java)!!,
+            checkin = row.get("checkin_date", Instant::class.java)!!,
+            checkout = row.get("checkout_date", Instant::class.java)!!,
             numberOfGuests = row.get("number_of_guests", Int::class.java)!!,
             status = row.get("status", BookingStatus::class.java)!!,
             specialRequests = row.get("special_requests", String::class.java),
@@ -140,14 +140,14 @@ class BookingRepositoryImpl(
         """
 
         private const val SAVE = """
-            INSERT INTO booking (id, customer_id, hotel_id, room_id, booked_at, checkin, checkout, number_of_guests, status, special_requests)
-            VALUES (:id, :customerId, :hotelId, :roomId, :bookedAt, :checkin, :checkout, :numberOfGuests, :status, :specialRequests)
+            INSERT INTO booking (id, customer_id, hotel_id, room_id, booked_at, checkin_date, checkout_date, number_of_guests, status, special_requests)
+            VALUES (:id, :customerId, :hotelId, :roomId, :bookedAt, :checkinDate, :checkoutDate, :numberOfGuests, :status, :specialRequests)
             RETURNING *
         """
 
         private const val UPDATE = """
             UPDATE booking
-            SET room_id = :roomId, booked_at = :bookedAt, checkin = :checkin, checkout = :checkout, number_of_guests = :numberOfGuests, status = :status, special_requests = :specialRequests
+            SET room_id = :roomId, booked_at = :bookedAt, checkin_date = :checkinDate, checkout_date = :checkoutDate, number_of_guests = :numberOfGuests, status = :status, special_requests = :specialRequests
             WHERE id = :id
             RETURNING *
         """

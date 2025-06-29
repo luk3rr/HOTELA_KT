@@ -8,7 +8,7 @@ import java.util.UUID
 object UpdateRoomRequestStubs {
     fun create(
         roomTypeId: UUID? = UUID.fromString("decb09b1-bd71-4976-8292-f95f367ef5c7"),
-        number: String? = "room-id-501",
+        roomCode: String? = "room-id-501",
         floor: Int? = 5,
         pricePerNight: BigDecimal? = BigDecimal("900.00"),
         capacity: Int? = 3,
@@ -17,7 +17,7 @@ object UpdateRoomRequestStubs {
     ): UpdateRoomRequest =
         UpdateRoomRequest(
             roomTypeId = roomTypeId,
-            number = number,
+            number = roomCode,
             floor = floor,
             pricePerNight = pricePerNight,
             capacity = capacity,
