@@ -231,7 +231,7 @@ class BookingService(
             hotelService.findById(booking.hotelId)
                 ?: throw HotelaException.HotelNotFoundException(booking.hotelId)
 
-        println("requesterUserId: ${requesterUserId}")
+        println("requesterUserId: $requesterUserId")
         println("booking.customerId: ${booking.customerId}")
         println("hotel.partnerId: ${hotel.partnerId}")
         println("True or false: ${booking.customerId == requesterUserId || hotel.partnerId == requesterUserId}")

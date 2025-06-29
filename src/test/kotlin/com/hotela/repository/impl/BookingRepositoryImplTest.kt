@@ -3,8 +3,21 @@ package com.hotela.repository.impl
 import com.hotela.clearAllTables
 import com.hotela.model.domain.Email
 import com.hotela.model.enum.BookingStatus
-import com.hotela.repository.*
-import com.hotela.stubs.db.*
+import com.hotela.repository.AddressRepository
+import com.hotela.repository.AuthCredentialRepository
+import com.hotela.repository.BookingRepository
+import com.hotela.repository.CustomerRepository
+import com.hotela.repository.HotelRepository
+import com.hotela.repository.PartnerRepository
+import com.hotela.repository.RoomRepository
+import com.hotela.stubs.db.AddressStubs
+import com.hotela.stubs.db.AuthCredentialStubs
+import com.hotela.stubs.db.BookingStubs
+import com.hotela.stubs.db.CustomerStubs
+import com.hotela.stubs.db.HotelStubs
+import com.hotela.stubs.db.PartnerStubs
+import com.hotela.stubs.db.RoomStubs
+import com.hotela.stubs.db.RoomTypeStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldHaveSize
@@ -13,9 +26,11 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
-import java.util.*
+import java.util.UUID
 
-class BookingRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class BookingRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var bookingRepository: BookingRepository
 
@@ -45,20 +60,22 @@ class BookingRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() 
     init {
         val address = AddressStubs.create()
         val customerAuthCredential = AuthCredentialStubs.create()
-        val partnerAuthCredential = AuthCredentialStubs.create(
-            id = UUID.fromString("98aade90-35c6-452b-9fbb-e089ff6751d8"),
-            loginEmail = Email("partner@partner.com")
-        )
+        val partnerAuthCredential =
+            AuthCredentialStubs.create(
+                id = UUID.fromString("98aade90-35c6-452b-9fbb-e089ff6751d8"),
+                loginEmail = Email("partner@partner.com"),
+            )
         val partner = PartnerStubs.create(authCredentialId = partnerAuthCredential.id)
         val customer = CustomerStubs.create(authCredentialId = customerAuthCredential.id, addressId = address.id)
         val hotel = HotelStubs.create(partnerId = partner.id, addressId = address.id)
         val roomType = RoomTypeStubs.createStandardSolteiro()
         val room = RoomStubs.create(hotelId = hotel.id, roomTypeId = roomType.id)
-        val booking = BookingStubs.create(
-            customerId = customer.id,
-            hotelId = hotel.id,
-            roomId = room.id
-        )
+        val booking =
+            BookingStubs.create(
+                customerId = customer.id,
+                hotelId = hotel.id,
+                roomId = room.id,
+            )
 
         beforeSpec {
             databaseClient.clearAllTables()
@@ -73,7 +90,11 @@ class BookingRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() 
         }
 
         beforeTest {
-            databaseClient.sql("DELETE FROM booking").fetch().rowsUpdated().awaitSingle()
+            databaseClient
+                .sql("DELETE FROM booking")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
         should("successfully create a booking") {

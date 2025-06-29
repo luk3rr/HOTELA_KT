@@ -75,12 +75,14 @@ class HotelRepositoryImpl(
             name = row.get("name", String::class.java)!!,
             contactInfo =
                 ContactInfo(
-                    email = Email(
-                        row.get("email", String::class.java)!!
-                    ),
-                    phone = PhoneNumber(
-                        row.get("phone", String::class.java)!!)
-                    ,
+                    email =
+                        Email(
+                            row.get("email", String::class.java)!!,
+                        ),
+                    phone =
+                        PhoneNumber(
+                            row.get("phone", String::class.java)!!,
+                        ),
                 ),
             website = row.get("website", String::class.java),
             description = row.get("description", String::class.java),

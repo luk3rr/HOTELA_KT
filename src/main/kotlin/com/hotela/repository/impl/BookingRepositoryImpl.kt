@@ -10,7 +10,7 @@ import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Component
 class BookingRepositoryImpl(

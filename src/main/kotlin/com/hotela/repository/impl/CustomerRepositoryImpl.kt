@@ -14,7 +14,7 @@ import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Component
 class CustomerRepositoryImpl(
@@ -90,18 +90,21 @@ class CustomerRepositoryImpl(
             name = row.get("name", String::class.java)!!,
             contactInfo =
                 ContactInfo(
-                    email = Email(
-                        row.get("email", String::class.java)!!
-                    ),
-                    phone = PhoneNumber(
-                        row.get("phone", String::class.java)!!
-                    ),
+                    email =
+                        Email(
+                            row.get("email", String::class.java)!!,
+                        ),
+                    phone =
+                        PhoneNumber(
+                            row.get("phone", String::class.java)!!,
+                        ),
                 ),
             documentId =
                 DocumentId(
-                    type = DocumentIdType.fromString(
-                        row.get("document_id_type", String::class.java)!!
-                    ),
+                    type =
+                        DocumentIdType.fromString(
+                            row.get("document_id_type", String::class.java)!!,
+                        ),
                     value = row.get("document_id_value", String::class.java)!!,
                 ),
             birthDate = row.get("birth_date", Instant::class.java),

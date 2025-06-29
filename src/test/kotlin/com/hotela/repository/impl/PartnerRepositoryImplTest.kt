@@ -13,9 +13,11 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
-import java.util.*
+import java.util.UUID
 
-class PartnerRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class PartnerRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var authCredentialRepository: AuthCredentialRepository
 
@@ -38,7 +40,11 @@ class PartnerRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() 
         }
 
         beforeTest {
-            databaseClient.sql("DELETE FROM partner").fetch().rowsUpdated().awaitSingle()
+            databaseClient
+                .sql("DELETE FROM partner")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
         should("successfully create a partner") {

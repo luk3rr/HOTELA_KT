@@ -94,18 +94,21 @@ class PartnerRepositoryImpl(
             legalName = row.get("legal_name", String::class.java)!!,
             contactInfo =
                 ContactInfo(
-                    email = Email(
-                        row.get("email", String::class.java)!!
-                    ),
-                    phone = PhoneNumber(
-                        row.get("phone", String::class.java)!!
-                    ),
+                    email =
+                        Email(
+                            row.get("email", String::class.java)!!,
+                        ),
+                    phone =
+                        PhoneNumber(
+                            row.get("phone", String::class.java)!!,
+                        ),
                 ),
             documentId =
                 DocumentId(
-                    type = DocumentIdType.fromString(
-                        row.get("document_id_type", String::class.java)!!
-                    ),
+                    type =
+                        DocumentIdType.fromString(
+                            row.get("document_id_type", String::class.java)!!,
+                        ),
                     value = row.get("document_id_value", String::class.java)!!,
                 ),
             contractSignedAt = row.get("contract_signed_at", Instant::class.java)!!,

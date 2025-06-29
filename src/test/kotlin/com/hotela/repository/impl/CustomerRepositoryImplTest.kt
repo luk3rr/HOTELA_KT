@@ -14,12 +14,11 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.r2dbc.core.DatabaseClient
-import org.springframework.test.context.ActiveProfiles
-import org.testcontainers.junit.jupiter.Testcontainers
 
-class CustomerRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class CustomerRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var addressRepository: AddressRepository
 
@@ -47,7 +46,11 @@ class CustomerRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec()
         }
 
         beforeTest {
-            databaseClient.sql("DELETE FROM customer").fetch().rowsUpdated().awaitSingle()
+            databaseClient
+                .sql("DELETE FROM customer")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
         should("successfully create a customer") {

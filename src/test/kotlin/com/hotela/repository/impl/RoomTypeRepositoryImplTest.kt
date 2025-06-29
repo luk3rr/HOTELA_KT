@@ -4,16 +4,16 @@ import com.hotela.repository.RoomTypeRepository
 import com.hotela.stubs.db.RoomTypeStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.extensions.spring.SpringExtension
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
-import java.util.*
+import java.util.UUID
 
-class RoomTypeRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class RoomTypeRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var roomTypeRepository: RoomTypeRepository
 

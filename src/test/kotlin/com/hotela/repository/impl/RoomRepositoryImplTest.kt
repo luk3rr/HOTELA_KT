@@ -3,8 +3,17 @@ package com.hotela.repository.impl
 import com.hotela.clearAllTables
 import com.hotela.model.db.Room
 import com.hotela.model.enum.RoomStatus
-import com.hotela.repository.*
-import com.hotela.stubs.db.*
+import com.hotela.repository.AddressRepository
+import com.hotela.repository.AuthCredentialRepository
+import com.hotela.repository.HotelRepository
+import com.hotela.repository.PartnerRepository
+import com.hotela.repository.RoomRepository
+import com.hotela.stubs.db.AddressStubs
+import com.hotela.stubs.db.AuthCredentialStubs
+import com.hotela.stubs.db.HotelStubs
+import com.hotela.stubs.db.PartnerStubs
+import com.hotela.stubs.db.RoomStubs
+import com.hotela.stubs.db.RoomTypeStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldHaveSize
@@ -15,9 +24,11 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
 import java.math.BigDecimal
-import java.util.*
+import java.util.UUID
 
-class RoomRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class RoomRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var roomRepository: RoomRepository
 
@@ -54,7 +65,11 @@ class RoomRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
         }
 
         beforeTest {
-            databaseClient.sql("DELETE FROM room").fetch().rowsUpdated().awaitSingle()
+            databaseClient
+                .sql("DELETE FROM room")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
         should("create room successfully") {
@@ -73,14 +88,15 @@ class RoomRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
 
         should("update room successfully") {
             roomRepository.create(room)
-            val updatedRoom = room.copy(
-                roomCode = "A-202",
-                floor = 2,
-                pricePerNight = BigDecimal("199.99"),
-                capacity = 4,
-                status = RoomStatus.UNAVAILABLE,
-                description = "Updated room description"
-            )
+            val updatedRoom =
+                room.copy(
+                    roomCode = "A-202",
+                    floor = 2,
+                    pricePerNight = BigDecimal("199.99"),
+                    capacity = 4,
+                    status = RoomStatus.UNAVAILABLE,
+                    description = "Updated room description",
+                )
 
             val updated = roomRepository.update(updatedRoom)
 

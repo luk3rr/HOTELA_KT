@@ -11,9 +11,11 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
-import java.util.*
+import java.util.UUID
 
-class AuthCredentialRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class AuthCredentialRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var authCredentialRepository: AuthCredentialRepository
 
@@ -30,7 +32,11 @@ class AuthCredentialRepositoryImplTest : AbstractDatabaseIntegrationTest, Should
         }
 
         beforeTest {
-            databaseClient.sql("DELETE FROM auth_credential").fetch().rowsUpdated().awaitSingle()
+            databaseClient
+                .sql("DELETE FROM auth_credential")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
         should("successfully create an auth credential") {

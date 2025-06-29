@@ -9,13 +9,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.r2dbc.core.DatabaseClient
-import org.springframework.test.context.ActiveProfiles
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.util.UUID
 
-class AddressRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class AddressRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var addressRepository: AddressRepository
 
@@ -32,7 +31,11 @@ class AddressRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() 
         }
 
         beforeEach {
-            databaseClient.sql("DELETE FROM address").fetch().rowsUpdated().awaitSingle()
+            databaseClient
+                .sql("DELETE FROM address")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
         should("successfully create an address") {

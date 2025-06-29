@@ -22,7 +22,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 class BookingServiceTest :
     BehaviorSpec({
@@ -52,9 +52,10 @@ class BookingServiceTest :
                 )
 
             every { jwtToken.token } returns jwt
-            every { jwt.claims } returns mapOf(
-                AuthClaimKey.USERID.key to customer.id.toString()
-            )
+            every { jwt.claims } returns
+                mapOf(
+                    AuthClaimKey.USERID.key to customer.id.toString(),
+                )
 
             every { timeProvider.now() } returns Instant.now()
 
@@ -212,10 +213,10 @@ class BookingServiceTest :
 
                 When("room is not available for the selected dates") {
                     coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns
-                            listOf(
-                                booking,
-                                anotherBookingInProgress,
-                            )
+                        listOf(
+                            booking,
+                            anotherBookingInProgress,
+                        )
 
                     val createBookingRequestInvalid =
                         createBookingRequest.copy(
@@ -382,10 +383,10 @@ class BookingServiceTest :
 
                 When("room is not available for the selected dates") {
                     coEvery { bookingRepository.findRunningBookingsByHotelId(any()) } returns
-                            listOf(
-                                booking,
-                                anotherBookingInProgress,
-                            )
+                        listOf(
+                            booking,
+                            anotherBookingInProgress,
+                        )
 
                     val updateBookingRequestInvalid =
                         updateBookingRequest.copy(
@@ -488,10 +489,10 @@ class BookingServiceTest :
                     every {
                         timeProvider.now()
                     } returns
-                            booking.checkin.minus(
-                                BookingService.CHECKIN_ALLOWED_TIME_WINDOW_MINUTES + 1,
-                                ChronoUnit.MINUTES,
-                            )
+                        booking.checkin.minus(
+                            BookingService.CHECKIN_ALLOWED_TIME_WINDOW_MINUTES + 1,
+                            ChronoUnit.MINUTES,
+                        )
 
                     Then("it should throw InvalidDataException") {
                         val exception =

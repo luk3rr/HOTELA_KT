@@ -18,19 +18,25 @@ interface AbstractDatabaseIntegrationTest {
         const val DATABASE_SCHEMA = "hotela"
 
         @Container
-        private val postgreSQLContainer = PostgreSQLContainer("postgres:${POSTGRES_VERSION}").apply {
-            withDatabaseName("hotela")
-            withUsername("postgres")
-            withPassword("postgres")
-        }.also { it.start() }
+        private val postgreSQLContainer =
+            PostgreSQLContainer("postgres:${POSTGRES_VERSION}")
+                .apply {
+                    withDatabaseName("hotela")
+                    withUsername("postgres")
+                    withPassword("postgres")
+                }.also { it.start() }
 
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             val r2dbcUrl =
-                "r2dbc:postgresql://${postgreSQLContainer.host}:${postgreSQLContainer.getMappedPort(CONTAINER_PORT)}/${postgreSQLContainer.databaseName}"
+                "r2dbc:postgresql://${postgreSQLContainer.host}:${postgreSQLContainer.getMappedPort(
+                    CONTAINER_PORT,
+                )}/${postgreSQLContainer.databaseName}"
             val jdbcUrl =
-                "jdbc:postgresql://${postgreSQLContainer.host}:${postgreSQLContainer.getMappedPort(CONTAINER_PORT)}/${postgreSQLContainer.databaseName}"
+                "jdbc:postgresql://${postgreSQLContainer.host}:${postgreSQLContainer.getMappedPort(
+                    CONTAINER_PORT,
+                )}/${postgreSQLContainer.databaseName}"
 
             registry.add("spring.r2dbc.url") { r2dbcUrl }
             registry.add("spring.liquibase.url") { jdbcUrl }

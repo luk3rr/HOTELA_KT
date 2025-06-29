@@ -11,7 +11,7 @@ import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.r2dbc.core.bind
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Component
 class AuthCredentialRepositoryImpl(
@@ -66,9 +66,10 @@ class AuthCredentialRepositoryImpl(
     private fun mapper(row: Row): AuthCredential =
         AuthCredential(
             id = row.get("id", UUID::class.java)!!,
-            loginEmail = Email(
-                row.get("login_email", String::class.java)!!
-            ),
+            loginEmail =
+                Email(
+                    row.get("login_email", String::class.java)!!,
+                ),
             password = row.get("password", String::class.java)!!,
             role = row.get("role", Role::class.java)!!,
             isActive = row.get("is_active", Boolean::class.java)!!,

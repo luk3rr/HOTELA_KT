@@ -2,8 +2,23 @@ package com.hotela.repository.impl
 
 import com.hotela.clearAllTables
 import com.hotela.model.db.Review
-import com.hotela.repository.*
-import com.hotela.stubs.db.*
+import com.hotela.repository.AddressRepository
+import com.hotela.repository.AuthCredentialRepository
+import com.hotela.repository.BookingRepository
+import com.hotela.repository.CustomerRepository
+import com.hotela.repository.HotelRepository
+import com.hotela.repository.PartnerRepository
+import com.hotela.repository.ReviewRepository
+import com.hotela.repository.RoomRepository
+import com.hotela.stubs.db.AddressStubs
+import com.hotela.stubs.db.AuthCredentialStubs
+import com.hotela.stubs.db.BookingStubs
+import com.hotela.stubs.db.CustomerStubs
+import com.hotela.stubs.db.HotelStubs
+import com.hotela.stubs.db.PartnerStubs
+import com.hotela.stubs.db.ReviewStubs
+import com.hotela.stubs.db.RoomStubs
+import com.hotela.stubs.db.RoomTypeStubs
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldHaveSize
@@ -13,9 +28,11 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
-class ReviewRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class ReviewRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var reviewRepository: ReviewRepository
 
@@ -59,15 +76,20 @@ class ReviewRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
             val customer = customerRepository.create(CustomerStubs.create())
             val booking = bookingRepository.create(BookingStubs.create(customerId = customer.id, hotelId = hotel.id, roomId = room.id))
 
-            review = ReviewStubs.create(
-                bookingId = booking.id,
-                customerId = customer.id,
-                hotelId = hotel.id
-            )
+            review =
+                ReviewStubs.create(
+                    bookingId = booking.id,
+                    customerId = customer.id,
+                    hotelId = hotel.id,
+                )
         }
 
         beforeTest {
-            databaseClient.sql("DELETE FROM review").fetch().rowsUpdated().awaitSingle()
+            databaseClient
+                .sql("DELETE FROM review")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
         should("create review successfully") {

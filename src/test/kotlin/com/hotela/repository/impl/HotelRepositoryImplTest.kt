@@ -16,9 +16,11 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.r2dbc.core.DatabaseClient
-import java.util.*
+import java.util.UUID
 
-class HotelRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
+class HotelRepositoryImplTest :
+    ShouldSpec(),
+    AbstractDatabaseIntegrationTest {
     @Autowired
     private lateinit var partnerRepository: PartnerRepository
 
@@ -41,11 +43,12 @@ class HotelRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
         val partnerAuthCredential = AuthCredentialStubs.create()
         val partner = PartnerStubs.create(authCredentialId = partnerAuthCredential.id)
         val hotel = HotelStubs.create(partnerId = partner.id, addressId = address.id)
-        val anotherHotel = HotelStubs.create(
-            id = UUID.fromString("29db6b41-e1c4-4c05-ad4a-e605547fe5a2"),
-            partnerId = partner.id,
-            addressId = address.id
-        )
+        val anotherHotel =
+            HotelStubs.create(
+                id = UUID.fromString("29db6b41-e1c4-4c05-ad4a-e605547fe5a2"),
+                partnerId = partner.id,
+                addressId = address.id,
+            )
 
         beforeSpec {
             databaseClient.clearAllTables()
@@ -56,7 +59,11 @@ class HotelRepositoryImplTest : AbstractDatabaseIntegrationTest, ShouldSpec() {
         }
 
         beforeTest {
-            databaseClient.sql("DELETE FROM hotel").fetch().rowsUpdated().awaitSingle()
+            databaseClient
+                .sql("DELETE FROM hotel")
+                .fetch()
+                .rowsUpdated()
+                .awaitSingle()
         }
 
         should("successfully create a hotel") {
