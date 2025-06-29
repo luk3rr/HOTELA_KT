@@ -5,6 +5,7 @@
 --changeset lucas.araujo:001-create-types
 
 SET search_path TO hotela, public;
+SET ROLE hotela_admins;
 ------------------------------------------------------------------------------------------------------------------------
 
 CREATE TYPE PARTNER_STATUS AS ENUM ('ACTIVE', 'INACTIVE');
