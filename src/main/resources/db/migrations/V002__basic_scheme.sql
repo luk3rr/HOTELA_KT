@@ -5,7 +5,6 @@
 --changeset lucas.araujo:002-create-tables
 
 SET search_path TO hotela;
-SET ROLE hotela_admins;
 ------------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE auth_credential

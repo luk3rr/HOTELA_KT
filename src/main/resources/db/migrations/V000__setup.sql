@@ -7,5 +7,4 @@
 SET search_path TO hotela, public;
 ------------------------------------------------------------------------------------------------------------------------
 
-GRANT ALL ON TABLE databasechangelog TO hotela_admins;
-GRANT ALL ON TABLE databasechangeloglock TO hotela_admins;
+CREATE SCHEMA IF NOT EXISTS hotela;

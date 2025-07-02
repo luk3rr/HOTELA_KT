@@ -5,7 +5,6 @@
 --changeset lucas.araujo:003-insert-room-types
 
 SET search_path TO hotela;
-SET ROLE hotela_admins;
 ------------------------------------------------------------------------------------------------------------------------
 
 INSERT INTO room_type (id, name, description)
