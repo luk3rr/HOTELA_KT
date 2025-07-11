@@ -70,7 +70,7 @@ export $(cat .env | xargs)
 
 Em seguida, execute o seguinte comando para compilar e iniciar a aplicação com profile de desenvolvimento:
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=local'
+./gradlew bootRun --args='--spring.profiles.active=dev'
 ```
 
 A aplicação será iniciada na porta padrão 8080.
