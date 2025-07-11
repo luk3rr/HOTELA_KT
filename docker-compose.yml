@@ -3,7 +3,7 @@ services:
     image: postgres:latest
     container_name: hotela-postgres
     environment:
-      POSTGRES_USER: ${DB_USER}
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: hotela
       TZ: "UTC"

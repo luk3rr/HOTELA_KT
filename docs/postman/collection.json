@@ -4,7 +4,7 @@
 		"name": "hotela",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "44009295",
-		"_collection_link": "https://planetary-comet-7944103.postman.co/workspace/Lucas-Ara%C3%BAjo's-Workspace~94deadc0-b409-41df-8104-d334209cba12/collection/44009295-2c501139-3f68-4924-84c7-3998ec9fd911?action=share&source=collection_link&creator=44009295"
+		"_collection_link": "https://planetary-comet-7944103.postman.co/workspace/Lucas-Ara%25C3%25BAjo's-Workspace~94deadc0-b409-41df-8104-d334209cba12/collection/44009295-2c501139-3f68-4924-84c7-3998ec9fd911?action=share&source=collection_link&creator=44009295"
 	},
 	"item": [
 		{
@@ -17,24 +17,33 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Guarda o email e password do request",
-									"let requestData = JSON.parse(request.data);",
-									"pm.collectionVariables.set(\"customer_email\", requestData.email);",
-									"pm.collectionVariables.set(\"customer_password\", requestData.password);",
-									"",
 									"// Guarda o token, seu tipo e o id de login do cliente",
 									"let jsonData = pm.response.json();",
 									"pm.collectionVariables.set(\"customer_token\", jsonData.token);",
 									"pm.collectionVariables.set(\"customer_token_type\", jsonData.type);",
 									"",
 									"// Extrai os IDs do token e armazena em variáveis",
-									"let token = pm.collectionVariables.get(\"customer_token\");",
+									"let token = pm.collectionVariables.get(\"token\");",
 									"let payloadBase64 = token.split('.')[1];",
 									"let payloadJson = JSON.parse(atob(payloadBase64));",
 									"let customerAuthId = payloadJson.authId;",
 									"let customerUserId = payloadJson.userId;",
 									"pm.collectionVariables.set(\"customer_auth_id\", customerAuthId);",
 									"pm.collectionVariables.set(\"customer_user_id\", customerUserId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Guarda o email e password do request",
+									"let requestData = JSON.parse(request.data);",
+									"pm.collectionVariables.set(\"customer_email\", requestData.loginEmail);",
+									"pm.collectionVariables.set(\"customer_password\", requestData.password);",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -52,7 +61,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"example@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"John Doe\",\n  \"phone\": \"1234567890\",\n  \"idDocument\": \"12345678901\",\n  \"birthDate\": \"1990-01-01\",\n  \"address\": \"123 Example Street, City, Country\"\n}\n",
+							"raw": "{\n    \"loginEmail\": \"joao.silva11@email.com\",\n    \"password\": \"senhaSuperSegura123\",\n    \"name\": \"João da Silva\",\n    \"contactInfo\": {\n        \"email\": \"contato.pessoal.joao1@email.com\",\n        \"phone\": \"5511987654321\"\n    },\n    \"documentId\": {\n        \"type\": \"CPF\",\n        \"value\": \"123.456.789-00\"\n    },\n    \"birthDate\": \"1990-05-20T10:00:00Z\",\n    \"address\": {\n        \"streetAddress\": \"Rua das Flores\",\n        \"number\": \"123\",\n        \"complement\": \"Apto 45B\",\n        \"neighborhood\": \"Jardins\",\n        \"city\": \"São Paulo\",\n        \"stateProvince\": \"SP\",\n        \"postalCode\": \"01420-000\",\n        \"countryCode\": \"BR\",\n        \"latitude\": -23.56778,\n        \"longitude\": -46.66833\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -80,19 +89,30 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Guarda o token, seu tipo e o id de login do cliente",
+									"// Fixed decoding error for the token",
 									"let jsonData = pm.response.json();",
 									"pm.collectionVariables.set(\"customer_token\", jsonData.token);",
 									"pm.collectionVariables.set(\"customer_token_type\", jsonData.type);",
 									"",
-									"// Extrai os IDs do token e armazena em variáveis",
-									"let token = pm.collectionVariables.get(\"customer_token\");",
+									"// Extract the IDs from the token and store in variables",
+									"let token = jsonData.token;",
 									"let payloadBase64 = token.split('.')[1];",
 									"let payloadJson = JSON.parse(atob(payloadBase64));",
 									"let customerAuthId = payloadJson.authId;",
 									"let customerUserId = payloadJson.userId;",
 									"pm.collectionVariables.set(\"customer_auth_id\", customerAuthId);",
-									"pm.collectionVariables.set(\"customer_user_id\", customerUserId);"
+									"pm.collectionVariables.set(\"customer_user_id\", customerUserId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -138,24 +158,33 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Guarda o email e password do request",
-									"let requestData = JSON.parse(request.data);",
-									"pm.collectionVariables.set(\"partner_email\", requestData.email);",
-									"pm.collectionVariables.set(\"partner_password\", requestData.password);",
-									"",
 									"// Guarda o token, seu tipo e o id de login do parceiro",
 									"let jsonData = pm.response.json();",
 									"pm.collectionVariables.set(\"partner_token\", jsonData.token);",
 									"pm.collectionVariables.set(\"partner_token_type\", jsonData.type);",
 									"",
 									"// Extrai os IDs do token e armazena em variáveis",
-									"let token = pm.collectionVariables.get(\"partner_token\");",
+									"let token = pm.collectionVariables.get(\"token\");",
 									"let payloadBase64 = token.split('.')[1];",
 									"let payloadJson = JSON.parse(atob(payloadBase64));",
 									"let partnerAuthId = payloadJson.authId;",
 									"let partnerUserId = payloadJson.userId;",
 									"pm.collectionVariables.set(\"partner_auth_id\", partnerAuthId);",
 									"pm.collectionVariables.set(\"partner_user_id\", partnerUserId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Guarda o email e password do request",
+									"let requestData = JSON.parse(request.data);",
+									"pm.collectionVariables.set(\"partner_email\", requestData.loginEmail);",
+									"pm.collectionVariables.set(\"partner_password\", requestData.password);",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -173,7 +202,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"contat11o@pousadadomar.com.br\",\n  \"password\": \"senhaSuperSecreta123\",\n  \"name\": \"Pousada do Mar\",\n  \"cnpj\": \"12.345.678/0001-99\",\n  \"phone\": \"+55 31 99999-8888\",\n  \"address\": \"Rua das Gaivotas, 123 - Ubatuba, SP\",\n  \"contactName\": \"Maria Silva\",\n  \"contactPhone\": \"+55 11 98888-7777\",\n  \"contactEmail\": \"maria.silva@pousadadomar.com.br\",\n  \"contractSigned\": true,\n  \"notes\": \"Contrato assinado digitalmente no dia 20/03/2025\"\n}",
+							"raw": "{\n  \"loginEmail\": \"comercial@hotelexemplo.com\",\n  \"password\": \"umaSenhaMuitoForte!123\",\n  \"companyName\": \"Hotel Exemplo Ltda.\",\n  \"legalName\": \"Hotel Exemplo e Turismo Ltda.\",\n  \"contactInfo\": {\n    \"email\": \"contato@hotelexemplo.com\",\n    \"phone\": \"+55 (11) 98765-4321\"\n  },\n  \"documentId\": {\n    \"type\": \"CNPJ\",\n    \"value\": \"12.345.678/0001-99\"\n  },\n  \"contractSignedAt\": \"2025-07-01T10:00:00Z\",\n  \"status\": \"ACTIVE\",\n  \"notes\": \"Parceiro novo na plataforma, onboarding concluído.\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -207,13 +236,23 @@
 									"pm.collectionVariables.set(\"partner_token_type\", jsonData.type);",
 									"",
 									"// Extrai os IDs do token e armazena em variáveis",
-									"let token = pm.collectionVariables.get(\"partner_token\");",
+									"let token = jsonData.token;",
 									"let payloadBase64 = token.split('.')[1];",
 									"let payloadJson = JSON.parse(atob(payloadBase64));",
 									"let partnerAuthId = payloadJson.authId;",
 									"let partnerUserId = payloadJson.userId;",
 									"pm.collectionVariables.set(\"partner_auth_id\", partnerAuthId);",
 									"pm.collectionVariables.set(\"partner_user_id\", partnerUserId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -301,7 +340,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Hotel das Palmeiras\",\n  \"address\": \"Rua Exemplo, 123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"12345-678\",\n  \"phone\": \"11999999999\",\n  \"rating\": 4.5,\n  \"description\": \"Hotel charmoso com café incluso\",\n  \"website\": \"http://hotelpalmeiras.com\",\n  \"latitude\": -23.55052,\n  \"longitude\": -46.633308\n}",
+							"raw": "{\n  \"name\": \"Hotel Vista da Serra\",\n  \"address\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"streetAddress\": \"Avenida das Montanhas\",\n    \"number\": \"1024\",\n    \"complement\": \"Bloco B, Apto 32\",\n    \"neighborhood\": \"Centro\",\n    \"city\": \"Campos do Jordão\",\n    \"stateProvince\": \"São Paulo\",\n    \"postalCode\": \"12460-000\",\n    \"countryCode\": \"BR\",\n    \"latitude\": -22.7392,\n    \"longitude\": -45.5915\n  },\n  \"contactInfo\": {\n    \"email\": \"reservas@vistadaserra.com.br\",\n    \"phone\": \"+55 (12) 3663-1234\"\n  },\n  \"website\": \"https://www.vistadaserra.com.br\",\n  \"description\": \"Um refúgio encantador nas montanhas, perfeito para quem busca tranquilidade e contato com a natureza. Oferecemos acomodações confortáveis, gastronomia local e uma vista de tirar o fôlego.\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -316,73 +355,6 @@
 							"path": [
 								"hotel",
 								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update hotel",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "headerPrefix",
-									"value": "{{partner_token_type}}",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"description\": \"Hotel charmoso com café da manhã, almoço e jantar incluso\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/hotel/update/:id",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"hotel",
-								"update",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{hotel_id}}"
-								}
 							]
 						}
 					},
@@ -528,6 +500,73 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Update hotel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{partner_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Hotel charmoso com café da manhã, almoço e jantar incluso\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/hotel/update/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"hotel",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{hotel_id}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -578,7 +617,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"hotelId\": \"{{hotel_id}}\",\n  \"number\": \"102\",\n  \"floor\": 1,\n  \"type\": \"Deluxe\",\n  \"price\": 350.00,\n  \"capacity\": 2,\n  \"status\": \"AVAILABLE\",\n  \"description\": \"Quarto com vista para o mar, cama king size e ar-condicionado.\"\n}\n",
+							"raw": "{\n  \"hotelId\": \"{{hotel_id}}\",\n  \"roomTypeId\": \"50d14717-f2bd-43ea-9f24-600b850734a6\",\n  \"number\": \"205A\",\n  \"floor\": 2,\n  \"pricePerNight\": 450.75,\n  \"capacity\": 2,\n  \"status\": \"AVAILABLE\",\n  \"description\": \"Quarto com vista para o mar e varanda privativa.\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -593,73 +632,6 @@
 							"path": [
 								"room",
 								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update room",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "headerPrefix",
-									"value": "{{partner_token_type}}",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"price\": \"860.00\",\n  \"status\": \"BOOKED\",\n  \"description\": \"A spacious suite with a king-size bed and a balcony\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/room/update/:id",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"room",
-								"update",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{room_id}}"
-								}
 							]
 						}
 					},
@@ -733,6 +705,73 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Update room",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{partner_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": \"860.00\",\n  \"status\": \"BOOKED\",\n  \"description\": \"A spacious suite with a king-size bed and a balcony\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/room/update/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"room",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{room_id}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -784,7 +823,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"customerId\": \"{{customer_user_id}}\",\n  \"hotelId\": \"{{hotel_id}}\",\n  \"roomId\": \"{{room_id}}\",\n  \"checkin\": \"2025-05-25T21:30:00\",\n  \"checkout\": \"2025-05-27T21:30:01\",\n  \"guests\": 2,\n  \"status\": \"CONFIRMED\",\n  \"notes\": \"Customer prefers a quiet room\"\n}",
+							"raw": "{\n  \"customerId\": \"{{customer_user_id}}\",\n  \"hotelId\": \"{{hotel_id}}\",\n  \"roomId\": \"{{room_id}}\",\n  \"checkin\": \"2025-07-03T01:50:00Z\",\n  \"checkout\": \"2025-07-05T21:30:01Z\",\n  \"numberOfGuests\": 2,\n  \"specialRequests\": \"Poderia deixar garrafas de água extra no frigobar, por gentileza?\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -799,73 +838,6 @@
 							"path": [
 								"booking",
 								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update booking",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "headerPrefix",
-									"value": "{{customer_token_type}}",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"roomId\": \"{{room_id}}\",\n  \"checkin\": \"2025-05-11T15:00:00\",\n  \"checkout\": \"2025-05-16T11:00:00\",\n  \"guests\": 2\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/booking/update/:id",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"booking",
-								"update",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{booking_id}}"
-								}
 							]
 						}
 					},
@@ -928,6 +900,73 @@
 							],
 							"path": [
 								"booking",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{booking_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roomId\": \"{{room_id}}\",\n  \"checkin\": \"2025-07-11T15:00:00Z\",\n  \"checkout\": \"2025-07-16T11:00:00Z\",\n  \"numberOfGuests\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/booking/update/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"booking",
+								"update",
 								":id"
 							],
 							"variable": [
@@ -1126,73 +1165,6 @@
 					"response": []
 				},
 				{
-					"name": "Update review",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "headerPrefix",
-									"value": "{{customer_token_type}}",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excelente atendimento!\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/review/update/:id",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"review",
-								"update",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{review_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Find review by id",
 					"event": [
 						{
@@ -1260,14 +1232,9 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Customer",
-			"item": [
+				},
 				{
-					"name": "Find customer by id",
+					"name": "Update review",
 					"event": [
 						{
 							"listen": "test",
@@ -1280,63 +1247,6 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "headerPrefix",
-									"value": "{{customer_token_type}}",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{server_addr}}/customer/:id",
-							"host": [
-								"{{server_addr}}"
-							],
-							"path": [
-								"customer",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{customer_user_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update customer",
 					"request": {
 						"auth": {
 							"type": "oauth2",
@@ -1363,7 +1273,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"John F Doe\",\n    \"phone\": \"1234567890\",\n    \"idDocument\": \"12345678901\",\n    \"birthDate\": \"2001-01-01\",\n    \"address\": \"321 Example Street, City, Country\"\n}",
+							"raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excelente atendimento!\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1371,13 +1281,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{server_addr}}/customer/update",
+							"raw": "{{server_addr}}/review/update/:id",
 							"host": [
 								"{{server_addr}}"
 							],
 							"path": [
-								"customer",
-								"update"
+								"review",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{review_id}}"
+								}
 							]
 						}
 					},
@@ -1485,7 +1402,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Hotel Bela Vista Ltda\",\n  \"email\": \"novocontato@belavista.com\",\n  \"phone\": \"(11) 1234-9876\",\n  \"contactName\": \"João Pereira\",\n  \"status\": \"INACTIVE\",\n  \"notes\": \"Contrato em revisão\"\n}\n",
+							"raw": "{\n  \"contactInfo\": {\n    \"email\": \"financeiro@hotelexemplo.com\",\n    \"phone\": \"+55 (11) 98877-6655\"\n  },\n  \"status\": \"INACTIVE\",\n  \"notes\": \"Parceiro com contrato suspenso temporariamente.\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1499,6 +1416,128 @@
 							],
 							"path": [
 								"partner",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer",
+			"item": [
+				{
+					"name": "Find customer by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/customer/:id",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"customer",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{customer_user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update customer",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "{{customer_token_type}}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ana Clara de Souza\",\n  \"contactInfo\": {\n    \"email\": \"ana.souza.nova@email.com\",\n    \"phone\": \"+55 (11) 91234-5678\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server_addr}}/customer/update",
+							"host": [
+								"{{server_addr}}"
+							],
+							"path": [
+								"customer",
 								"update"
 							]
 						}

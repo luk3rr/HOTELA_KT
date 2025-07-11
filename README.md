@@ -1,20 +1,31 @@
-# Sistema de hotel
-- **Back-end:** Kotlin
-- **Testes unitários:** Kotest
-- **Framework:** Spring  
-- **Comunicação back-front:** API Restful
+<h1 align="center">
+  <br>
+  <img src="./docs/img/hotela.png" alt="logo" width="300">
+  <br>
+</h1>
+
+# Hotela API
+Este projeto é a espinha dorsal da nossa plataforma de reservas, construído para ser robusto, escalável e seguro. 
+Ele gerencia toda a lógica de negócio, desde o cadastro de usuários e parceiros até o processo de reserva de hotéis, conectando os dois lados de forma eficiente.
+
+## Funcionalidades Principais
+- Autenticação e Autorização: Sistema seguro baseado em JWT.
+- Gerenciamento de Usuários: CRUD completo para hóspedes e parceiros (donos de hotéis).
+- Gerenciamento de Hotéis: Permite que parceiros cadastrem e gerenciem suas propriedades.
+- Sistema de Reservas: Lógica para criar, consultar e gerenciar reservas.
+- API RESTful: Comunicação clara e padronizada, documentada com Swagger.
+
+## Tecnologias Utilizadas
+- Linguagem: Kotlin
+- Framework: Spring Boot & Spring Security
+- Testes: Kotest para testes unitários e de integração.
+- Banco de Dados: PostgreSQL
+- Qualidade de Código: Spotless e SonarQube
 
 ## Como executar o projeto com Gradle
-
 Certifique-se de ter o **Java 21** instalado.
 
-### 1. Clonar o repositório
-```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
-```
-
-### 2. Gere uma chave compatível com JWT
+### 1. Gere uma chave compatível com JWT
 ```bash
 echo "JWT_SECRET=$(openssl rand -base64 32)" >> .env
 ```
@@ -24,9 +35,13 @@ Essa chave será usada para assinar os tokens JWT. Você pode verificar se ela f
 cat .env
 ```
 
-### 3. Gere uma senha para o banco de dados
+### 2. Gere uma senha e usuário para o banco de dados
 ```bash
-echo "POSTGRES_PASSWORD=$(openssl rand -base64 12)" >> .env
+echo "DB_PASSWORD=$(openssl rand -base64 12)" >> .env
+```
+
+```bash
+echo "DB_USERNAME=hotela_user" >> .env
 ```
 
 Essa senha será usada para acessar o banco de dados PostgreSQL. Você pode verificar se ela foi criada corretamente com o comando:
@@ -34,7 +49,7 @@ Essa senha será usada para acessar o banco de dados PostgreSQL. Você pode veri
 cat .env
 ```
 
-### 4. Iniciar o container com o banco de dados
+### 3. Iniciar o container com o banco de dados
 Certifique-se de ter o **Docker** instalado e em execução.
 
 Para iniciar o banco de dados PostgreSQL, execute o seguinte comando na raiz do projeto:
@@ -47,15 +62,15 @@ Isso iniciará um container com o banco de dados PostgreSQL. Você pode verifica
 docker compose ps
 ```
 
-### 5. Executar o projeto
+### 4. Executar o projeto
 Primeiro, leia o arquivo `.env` para carregar as variáveis de ambiente:
 ```bash
 export $(cat .env | xargs)
 ```
 
-Em seguida, execute o seguinte comando para compilar e iniciar a aplicação:
+Em seguida, execute o seguinte comando para compilar e iniciar a aplicação com profile de desenvolvimento:
 ```bash
-./gradlew bootRun
+./gradlew bootRun --args='--spring.profiles.active=local'
 ```
 
 A aplicação será iniciada na porta padrão 8080.
@@ -74,7 +89,7 @@ Para isso, basta importar a collection e o environment no Postman.
 ## Documentação das APIs
 A documentação dos endpoints pode ser encontrada em [docs/api](docs/api/readme.md)
 
-Com a aplicação em execução, você pode acessar a documentação Swagger em:
+Com a aplicação em execução local, você pode acessar a documentação Swagger em:
 ```
 http://localhost:8080/swagger-ui/index.html
 ```
