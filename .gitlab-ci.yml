@@ -1,11 +1,11 @@
 include:
-  - project: 'personal/projects/infrastructure-lives'
+  - project: 'personal/infrastructure_lives'
     file: '/pipeline/backend.yml'
     ref: main
 
 variables:
   SERVICE_NAME: "hotela"
-  SERVICE_GROUP: "personal/projects"
+  SERVICE_GROUP: "personal"
   PROJECT_NAME: "HOTELA_KT"
   APP_DEPLOY_MANIFEST_PATH: "k8s/deployment.yml"
   MIGRATION_DEPLOY_MANIFEST_PATH: "k8s/migration.yml"
