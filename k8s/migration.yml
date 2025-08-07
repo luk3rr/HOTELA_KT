@@ -47,7 +47,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: DB_HOST
-              value: "postgres-service.database.svc.cluster.local"
+              value: "postgres.luk3rr.com."
           command: ["/bin/bash", "-c"]
           args:
             - |
@@ -73,7 +73,7 @@ spec:
               set +a
               
               liquibase \
-                --url=jdbc:postgresql://postgres-service.database.svc.cluster.local:5432/services \
+                --url=jdbc:postgresql://${DB_HOST}:5432/hotela \
                 --username=$DB_USERNAME \
                 --password=$DB_PASSWORD \
                 --liquibase-schema-name=hotela \

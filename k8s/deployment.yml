@@ -57,7 +57,7 @@ spec:
             - containerPort: 8080
           env:
             - name: DB_HOST
-              value: "postgres-service.database.svc.cluster.local"
+              value: "postgres.luk3rr.com."
           command: ["/bin/bash", "-c"]
           args:
             - |
