@@ -18,6 +18,7 @@ cache:
 
 stages:
   - test
+  - quality
   - build
   - deploy
 
